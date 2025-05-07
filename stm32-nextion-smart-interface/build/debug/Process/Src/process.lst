@@ -1,0 +1,4142 @@
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"process.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Process/Src/process.c"
+  20              		.section	.rodata.nextionAlarmOperation.str1.4,"aMS",%progbits,1
+  21              		.align	2
+  22              	.LC0:
+  23 0000 3600     		.ascii	"6\000"
+  24 0002 0000     		.align	2
+  25              	.LC1:
+  26 0004 3100     		.ascii	"1\000"
+  27 0006 0000     		.align	2
+  28              	.LC2:
+  29 0008 3200     		.ascii	"2\000"
+  30 000a 0000     		.align	2
+  31              	.LC3:
+  32 000c 3300     		.ascii	"3\000"
+  33 000e 0000     		.align	2
+  34              	.LC4:
+  35 0010 3400     		.ascii	"4\000"
+  36              		.section	.text.nextionAlarmOperation,"ax",%progbits
+  37              		.align	1
+  38              		.syntax unified
+  39              		.thumb
+  40              		.thumb_func
+  42              	nextionAlarmOperation:
+  43              	.LFB138:
+   1:Process/Src/process.c **** #include "process.h"
+   2:Process/Src/process.c **** #include "staticprocess.h"
+   3:Process/Src/process.c **** 
+   4:Process/Src/process.c **** 
+   5:Process/Src/process.c **** static uint8_t  password = 0;
+   6:Process/Src/process.c **** static uint8_t  eeprom_read_array[50];
+   7:Process/Src/process.c **** static char     str[35];
+   8:Process/Src/process.c **** static uint8_t  alarm_hour, Alarm_minute, alarm_on_off = 0, alarm_operation = 0;
+   9:Process/Src/process.c **** static uint8_t  status_blue = 0, status_red = 0, status_green = 0;
+  10:Process/Src/process.c **** static uint32_t last_tick = 0;
+  11:Process/Src/process.c **** 
+  12:Process/Src/process.c **** static nextion_page_state_t   nextion_page_state;
+  13:Process/Src/process.c **** static EE24_HandleTypeDef     ee24;
+  14:Process/Src/process.c **** static NEXTION_PackageTypeDef nextionTouchEvent;
+  15:Process/Src/process.c **** static packet_data            packetData;
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 2
+
+
+  16:Process/Src/process.c **** static packet_steps_t         packetsteps;
+  17:Process/Src/process.c **** 
+  18:Process/Src/process.c **** static en_setalarm_state      step_alarm;
+  19:Process/Src/process.c **** static en_settime_state       step_time;
+  20:Process/Src/process.c **** static en_settouch_state      step_touch;
+  21:Process/Src/process.c **** 
+  22:Process/Src/process.c **** 
+  23:Process/Src/process.c **** 
+  24:Process/Src/process.c **** static void nextionPage1LightsSatus (void);
+  25:Process/Src/process.c **** static void nextionSetAlarm(void);
+  26:Process/Src/process.c **** static void nextionSetChangePassword(void);
+  27:Process/Src/process.c **** static void nextionSetTime(void);
+  28:Process/Src/process.c **** static void nextionSetPassword(void);
+  29:Process/Src/process.c **** static void nextionSetSleep(void);
+  30:Process/Src/process.c **** static void nextionSetTemp(void);
+  31:Process/Src/process.c **** static void nextionAlarmOperation(void);
+  32:Process/Src/process.c **** static void nextionRedLightsStatus(void);
+  33:Process/Src/process.c **** static void nextionBlueLightsStatus(void);
+  34:Process/Src/process.c **** static void nextionGreenLightsStatus(void);
+  35:Process/Src/process.c **** static void nextionAlarmSendString(void);
+  36:Process/Src/process.c **** 
+  37:Process/Src/process.c **** 
+  38:Process/Src/process.c **** 
+  39:Process/Src/process.c **** void process_INIT(void)
+  40:Process/Src/process.c **** {
+  41:Process/Src/process.c **** 
+  42:Process/Src/process.c **** 
+  43:Process/Src/process.c ****   nextion_page_state  = NEXTION_PAGE0;
+  44:Process/Src/process.c ****   packetsteps         = PACKAGE_İS_VALİD;
+  45:Process/Src/process.c ****   step_touch          = SETTOUCH_STATE_IDLE;
+  46:Process/Src/process.c **** 
+  47:Process/Src/process.c ****     serial_message("OK%s\n","EY");
+  48:Process/Src/process.c **** 
+  49:Process/Src/process.c ****   if (EE24_Init(&ee24, get_pointer_hi2c2(), EE24_ADDRESS_DEFAULT, MCU_EEPROM_WC__3V3_GPIO_Port , MC
+  50:Process/Src/process.c ****   {
+  51:Process/Src/process.c ****       EE24_Read(&ee24, 0, eeprom_read_array, 8, 1000);
+  52:Process/Src/process.c ****       password = eeprom_read_array[0];
+  53:Process/Src/process.c ****   }
+  54:Process/Src/process.c ****   PCF85_Init(get_pointer_hi2c2());
+  55:Process/Src/process.c ****   PCF85_SetDate(0,eeprom_read_array[1],eeprom_read_array[2],eeprom_read_array[3]+1970);
+  56:Process/Src/process.c ****   PCF85_SetTime(eeprom_read_array[4],eeprom_read_array[5],eeprom_read_array[6]);
+  57:Process/Src/process.c ****   
+  58:Process/Src/process.c **** 
+  59:Process/Src/process.c **** }
+  60:Process/Src/process.c **** 
+  61:Process/Src/process.c **** 
+  62:Process/Src/process.c **** 
+  63:Process/Src/process.c **** void Process_Nextion(void)
+  64:Process/Src/process.c **** {
+  65:Process/Src/process.c ****   if(NEXTION_DMA_FLAG == DMA_FLAG_ENABLE)
+  66:Process/Src/process.c ****   {
+  67:Process/Src/process.c ****      NEXTION_DMA_FLAG = DMA_FLAG_DISABLE;
+  68:Process/Src/process.c ****      memcpy(&nextionTouchEvent, rxbuffer_uart1, sizeof(nextionTouchEvent));
+  69:Process/Src/process.c ****   }
+  70:Process/Src/process.c **** 
+  71:Process/Src/process.c ****   nextionAlarmOperation();
+  72:Process/Src/process.c **** 
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 3
+
+
+  73:Process/Src/process.c ****   switch (nextion_page_state)
+  74:Process/Src/process.c ****   {
+  75:Process/Src/process.c ****     case NEXTION_PAGE0:
+  76:Process/Src/process.c ****       if(nextionTouchEvent.componendId == _Nextion_componentId2)
+  77:Process/Src/process.c ****       {
+  78:Process/Src/process.c ****         NEXTION_SendCode("print n0.val");
+  79:Process/Src/process.c ****         last_tick = HAL_GetTick();
+  80:Process/Src/process.c ****         step_touch = SETTOUCH_STATE_PASSWORD;
+  81:Process/Src/process.c ****       }
+  82:Process/Src/process.c ****     break;
+  83:Process/Src/process.c ****   
+  84:Process/Src/process.c ****   
+  85:Process/Src/process.c ****     case NEXTION_PAGE1:
+  86:Process/Src/process.c ****       switch (nextionTouchEvent.componendId)
+  87:Process/Src/process.c ****       {
+  88:Process/Src/process.c ****         case _Nextion_componentId5:
+  89:Process/Src/process.c ****           NEXTION_SendPage("2");
+  90:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE2;
+  91:Process/Src/process.c ****         break;
+  92:Process/Src/process.c ****         
+  93:Process/Src/process.c ****         case _Nextion_componentId6:
+  94:Process/Src/process.c ****           NEXTION_SendPage("3");
+  95:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE3;
+  96:Process/Src/process.c ****         break;
+  97:Process/Src/process.c ****     
+  98:Process/Src/process.c ****         case _Nextion_componentId7:
+  99:Process/Src/process.c ****           NEXTION_SendPage("4");
+ 100:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE4;
+ 101:Process/Src/process.c ****         break;
+ 102:Process/Src/process.c ****     
+ 103:Process/Src/process.c ****         case _Nextion_componentIdA:
+ 104:Process/Src/process.c ****           nextionBlueLightsStatus();
+ 105:Process/Src/process.c ****         break;
+ 106:Process/Src/process.c ****     
+ 107:Process/Src/process.c ****         case _Nextion_componentId8:
+ 108:Process/Src/process.c ****           nextionRedLightsStatus();
+ 109:Process/Src/process.c ****         break;
+ 110:Process/Src/process.c ****     
+ 111:Process/Src/process.c ****         case _Nextion_componentId4:
+ 112:Process/Src/process.c ****           nextionGreenLightsStatus();
+ 113:Process/Src/process.c ****         break;
+ 114:Process/Src/process.c ****     
+ 115:Process/Src/process.c ****         case _Nextion_componentIdC:
+ 116:Process/Src/process.c ****           NEXTION_SendCode("print n1.val");
+ 117:Process/Src/process.c ****           step_touch = SETTOUCH_STATE_TEMP;
+ 118:Process/Src/process.c ****           NEXTION_DMA_FLAG = DMA_FLAG_DISABLE;
+ 119:Process/Src/process.c ****           last_tick = HAL_GetTick();
+ 120:Process/Src/process.c ****           
+ 121:Process/Src/process.c ****         break;
+ 122:Process/Src/process.c ****     
+ 123:Process/Src/process.c ****         case _Nextion_componentIdE:
+ 124:Process/Src/process.c ****         last_tick = HAL_GetTick();
+ 125:Process/Src/process.c ****         NEXTION_SendCode("sleep=1");
+ 126:Process/Src/process.c ****         step_touch = SETTOUCH_STATE_SLEEP;
+ 127:Process/Src/process.c ****         break;
+ 128:Process/Src/process.c ****       }
+ 129:Process/Src/process.c ****     break;
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 4
+
+
+ 130:Process/Src/process.c ****   
+ 131:Process/Src/process.c ****   
+ 132:Process/Src/process.c ****     case NEXTION_PAGE2:
+ 133:Process/Src/process.c ****       switch (nextionTouchEvent.componendId)
+ 134:Process/Src/process.c ****       {
+ 135:Process/Src/process.c ****         case _Nextion_componentIdA:
+ 136:Process/Src/process.c ****           NEXTION_SendPage("1");
+ 137:Process/Src/process.c ****           nextionPage1LightsSatus ();
+ 138:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE1;
+ 139:Process/Src/process.c ****         break;
+ 140:Process/Src/process.c ****   
+ 141:Process/Src/process.c ****         case _Nextion_componentIdC:
+ 142:Process/Src/process.c ****           NEXTION_SendPage("3");
+ 143:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE3;
+ 144:Process/Src/process.c ****         break;
+ 145:Process/Src/process.c ****   
+ 146:Process/Src/process.c ****         case _Nextion_componentIdD:
+ 147:Process/Src/process.c ****           NEXTION_SendPage("4");
+ 148:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE4;
+ 149:Process/Src/process.c ****         break;
+ 150:Process/Src/process.c ****   
+ 151:Process/Src/process.c ****         case _Nextion_componentId9:
+ 152:Process/Src/process.c ****           last_tick = HAL_GetTick();
+ 153:Process/Src/process.c ****           step_time = SETTIME_STATE_SEND_HOUR;
+ 154:Process/Src/process.c ****           step_touch = SETTOUCH_STATE_TIME;
+ 155:Process/Src/process.c ****         break;
+ 156:Process/Src/process.c ****       }
+ 157:Process/Src/process.c ****     break;
+ 158:Process/Src/process.c ****   
+ 159:Process/Src/process.c ****   
+ 160:Process/Src/process.c ****     case NEXTION_PAGE3:
+ 161:Process/Src/process.c ****       switch (nextionTouchEvent.componendId)
+ 162:Process/Src/process.c ****       {
+ 163:Process/Src/process.c ****         case _Nextion_componentId2:
+ 164:Process/Src/process.c ****           NEXTION_DMA_FLAG = DMA_FLAG_DISABLE;
+ 165:Process/Src/process.c ****           NEXTION_SendPage("1");
+ 166:Process/Src/process.c ****           nextionPage1LightsSatus ();
+ 167:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE1;
+ 168:Process/Src/process.c ****         break;
+ 169:Process/Src/process.c ****   
+ 170:Process/Src/process.c ****         case _Nextion_componentId3:
+ 171:Process/Src/process.c ****           NEXTION_SendPage("2");
+ 172:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE2;
+ 173:Process/Src/process.c ****         break;
+ 174:Process/Src/process.c ****   
+ 175:Process/Src/process.c ****         case _Nextion_componentId5:
+ 176:Process/Src/process.c ****           NEXTION_SendPage("4");
+ 177:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE4;
+ 178:Process/Src/process.c ****         break;
+ 179:Process/Src/process.c ****   
+ 180:Process/Src/process.c ****         case _Nextion_componentIdA:
+ 181:Process/Src/process.c ****           last_tick = HAL_GetTick();
+ 182:Process/Src/process.c ****           step_alarm = SETALARM_STATE_SEND_HOUR;
+ 183:Process/Src/process.c ****           alarm_on_off = 1;
+ 184:Process/Src/process.c ****           step_touch = SETTOUCH_STATE_ALARM;
+ 185:Process/Src/process.c ****         break;
+ 186:Process/Src/process.c ****       }
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 5
+
+
+ 187:Process/Src/process.c ****     break;
+ 188:Process/Src/process.c ****   
+ 189:Process/Src/process.c ****   
+ 190:Process/Src/process.c ****     case NEXTION_PAGE4:
+ 191:Process/Src/process.c ****       switch (nextionTouchEvent.componendId)
+ 192:Process/Src/process.c ****       {
+ 193:Process/Src/process.c ****         case _Nextion_componentId4:
+ 194:Process/Src/process.c ****           NEXTION_SendPage("1");
+ 195:Process/Src/process.c ****           nextionPage1LightsSatus();
+ 196:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE1;
+ 197:Process/Src/process.c ****         break;
+ 198:Process/Src/process.c ****   
+ 199:Process/Src/process.c ****         case _Nextion_componentId5:
+ 200:Process/Src/process.c ****           NEXTION_SendPage("2");
+ 201:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE2;    
+ 202:Process/Src/process.c ****         break;
+ 203:Process/Src/process.c ****   
+ 204:Process/Src/process.c ****         case _Nextion_componentId6:
+ 205:Process/Src/process.c ****           NEXTION_SendPage("3");
+ 206:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE3;
+ 207:Process/Src/process.c ****         break;
+ 208:Process/Src/process.c ****   
+ 209:Process/Src/process.c ****         case _Nextion_componentId3:
+ 210:Process/Src/process.c ****           NEXTION_SendCode("print n0.val");
+ 211:Process/Src/process.c ****           last_tick = HAL_GetTick();
+ 212:Process/Src/process.c ****           step_touch = SETTOUCH_STATE_CHANGE_PASSWORD;
+ 213:Process/Src/process.c ****         break;
+ 214:Process/Src/process.c ****       }
+ 215:Process/Src/process.c ****     break;
+ 216:Process/Src/process.c ****   }
+ 217:Process/Src/process.c ****   nextionTouchEvent.componendId = NEXTION_COPMPONENT_ID_RESET;
+ 218:Process/Src/process.c **** 
+ 219:Process/Src/process.c **** 
+ 220:Process/Src/process.c ****   switch (step_touch)
+ 221:Process/Src/process.c ****   {
+ 222:Process/Src/process.c ****     case SETTOUCH_STATE_IDLE:
+ 223:Process/Src/process.c ****     break;
+ 224:Process/Src/process.c **** 
+ 225:Process/Src/process.c ****     case SETTOUCH_STATE_PASSWORD:
+ 226:Process/Src/process.c ****       nextionSetPassword();
+ 227:Process/Src/process.c ****     break;
+ 228:Process/Src/process.c **** 
+ 229:Process/Src/process.c ****     case SETTOUCH_STATE_TEMP:
+ 230:Process/Src/process.c ****       nextionSetTemp();
+ 231:Process/Src/process.c ****     break;
+ 232:Process/Src/process.c **** 
+ 233:Process/Src/process.c ****     case SETTOUCH_STATE_SLEEP:
+ 234:Process/Src/process.c ****       nextionSetSleep();
+ 235:Process/Src/process.c ****     break;
+ 236:Process/Src/process.c **** 
+ 237:Process/Src/process.c ****     case SETTOUCH_STATE_TIME:
+ 238:Process/Src/process.c ****       nextionSetTime();
+ 239:Process/Src/process.c ****     break;
+ 240:Process/Src/process.c **** 
+ 241:Process/Src/process.c ****     case SETTOUCH_STATE_ALARM:
+ 242:Process/Src/process.c ****       nextionSetAlarm();
+ 243:Process/Src/process.c ****     break;
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 6
+
+
+ 244:Process/Src/process.c **** 
+ 245:Process/Src/process.c ****     case SETTOUCH_STATE_CHANGE_PASSWORD:
+ 246:Process/Src/process.c ****       nextionSetChangePassword();
+ 247:Process/Src/process.c ****     break;
+ 248:Process/Src/process.c ****   }
+ 249:Process/Src/process.c **** 
+ 250:Process/Src/process.c ****   if(alarm_on_off == 1 && nextion_page_state == NEXTION_PAGE3)
+ 251:Process/Src/process.c ****   {
+ 252:Process/Src/process.c ****     nextionAlarmSendString();
+ 253:Process/Src/process.c ****   }
+ 254:Process/Src/process.c **** 
+ 255:Process/Src/process.c **** }
+ 256:Process/Src/process.c **** 
+ 257:Process/Src/process.c **** static void nextionAlarmSendString(void)
+ 258:Process/Src/process.c **** {
+ 259:Process/Src/process.c ****   sprintf(str, "alarm set successfully %02d:%02d", alarm_hour, Alarm_minute);
+ 260:Process/Src/process.c ****   NEXTION_SendString("t2", str);
+ 261:Process/Src/process.c **** }
+ 262:Process/Src/process.c **** 
+ 263:Process/Src/process.c **** 
+ 264:Process/Src/process.c **** static void nextionAlarmOperation(void)
+ 265:Process/Src/process.c **** {
+  44              		.loc 1 265 1 view -0
+  45              		.cfi_startproc
+  46              		@ args = 0, pretend = 0, frame = 8
+  47              		@ frame_needed = 0, uses_anonymous_args = 0
+  48 0000 00B5     		push	{lr}
+  49              		.cfi_def_cfa_offset 4
+  50              		.cfi_offset 14, -4
+  51 0002 83B0     		sub	sp, sp, #12
+  52              		.cfi_def_cfa_offset 16
+ 266:Process/Src/process.c ****       if(alarm_on_off == 1 && get_st_time().minute == Alarm_minute && get_st_time().hour == alarm_h
+  53              		.loc 1 266 7 view .LVU1
+  54              		.loc 1 266 23 is_stmt 0 view .LVU2
+  55 0004 354B     		ldr	r3, .L14
+  56 0006 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  57              		.loc 1 266 9 view .LVU3
+  58 0008 012B     		cmp	r3, #1
+  59 000a 06D0     		beq	.L12
+  60              	.L2:
+ 267:Process/Src/process.c ****     {
+ 268:Process/Src/process.c ****       NEXTION_SendPage("6");
+ 269:Process/Src/process.c ****       alarm_on_off = 0;
+ 270:Process/Src/process.c ****       alarm_operation = 1;
+ 271:Process/Src/process.c ****     }else if(alarm_operation == 1)
+  61              		.loc 1 271 11 is_stmt 1 view .LVU4
+  62              		.loc 1 271 30 is_stmt 0 view .LVU5
+  63 000c 344B     		ldr	r3, .L14+4
+  64 000e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  65              		.loc 1 271 13 view .LVU6
+  66 0010 012B     		cmp	r3, #1
+  67 0012 2ED0     		beq	.L13
+  68              	.L1:
+ 272:Process/Src/process.c ****     {
+ 273:Process/Src/process.c ****       HAL_GPIO_WritePin(MCU_BUZZER__3V3_GPIO_Port,MCU_BUZZER__3V3_Pin,1);
+ 274:Process/Src/process.c ****      
+ 275:Process/Src/process.c ****       if(nextionTouchEvent.pageNumber == 0x06)
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 7
+
+
+ 276:Process/Src/process.c ****       {
+ 277:Process/Src/process.c ****         HAL_GPIO_WritePin(MCU_BUZZER__3V3_GPIO_Port,MCU_BUZZER__3V3_Pin, GPIO_PIN_RESET);
+ 278:Process/Src/process.c ****         Alarm_minute = 50;
+ 279:Process/Src/process.c ****         alarm_hour = 50;
+ 280:Process/Src/process.c ****         alarm_operation = 0;
+ 281:Process/Src/process.c **** 
+ 282:Process/Src/process.c ****         switch (nextion_page_state)
+ 283:Process/Src/process.c ****         {
+ 284:Process/Src/process.c ****           case NEXTION_PAGE1:
+ 285:Process/Src/process.c ****             NEXTION_SendPage("1");
+ 286:Process/Src/process.c ****           break;
+ 287:Process/Src/process.c ****           case NEXTION_PAGE2:
+ 288:Process/Src/process.c ****             NEXTION_SendPage("2");
+ 289:Process/Src/process.c ****           break;
+ 290:Process/Src/process.c ****           case NEXTION_PAGE3:
+ 291:Process/Src/process.c ****             NEXTION_SendPage("3");
+ 292:Process/Src/process.c ****           break;
+ 293:Process/Src/process.c ****           case NEXTION_PAGE4:
+ 294:Process/Src/process.c ****             NEXTION_SendPage("4");
+ 295:Process/Src/process.c ****           break;
+ 296:Process/Src/process.c ****           case NEXTION_PAGE0:
+ 297:Process/Src/process.c ****           break;
+ 298:Process/Src/process.c ****         }
+ 299:Process/Src/process.c ****         nextionTouchEvent.componendId = 0;
+ 300:Process/Src/process.c ****       }
+ 301:Process/Src/process.c ****     }
+ 302:Process/Src/process.c **** }
+  69              		.loc 1 302 1 view .LVU7
+  70 0014 03B0     		add	sp, sp, #12
+  71              		.cfi_remember_state
+  72              		.cfi_def_cfa_offset 4
+  73              		@ sp needed
+  74 0016 5DF804FB 		ldr	pc, [sp], #4
+  75              	.L12:
+  76              		.cfi_restore_state
+ 266:Process/Src/process.c ****     {
+  77              		.loc 1 266 31 discriminator 1 view .LVU8
+  78 001a FFF7FEFF 		bl	get_st_time
+  79              	.LVL0:
+  80 001e 8DF80000 		strb	r0, [sp]
+  81 0022 C0F30723 		ubfx	r3, r0, #8, #8
+  82 0026 8DF80130 		strb	r3, [sp, #1]
+  83 002a C0F30740 		ubfx	r0, r0, #16, #8
+  84 002e 8DF80200 		strb	r0, [sp, #2]
+ 266:Process/Src/process.c ****     {
+  85              		.loc 1 266 44 discriminator 1 view .LVU9
+  86 0032 DAB2     		uxtb	r2, r3
+ 266:Process/Src/process.c ****     {
+  87              		.loc 1 266 52 discriminator 1 view .LVU10
+  88 0034 2B4B     		ldr	r3, .L14+8
+  89 0036 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 266:Process/Src/process.c ****     {
+  90              		.loc 1 266 28 discriminator 1 view .LVU11
+  91 0038 9A42     		cmp	r2, r3
+  92 003a E7D1     		bne	.L2
+ 266:Process/Src/process.c ****     {
+  93              		.loc 1 266 71 discriminator 2 view .LVU12
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 8
+
+
+  94 003c FFF7FEFF 		bl	get_st_time
+  95              	.LVL1:
+  96 0040 8DF80400 		strb	r0, [sp, #4]
+  97 0044 C0F30723 		ubfx	r3, r0, #8, #8
+  98 0048 8DF80530 		strb	r3, [sp, #5]
+  99 004c C0F30740 		ubfx	r0, r0, #16, #8
+ 100 0050 8DF80600 		strb	r0, [sp, #6]
+ 266:Process/Src/process.c ****     {
+ 101              		.loc 1 266 84 discriminator 1 view .LVU13
+ 102 0054 C2B2     		uxtb	r2, r0
+ 266:Process/Src/process.c ****     {
+ 103              		.loc 1 266 90 discriminator 1 view .LVU14
+ 104 0056 244B     		ldr	r3, .L14+12
+ 105 0058 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 266:Process/Src/process.c ****     {
+ 106              		.loc 1 266 68 discriminator 1 view .LVU15
+ 107 005a 9A42     		cmp	r2, r3
+ 108 005c D6D1     		bne	.L2
+ 268:Process/Src/process.c ****       alarm_on_off = 0;
+ 109              		.loc 1 268 7 is_stmt 1 view .LVU16
+ 110 005e 2348     		ldr	r0, .L14+16
+ 111 0060 FFF7FEFF 		bl	NEXTION_SendPage
+ 112              	.LVL2:
+ 269:Process/Src/process.c ****       alarm_operation = 1;
+ 113              		.loc 1 269 7 view .LVU17
+ 269:Process/Src/process.c ****       alarm_operation = 1;
+ 114              		.loc 1 269 20 is_stmt 0 view .LVU18
+ 115 0064 1D4B     		ldr	r3, .L14
+ 116 0066 0022     		movs	r2, #0
+ 117 0068 1A70     		strb	r2, [r3]
+ 270:Process/Src/process.c ****     }else if(alarm_operation == 1)
+ 118              		.loc 1 270 7 is_stmt 1 view .LVU19
+ 270:Process/Src/process.c ****     }else if(alarm_operation == 1)
+ 119              		.loc 1 270 23 is_stmt 0 view .LVU20
+ 120 006a 1D4B     		ldr	r3, .L14+4
+ 121 006c 0122     		movs	r2, #1
+ 122 006e 1A70     		strb	r2, [r3]
+ 123 0070 D0E7     		b	.L1
+ 124              	.L13:
+ 273:Process/Src/process.c ****      
+ 125              		.loc 1 273 7 is_stmt 1 view .LVU21
+ 126 0072 0122     		movs	r2, #1
+ 127 0074 4FF48061 		mov	r1, #1024
+ 128 0078 1D48     		ldr	r0, .L14+20
+ 129 007a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 130              	.LVL3:
+ 275:Process/Src/process.c ****       {
+ 131              		.loc 1 275 7 view .LVU22
+ 275:Process/Src/process.c ****       {
+ 132              		.loc 1 275 27 is_stmt 0 view .LVU23
+ 133 007e 1D4B     		ldr	r3, .L14+24
+ 134 0080 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 275:Process/Src/process.c ****       {
+ 135              		.loc 1 275 9 view .LVU24
+ 136 0082 062B     		cmp	r3, #6
+ 137 0084 C6D1     		bne	.L1
+ 277:Process/Src/process.c ****         Alarm_minute = 50;
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 9
+
+
+ 138              		.loc 1 277 9 is_stmt 1 view .LVU25
+ 139 0086 0022     		movs	r2, #0
+ 140 0088 4FF48061 		mov	r1, #1024
+ 141 008c 1848     		ldr	r0, .L14+20
+ 142 008e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 143              	.LVL4:
+ 278:Process/Src/process.c ****         alarm_hour = 50;
+ 144              		.loc 1 278 9 view .LVU26
+ 278:Process/Src/process.c ****         alarm_hour = 50;
+ 145              		.loc 1 278 22 is_stmt 0 view .LVU27
+ 146 0092 3223     		movs	r3, #50
+ 147 0094 134A     		ldr	r2, .L14+8
+ 148 0096 1370     		strb	r3, [r2]
+ 279:Process/Src/process.c ****         alarm_operation = 0;
+ 149              		.loc 1 279 9 is_stmt 1 view .LVU28
+ 279:Process/Src/process.c ****         alarm_operation = 0;
+ 150              		.loc 1 279 20 is_stmt 0 view .LVU29
+ 151 0098 134A     		ldr	r2, .L14+12
+ 152 009a 1370     		strb	r3, [r2]
+ 280:Process/Src/process.c **** 
+ 153              		.loc 1 280 9 is_stmt 1 view .LVU30
+ 280:Process/Src/process.c **** 
+ 154              		.loc 1 280 25 is_stmt 0 view .LVU31
+ 155 009c 104B     		ldr	r3, .L14+4
+ 156 009e 0022     		movs	r2, #0
+ 157 00a0 1A70     		strb	r2, [r3]
+ 282:Process/Src/process.c ****         {
+ 158              		.loc 1 282 9 is_stmt 1 view .LVU32
+ 159 00a2 154B     		ldr	r3, .L14+28
+ 160 00a4 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 161 00a6 013B     		subs	r3, r3, #1
+ 162 00a8 032B     		cmp	r3, #3
+ 163 00aa 06D8     		bhi	.L4
+ 164 00ac DFE803F0 		tbb	[pc, r3]
+ 165              	.L6:
+ 166 00b0 02       		.byte	(.L9-.L6)/2
+ 167 00b1 09       		.byte	(.L8-.L6)/2
+ 168 00b2 0D       		.byte	(.L7-.L6)/2
+ 169 00b3 11       		.byte	(.L5-.L6)/2
+ 170              		.p2align 1
+ 171              	.L9:
+ 285:Process/Src/process.c ****           break;
+ 172              		.loc 1 285 13 view .LVU33
+ 173 00b4 1148     		ldr	r0, .L14+32
+ 174 00b6 FFF7FEFF 		bl	NEXTION_SendPage
+ 175              	.LVL5:
+ 286:Process/Src/process.c ****           case NEXTION_PAGE2:
+ 176              		.loc 1 286 11 view .LVU34
+ 177              	.L4:
+ 299:Process/Src/process.c ****       }
+ 178              		.loc 1 299 9 view .LVU35
+ 299:Process/Src/process.c ****       }
+ 179              		.loc 1 299 39 is_stmt 0 view .LVU36
+ 180 00ba 0E4B     		ldr	r3, .L14+24
+ 181 00bc 0022     		movs	r2, #0
+ 182 00be 9A70     		strb	r2, [r3, #2]
+ 183              		.loc 1 302 1 view .LVU37
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 10
+
+
+ 184 00c0 A8E7     		b	.L1
+ 185              	.L8:
+ 288:Process/Src/process.c ****           break;
+ 186              		.loc 1 288 13 is_stmt 1 view .LVU38
+ 187 00c2 0F48     		ldr	r0, .L14+36
+ 188 00c4 FFF7FEFF 		bl	NEXTION_SendPage
+ 189              	.LVL6:
+ 289:Process/Src/process.c ****           case NEXTION_PAGE3:
+ 190              		.loc 1 289 11 view .LVU39
+ 191 00c8 F7E7     		b	.L4
+ 192              	.L7:
+ 291:Process/Src/process.c ****           break;
+ 193              		.loc 1 291 13 view .LVU40
+ 194 00ca 0E48     		ldr	r0, .L14+40
+ 195 00cc FFF7FEFF 		bl	NEXTION_SendPage
+ 196              	.LVL7:
+ 292:Process/Src/process.c ****           case NEXTION_PAGE4:
+ 197              		.loc 1 292 11 view .LVU41
+ 198 00d0 F3E7     		b	.L4
+ 199              	.L5:
+ 294:Process/Src/process.c ****           break;
+ 200              		.loc 1 294 13 view .LVU42
+ 201 00d2 0D48     		ldr	r0, .L14+44
+ 202 00d4 FFF7FEFF 		bl	NEXTION_SendPage
+ 203              	.LVL8:
+ 295:Process/Src/process.c ****           case NEXTION_PAGE0:
+ 204              		.loc 1 295 11 view .LVU43
+ 205 00d8 EFE7     		b	.L4
+ 206              	.L15:
+ 207 00da 00BF     		.align	2
+ 208              	.L14:
+ 209 00dc 00000000 		.word	alarm_on_off
+ 210 00e0 00000000 		.word	alarm_operation
+ 211 00e4 00000000 		.word	Alarm_minute
+ 212 00e8 00000000 		.word	alarm_hour
+ 213 00ec 00000000 		.word	.LC0
+ 214 00f0 00040048 		.word	1207960576
+ 215 00f4 00000000 		.word	nextionTouchEvent
+ 216 00f8 00000000 		.word	nextion_page_state
+ 217 00fc 04000000 		.word	.LC1
+ 218 0100 08000000 		.word	.LC2
+ 219 0104 0C000000 		.word	.LC3
+ 220 0108 10000000 		.word	.LC4
+ 221              		.cfi_endproc
+ 222              	.LFE138:
+ 224              		.section	.rodata.nextionBlueLightsStatus.str1.4,"aMS",%progbits,1
+ 225              		.align	2
+ 226              	.LC5:
+ 227 0000 62362E70 		.ascii	"b6.pco=8507\000"
+ 227      636F3D38 
+ 227      35303700 
+ 228              		.align	2
+ 229              	.LC6:
+ 230 000c 62362E70 		.ascii	"b6.pco=65535\000"
+ 230      636F3D36 
+ 230      35353335 
+ 230      00
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 11
+
+
+ 231              		.section	.text.nextionBlueLightsStatus,"ax",%progbits
+ 232              		.align	1
+ 233              		.syntax unified
+ 234              		.thumb
+ 235              		.thumb_func
+ 237              	nextionBlueLightsStatus:
+ 238              	.LFB146:
+ 303:Process/Src/process.c **** 
+ 304:Process/Src/process.c **** static void nextionSetTemp(void)
+ 305:Process/Src/process.c **** {
+ 306:Process/Src/process.c ****   if(delay_tick_1ms_no_rst(&last_tick, 75))
+ 307:Process/Src/process.c ****   {
+ 308:Process/Src/process.c ****     sprintf(str, "%d", rxbuffer_uart1[0]);
+ 309:Process/Src/process.c ****     eeprom_read_array[7] = rxbuffer_uart1[0];
+ 310:Process/Src/process.c ****     NEXTION_SendValue("n1",str);
+ 311:Process/Src/process.c ****     EE24_Write(&ee24,7,rxbuffer_uart1,1,1000);
+ 312:Process/Src/process.c ****     step_touch = SETTOUCH_STATE_IDLE;
+ 313:Process/Src/process.c ****   }
+ 314:Process/Src/process.c **** }
+ 315:Process/Src/process.c **** 
+ 316:Process/Src/process.c **** 
+ 317:Process/Src/process.c **** static void nextionSetSleep(void)
+ 318:Process/Src/process.c **** {
+ 319:Process/Src/process.c ****   if(!delay_tick_1ms_no_rst(&last_tick,500))
+ 320:Process/Src/process.c ****   {
+ 321:Process/Src/process.c ****     nextionTouchEvent.TouchEvent = 0x00;
+ 322:Process/Src/process.c ****   }
+ 323:Process/Src/process.c ****   if(delay_tick_1ms_no_rst(&last_tick, 1400))
+ 324:Process/Src/process.c ****   {
+ 325:Process/Src/process.c ****     if (nextionTouchEvent.TouchEvent == 0x68)
+ 326:Process/Src/process.c ****     {
+ 327:Process/Src/process.c ****       NEXTION_SendCode("sleep=0");
+ 328:Process/Src/process.c ****       step_touch = SETTOUCH_STATE_IDLE;
+ 329:Process/Src/process.c ****     }
+ 330:Process/Src/process.c ****   }
+ 331:Process/Src/process.c **** }
+ 332:Process/Src/process.c **** 
+ 333:Process/Src/process.c **** 
+ 334:Process/Src/process.c **** static void nextionSetPassword(void)
+ 335:Process/Src/process.c **** {
+ 336:Process/Src/process.c ****   if(delay_tick_1ms(&last_tick, 50))
+ 337:Process/Src/process.c ****   {
+ 338:Process/Src/process.c ****     serial_message("sifre: %d",password);
+ 339:Process/Src/process.c ****     if(rxbuffer_uart1[0] == password)
+ 340:Process/Src/process.c ****     {
+ 341:Process/Src/process.c ****       NEXTION_SendPage("1");
+ 342:Process/Src/process.c ****       nextion_page_state = NEXTION_PAGE1; 
+ 343:Process/Src/process.c ****       nextionPage1LightsSatus();
+ 344:Process/Src/process.c ****     }
+ 345:Process/Src/process.c ****     step_touch = SETTOUCH_STATE_IDLE;
+ 346:Process/Src/process.c ****   }
+ 347:Process/Src/process.c **** }
+ 348:Process/Src/process.c **** 
+ 349:Process/Src/process.c **** 
+ 350:Process/Src/process.c **** static void nextionSetTime(void)
+ 351:Process/Src/process.c **** {
+ 352:Process/Src/process.c ****   uint8_t indata[1];
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 12
+
+
+ 353:Process/Src/process.c ****   switch (step_time)
+ 354:Process/Src/process.c ****   {
+ 355:Process/Src/process.c ****     case SETTIME_STATE_SEND_HOUR:
+ 356:Process/Src/process.c ****       NEXTION_SendCode("print n0.val");
+ 357:Process/Src/process.c ****       last_tick = HAL_GetTick();
+ 358:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_HOUR;
+ 359:Process/Src/process.c ****     break;
+ 360:Process/Src/process.c **** 
+ 361:Process/Src/process.c ****     case SETTIME_STATE_OPERATION_HOUR:
+ 362:Process/Src/process.c ****       if(delay_tick_1ms_no_rst(&last_tick,50))
+ 363:Process/Src/process.c ****       {
+ 364:Process/Src/process.c ****         indata[0] = rxbuffer_uart1[0];
+ 365:Process/Src/process.c ****         PCF85_SetHour(indata[0]);
+ 366:Process/Src/process.c ****         //EE24_Write(&ee24,4,indata,1,1000);
+ 367:Process/Src/process.c ****         step_time = SETTIME_STATE_SEND_MINUTE;
+ 368:Process/Src/process.c ****       }
+ 369:Process/Src/process.c ****     break;
+ 370:Process/Src/process.c **** 
+ 371:Process/Src/process.c ****     case SETTIME_STATE_SEND_MINUTE:
+ 372:Process/Src/process.c ****       NEXTION_SendCode("print n1.val");
+ 373:Process/Src/process.c ****       last_tick = HAL_GetTick();
+ 374:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_MINUTE;
+ 375:Process/Src/process.c ****     break;
+ 376:Process/Src/process.c **** 
+ 377:Process/Src/process.c ****     case SETTIME_STATE_OPERATION_MINUTE:
+ 378:Process/Src/process.c ****       if(delay_tick_1ms_no_rst(&last_tick, 50))
+ 379:Process/Src/process.c ****       {
+ 380:Process/Src/process.c **** 
+ 381:Process/Src/process.c ****         indata[0] = rxbuffer_uart1[0];
+ 382:Process/Src/process.c ****         PCF85_SetMinute(indata[0]);
+ 383:Process/Src/process.c ****         //EE24_Write(&ee24,5,indata,1,1000);
+ 384:Process/Src/process.c ****         step_time = SETTIME_STATE_SEND_SECOND;
+ 385:Process/Src/process.c ****       }
+ 386:Process/Src/process.c ****     break;
+ 387:Process/Src/process.c **** 
+ 388:Process/Src/process.c ****     case SETTIME_STATE_SEND_SECOND:
+ 389:Process/Src/process.c ****       NEXTION_SendCode("print n2.val");
+ 390:Process/Src/process.c ****       last_tick = HAL_GetTick();
+ 391:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_SECOND;
+ 392:Process/Src/process.c ****     break;
+ 393:Process/Src/process.c **** 
+ 394:Process/Src/process.c ****     case SETTIME_STATE_OPERATION_SECOND:
+ 395:Process/Src/process.c ****       if(delay_tick_1ms_no_rst(&last_tick,50))
+ 396:Process/Src/process.c ****       {
+ 397:Process/Src/process.c ****         indata[0] = rxbuffer_uart1[0];
+ 398:Process/Src/process.c ****         PCF85_SetSecond(indata[0]);
+ 399:Process/Src/process.c ****         step_time = SETTIME_STATE_SEND_DAY;
+ 400:Process/Src/process.c ****       }    
+ 401:Process/Src/process.c ****     break;
+ 402:Process/Src/process.c **** 
+ 403:Process/Src/process.c ****     case SETTIME_STATE_SEND_DAY:
+ 404:Process/Src/process.c ****       NEXTION_SendCode("print n3.val");
+ 405:Process/Src/process.c ****       last_tick = HAL_GetTick();
+ 406:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_DAY;
+ 407:Process/Src/process.c ****     break;
+ 408:Process/Src/process.c **** 
+ 409:Process/Src/process.c ****     case SETTIME_STATE_OPERATION_DAY:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 13
+
+
+ 410:Process/Src/process.c ****       if(delay_tick_1ms_no_rst(&last_tick,50))
+ 411:Process/Src/process.c ****       {
+ 412:Process/Src/process.c ****         indata[0] = rxbuffer_uart1[0];
+ 413:Process/Src/process.c ****         PCF85_Setday(indata[0]);
+ 414:Process/Src/process.c ****         step_time = SETTIME_STATE_SEND_MONTH;
+ 415:Process/Src/process.c ****       }
+ 416:Process/Src/process.c ****     break;
+ 417:Process/Src/process.c **** 
+ 418:Process/Src/process.c ****     case SETTIME_STATE_SEND_MONTH:
+ 419:Process/Src/process.c ****       NEXTION_SendCode("print n4.val");
+ 420:Process/Src/process.c ****       last_tick = HAL_GetTick();
+ 421:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_MONTH;
+ 422:Process/Src/process.c ****     break;
+ 423:Process/Src/process.c **** 
+ 424:Process/Src/process.c ****     case SETTIME_STATE_OPERATION_MONTH:
+ 425:Process/Src/process.c ****       if(delay_tick_1ms_no_rst(&last_tick,50))
+ 426:Process/Src/process.c ****       {
+ 427:Process/Src/process.c ****         indata[0] = rxbuffer_uart1[0];
+ 428:Process/Src/process.c ****         PCF85_Setmonth(indata[0]);
+ 429:Process/Src/process.c ****         step_time = SETTIME_STATE_SEND_YEAR;
+ 430:Process/Src/process.c ****       }
+ 431:Process/Src/process.c ****     break;
+ 432:Process/Src/process.c ****     
+ 433:Process/Src/process.c ****     case SETTIME_STATE_SEND_YEAR:
+ 434:Process/Src/process.c ****       NEXTION_SendCode("print n5.val");
+ 435:Process/Src/process.c ****       last_tick = HAL_GetTick();
+ 436:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_YEAR;
+ 437:Process/Src/process.c ****     break;
+ 438:Process/Src/process.c **** 
+ 439:Process/Src/process.c ****     case SETTIME_STATE_OPERATION_YEAR:
+ 440:Process/Src/process.c ****       if(delay_tick_1ms_no_rst(&last_tick,50))
+ 441:Process/Src/process.c ****       {
+ 442:Process/Src/process.c ****         indata[0] = rxbuffer_uart1[0];
+ 443:Process/Src/process.c ****         PCF85_Setyear(indata[0]-178);
+ 444:Process/Src/process.c ****         NEXTION_SendString("t0", "update successfully");
+ 445:Process/Src/process.c ****         step_touch = SETTOUCH_STATE_IDLE;
+ 446:Process/Src/process.c ****       }
+ 447:Process/Src/process.c ****     break;    
+ 448:Process/Src/process.c ****   }
+ 449:Process/Src/process.c **** }    
+ 450:Process/Src/process.c **** 
+ 451:Process/Src/process.c **** 
+ 452:Process/Src/process.c **** static void nextionSetAlarm(void)
+ 453:Process/Src/process.c **** {
+ 454:Process/Src/process.c ****   switch (step_alarm)
+ 455:Process/Src/process.c ****   {
+ 456:Process/Src/process.c ****   case   SETALARM_STATE_SEND_HOUR:
+ 457:Process/Src/process.c ****     NEXTION_SendCode("print n2.val");
+ 458:Process/Src/process.c ****     step_alarm = SETALARM_STATE_OPERATION_HOUR;
+ 459:Process/Src/process.c ****   break;
+ 460:Process/Src/process.c **** 
+ 461:Process/Src/process.c ****   case SETALARM_STATE_OPERATION_HOUR:
+ 462:Process/Src/process.c ****     if(delay_tick_1ms_no_rst(&last_tick,75))
+ 463:Process/Src/process.c ****     {
+ 464:Process/Src/process.c ****       uint8_t indata;
+ 465:Process/Src/process.c ****       indata = rxbuffer_uart1[0];
+ 466:Process/Src/process.c ****       alarm_hour = indata;
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 14
+
+
+ 467:Process/Src/process.c ****       step_alarm = SETALARM_STATE_SEND_MINUTE;
+ 468:Process/Src/process.c ****     }
+ 469:Process/Src/process.c ****   break;
+ 470:Process/Src/process.c **** 
+ 471:Process/Src/process.c ****   case SETALARM_STATE_SEND_MINUTE:
+ 472:Process/Src/process.c ****     NEXTION_SendCode("print n1.val");
+ 473:Process/Src/process.c ****     step_alarm = SETALARM_STATE_OPERATION_MINUTE;
+ 474:Process/Src/process.c ****   break;
+ 475:Process/Src/process.c **** 
+ 476:Process/Src/process.c ****   case SETALARM_STATE_OPERATION_MINUTE:
+ 477:Process/Src/process.c ****     if(delay_tick_1ms_no_rst(&last_tick, 200))
+ 478:Process/Src/process.c ****     {
+ 479:Process/Src/process.c ****       uint8_t indata;
+ 480:Process/Src/process.c ****       indata = rxbuffer_uart1[0];
+ 481:Process/Src/process.c ****       Alarm_minute = indata;
+ 482:Process/Src/process.c ****       step_alarm = SETALARM_STATE_SEND_ALARMTIME;
+ 483:Process/Src/process.c ****     }
+ 484:Process/Src/process.c ****   break;
+ 485:Process/Src/process.c **** 
+ 486:Process/Src/process.c ****   case SETALARM_STATE_SEND_ALARMTIME:
+ 487:Process/Src/process.c ****     sprintf(str, "alarm set successfully %02d:%02d", alarm_hour, Alarm_minute);
+ 488:Process/Src/process.c ****     NEXTION_SendString("t2", str);
+ 489:Process/Src/process.c ****     step_touch = SETTOUCH_STATE_IDLE;
+ 490:Process/Src/process.c ****   break;
+ 491:Process/Src/process.c ****   }
+ 492:Process/Src/process.c **** }
+ 493:Process/Src/process.c **** 
+ 494:Process/Src/process.c **** 
+ 495:Process/Src/process.c **** static void nextionSetChangePassword(void)
+ 496:Process/Src/process.c **** {
+ 497:Process/Src/process.c ****       if(delay_tick_1ms_no_rst(&last_tick, 75))
+ 498:Process/Src/process.c ****     {
+ 499:Process/Src/process.c ****       EE24_Write(&ee24,0,rxbuffer_uart1,1,1000);
+ 500:Process/Src/process.c ****       password = rxbuffer_uart1[0];
+ 501:Process/Src/process.c ****       rxbuffer_uart1[0] = -1;
+ 502:Process/Src/process.c ****       NEXTION_SendPage("0");
+ 503:Process/Src/process.c ****       NEXTION_SendValue("n0","0");
+ 504:Process/Src/process.c ****       nextion_page_state = Nextion_Page0;
+ 505:Process/Src/process.c ****       NEXTION_DMA_FLAG = DMA_FLAG_DISABLE;
+ 506:Process/Src/process.c ****       step_touch = SETTOUCH_STATE_IDLE;
+ 507:Process/Src/process.c ****     }
+ 508:Process/Src/process.c **** }
+ 509:Process/Src/process.c **** 
+ 510:Process/Src/process.c **** 
+ 511:Process/Src/process.c **** static void nextionPage1LightsSatus (void)
+ 512:Process/Src/process.c **** {
+ 513:Process/Src/process.c ****   sprintf(str, "%d", eeprom_read_array[7]);
+ 514:Process/Src/process.c ****   NEXTION_SendValue("n1",str);
+ 515:Process/Src/process.c ****   if(status_blue == 1)
+ 516:Process/Src/process.c ****   {
+ 517:Process/Src/process.c ****     NEXTION_SendCode("b6.pco=8507");
+ 518:Process/Src/process.c ****   }else
+ 519:Process/Src/process.c ****   {
+ 520:Process/Src/process.c ****     NEXTION_SendCode("b6.pco=65535");
+ 521:Process/Src/process.c ****   }
+ 522:Process/Src/process.c ****   if(status_red == 1)
+ 523:Process/Src/process.c ****   {
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 15
+
+
+ 524:Process/Src/process.c ****     NEXTION_SendCode("b5.pco=61440");
+ 525:Process/Src/process.c ****   }else
+ 526:Process/Src/process.c ****   {
+ 527:Process/Src/process.c ****     NEXTION_SendCode("b5.pco=65535");
+ 528:Process/Src/process.c ****   }
+ 529:Process/Src/process.c ****   if(status_green == 1)
+ 530:Process/Src/process.c ****   {
+ 531:Process/Src/process.c ****     NEXTION_SendCode("b0.pco=18248");
+ 532:Process/Src/process.c ****   }else
+ 533:Process/Src/process.c ****   {
+ 534:Process/Src/process.c ****     NEXTION_SendCode("b0.pco=65535");
+ 535:Process/Src/process.c ****   }
+ 536:Process/Src/process.c **** }
+ 537:Process/Src/process.c **** 
+ 538:Process/Src/process.c **** 
+ 539:Process/Src/process.c **** static void nextionBlueLightsStatus(void)
+ 540:Process/Src/process.c **** {
+ 239              		.loc 1 540 1 view -0
+ 240              		.cfi_startproc
+ 241              		@ args = 0, pretend = 0, frame = 0
+ 242              		@ frame_needed = 0, uses_anonymous_args = 0
+ 243 0000 08B5     		push	{r3, lr}
+ 244              		.cfi_def_cfa_offset 8
+ 245              		.cfi_offset 3, -8
+ 246              		.cfi_offset 14, -4
+ 541:Process/Src/process.c ****     if(status_blue==0)
+ 247              		.loc 1 541 5 view .LVU45
+ 248              		.loc 1 541 19 is_stmt 0 view .LVU46
+ 249 0002 0C4B     		ldr	r3, .L20
+ 250 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 251              		.loc 1 541 7 view .LVU47
+ 252 0006 53B9     		cbnz	r3, .L17
+ 542:Process/Src/process.c ****   {
+ 543:Process/Src/process.c ****     status_blue=!status_blue;
+ 253              		.loc 1 543 5 is_stmt 1 view .LVU48
+ 254              		.loc 1 543 16 is_stmt 0 view .LVU49
+ 255 0008 0122     		movs	r2, #1
+ 256 000a 0A4B     		ldr	r3, .L20
+ 257 000c 1A70     		strb	r2, [r3]
+ 544:Process/Src/process.c ****     HAL_GPIO_WritePin(RED_LED_GPIO_Port,BLUE_LED_Pin, status_blue);
+ 258              		.loc 1 544 5 is_stmt 1 view .LVU50
+ 259 000e 0421     		movs	r1, #4
+ 260 0010 0948     		ldr	r0, .L20+4
+ 261 0012 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 262              	.LVL9:
+ 545:Process/Src/process.c ****     NEXTION_SendCode("b6.pco=8507");
+ 263              		.loc 1 545 5 view .LVU51
+ 264 0016 0948     		ldr	r0, .L20+8
+ 265 0018 FFF7FEFF 		bl	NEXTION_SendCode
+ 266              	.LVL10:
+ 267              	.L16:
+ 546:Process/Src/process.c ****   }else
+ 547:Process/Src/process.c ****   {
+ 548:Process/Src/process.c ****     status_blue=!status_blue;
+ 549:Process/Src/process.c ****     HAL_GPIO_WritePin(RED_LED_GPIO_Port,BLUE_LED_Pin, status_blue);
+ 550:Process/Src/process.c ****     NEXTION_SendCode("b6.pco=65535");
+ 551:Process/Src/process.c ****   }
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 16
+
+
+ 552:Process/Src/process.c **** }
+ 268              		.loc 1 552 1 is_stmt 0 view .LVU52
+ 269 001c 08BD     		pop	{r3, pc}
+ 270              	.L17:
+ 548:Process/Src/process.c ****     HAL_GPIO_WritePin(RED_LED_GPIO_Port,BLUE_LED_Pin, status_blue);
+ 271              		.loc 1 548 5 is_stmt 1 view .LVU53
+ 548:Process/Src/process.c ****     HAL_GPIO_WritePin(RED_LED_GPIO_Port,BLUE_LED_Pin, status_blue);
+ 272              		.loc 1 548 16 is_stmt 0 view .LVU54
+ 273 001e 0022     		movs	r2, #0
+ 274 0020 044B     		ldr	r3, .L20
+ 275 0022 1A70     		strb	r2, [r3]
+ 549:Process/Src/process.c ****     NEXTION_SendCode("b6.pco=65535");
+ 276              		.loc 1 549 5 is_stmt 1 view .LVU55
+ 277 0024 0421     		movs	r1, #4
+ 278 0026 0448     		ldr	r0, .L20+4
+ 279 0028 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 280              	.LVL11:
+ 550:Process/Src/process.c ****   }
+ 281              		.loc 1 550 5 view .LVU56
+ 282 002c 0448     		ldr	r0, .L20+12
+ 283 002e FFF7FEFF 		bl	NEXTION_SendCode
+ 284              	.LVL12:
+ 285              		.loc 1 552 1 is_stmt 0 view .LVU57
+ 286 0032 F3E7     		b	.L16
+ 287              	.L21:
+ 288              		.align	2
+ 289              	.L20:
+ 290 0034 00000000 		.word	status_blue
+ 291 0038 00040048 		.word	1207960576
+ 292 003c 00000000 		.word	.LC5
+ 293 0040 0C000000 		.word	.LC6
+ 294              		.cfi_endproc
+ 295              	.LFE146:
+ 297              		.section	.rodata.nextionRedLightsStatus.str1.4,"aMS",%progbits,1
+ 298              		.align	2
+ 299              	.LC7:
+ 300 0000 62352E70 		.ascii	"b5.pco=61440\000"
+ 300      636F3D36 
+ 300      31343430 
+ 300      00
+ 301 000d 000000   		.align	2
+ 302              	.LC8:
+ 303 0010 62352E70 		.ascii	"b5.pco=65535\000"
+ 303      636F3D36 
+ 303      35353335 
+ 303      00
+ 304              		.section	.text.nextionRedLightsStatus,"ax",%progbits
+ 305              		.align	1
+ 306              		.syntax unified
+ 307              		.thumb
+ 308              		.thumb_func
+ 310              	nextionRedLightsStatus:
+ 311              	.LFB147:
+ 553:Process/Src/process.c **** 
+ 554:Process/Src/process.c **** 
+ 555:Process/Src/process.c **** static void nextionRedLightsStatus(void)
+ 556:Process/Src/process.c **** {
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 17
+
+
+ 312              		.loc 1 556 1 is_stmt 1 view -0
+ 313              		.cfi_startproc
+ 314              		@ args = 0, pretend = 0, frame = 0
+ 315              		@ frame_needed = 0, uses_anonymous_args = 0
+ 316 0000 08B5     		push	{r3, lr}
+ 317              		.cfi_def_cfa_offset 8
+ 318              		.cfi_offset 3, -8
+ 319              		.cfi_offset 14, -4
+ 557:Process/Src/process.c ****     if(status_red==0)
+ 320              		.loc 1 557 5 view .LVU59
+ 321              		.loc 1 557 18 is_stmt 0 view .LVU60
+ 322 0002 0C4B     		ldr	r3, .L26
+ 323 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 324              		.loc 1 557 7 view .LVU61
+ 325 0006 53B9     		cbnz	r3, .L23
+ 558:Process/Src/process.c ****   {
+ 559:Process/Src/process.c ****     status_red=!status_red;
+ 326              		.loc 1 559 5 is_stmt 1 view .LVU62
+ 327              		.loc 1 559 15 is_stmt 0 view .LVU63
+ 328 0008 0121     		movs	r1, #1
+ 329 000a 0A4B     		ldr	r3, .L26
+ 330 000c 1970     		strb	r1, [r3]
+ 560:Process/Src/process.c ****     HAL_GPIO_WritePin(RED_LED_GPIO_Port,RED_LED_Pin, status_red);
+ 331              		.loc 1 560 5 is_stmt 1 view .LVU64
+ 332 000e 0A46     		mov	r2, r1
+ 333 0010 0948     		ldr	r0, .L26+4
+ 334 0012 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 335              	.LVL13:
+ 561:Process/Src/process.c ****     NEXTION_SendCode("b5.pco=61440");
+ 336              		.loc 1 561 5 view .LVU65
+ 337 0016 0948     		ldr	r0, .L26+8
+ 338 0018 FFF7FEFF 		bl	NEXTION_SendCode
+ 339              	.LVL14:
+ 340              	.L22:
+ 562:Process/Src/process.c ****   }else{
+ 563:Process/Src/process.c ****     status_red=!status_red;
+ 564:Process/Src/process.c ****     HAL_GPIO_WritePin(RED_LED_GPIO_Port,RED_LED_Pin, status_red);
+ 565:Process/Src/process.c ****     NEXTION_SendCode("b5.pco=65535");
+ 566:Process/Src/process.c ****   }
+ 567:Process/Src/process.c **** }
+ 341              		.loc 1 567 1 is_stmt 0 view .LVU66
+ 342 001c 08BD     		pop	{r3, pc}
+ 343              	.L23:
+ 563:Process/Src/process.c ****     HAL_GPIO_WritePin(RED_LED_GPIO_Port,RED_LED_Pin, status_red);
+ 344              		.loc 1 563 5 is_stmt 1 view .LVU67
+ 563:Process/Src/process.c ****     HAL_GPIO_WritePin(RED_LED_GPIO_Port,RED_LED_Pin, status_red);
+ 345              		.loc 1 563 15 is_stmt 0 view .LVU68
+ 346 001e 0022     		movs	r2, #0
+ 347 0020 044B     		ldr	r3, .L26
+ 348 0022 1A70     		strb	r2, [r3]
+ 564:Process/Src/process.c ****     NEXTION_SendCode("b5.pco=65535");
+ 349              		.loc 1 564 5 is_stmt 1 view .LVU69
+ 350 0024 0121     		movs	r1, #1
+ 351 0026 0448     		ldr	r0, .L26+4
+ 352 0028 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 353              	.LVL15:
+ 565:Process/Src/process.c ****   }
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 18
+
+
+ 354              		.loc 1 565 5 view .LVU70
+ 355 002c 0448     		ldr	r0, .L26+12
+ 356 002e FFF7FEFF 		bl	NEXTION_SendCode
+ 357              	.LVL16:
+ 358              		.loc 1 567 1 is_stmt 0 view .LVU71
+ 359 0032 F3E7     		b	.L22
+ 360              	.L27:
+ 361              		.align	2
+ 362              	.L26:
+ 363 0034 00000000 		.word	status_red
+ 364 0038 00040048 		.word	1207960576
+ 365 003c 00000000 		.word	.LC7
+ 366 0040 10000000 		.word	.LC8
+ 367              		.cfi_endproc
+ 368              	.LFE147:
+ 370              		.section	.rodata.nextionGreenLightsStatus.str1.4,"aMS",%progbits,1
+ 371              		.align	2
+ 372              	.LC9:
+ 373 0000 62302E70 		.ascii	"b0.pco=18248\000"
+ 373      636F3D31 
+ 373      38323438 
+ 373      00
+ 374 000d 000000   		.align	2
+ 375              	.LC10:
+ 376 0010 62302E70 		.ascii	"b0.pco=65535\000"
+ 376      636F3D36 
+ 376      35353335 
+ 376      00
+ 377              		.section	.text.nextionGreenLightsStatus,"ax",%progbits
+ 378              		.align	1
+ 379              		.syntax unified
+ 380              		.thumb
+ 381              		.thumb_func
+ 383              	nextionGreenLightsStatus:
+ 384              	.LFB148:
+ 568:Process/Src/process.c **** 
+ 569:Process/Src/process.c **** 
+ 570:Process/Src/process.c **** static void nextionGreenLightsStatus(void)
+ 571:Process/Src/process.c **** {
+ 385              		.loc 1 571 1 is_stmt 1 view -0
+ 386              		.cfi_startproc
+ 387              		@ args = 0, pretend = 0, frame = 0
+ 388              		@ frame_needed = 0, uses_anonymous_args = 0
+ 389 0000 08B5     		push	{r3, lr}
+ 390              		.cfi_def_cfa_offset 8
+ 391              		.cfi_offset 3, -8
+ 392              		.cfi_offset 14, -4
+ 572:Process/Src/process.c ****         if(status_green==0)
+ 393              		.loc 1 572 9 view .LVU73
+ 394              		.loc 1 572 24 is_stmt 0 view .LVU74
+ 395 0002 0C4B     		ldr	r3, .L32
+ 396 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 397              		.loc 1 572 11 view .LVU75
+ 398 0006 53B9     		cbnz	r3, .L29
+ 573:Process/Src/process.c ****       {
+ 574:Process/Src/process.c ****         status_green=!status_green;
+ 399              		.loc 1 574 9 is_stmt 1 view .LVU76
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 19
+
+
+ 400              		.loc 1 574 21 is_stmt 0 view .LVU77
+ 401 0008 0122     		movs	r2, #1
+ 402 000a 0A4B     		ldr	r3, .L32
+ 403 000c 1A70     		strb	r2, [r3]
+ 575:Process/Src/process.c ****         HAL_GPIO_WritePin(RED_LED_GPIO_Port,GREEN_LED_Pin, status_green);
+ 404              		.loc 1 575 9 is_stmt 1 view .LVU78
+ 405 000e 0221     		movs	r1, #2
+ 406 0010 0948     		ldr	r0, .L32+4
+ 407 0012 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 408              	.LVL17:
+ 576:Process/Src/process.c ****         NEXTION_SendCode("b0.pco=18248");
+ 409              		.loc 1 576 9 view .LVU79
+ 410 0016 0948     		ldr	r0, .L32+8
+ 411 0018 FFF7FEFF 		bl	NEXTION_SendCode
+ 412              	.LVL18:
+ 413              	.L28:
+ 577:Process/Src/process.c ****       }else{
+ 578:Process/Src/process.c ****         status_green=!status_green;
+ 579:Process/Src/process.c ****         HAL_GPIO_WritePin(RED_LED_GPIO_Port,GREEN_LED_Pin, status_green);
+ 580:Process/Src/process.c ****         NEXTION_SendCode("b0.pco=65535");
+ 581:Process/Src/process.c ****       }
+ 582:Process/Src/process.c **** }
+ 414              		.loc 1 582 1 is_stmt 0 view .LVU80
+ 415 001c 08BD     		pop	{r3, pc}
+ 416              	.L29:
+ 578:Process/Src/process.c ****         HAL_GPIO_WritePin(RED_LED_GPIO_Port,GREEN_LED_Pin, status_green);
+ 417              		.loc 1 578 9 is_stmt 1 view .LVU81
+ 578:Process/Src/process.c ****         HAL_GPIO_WritePin(RED_LED_GPIO_Port,GREEN_LED_Pin, status_green);
+ 418              		.loc 1 578 21 is_stmt 0 view .LVU82
+ 419 001e 0022     		movs	r2, #0
+ 420 0020 044B     		ldr	r3, .L32
+ 421 0022 1A70     		strb	r2, [r3]
+ 579:Process/Src/process.c ****         NEXTION_SendCode("b0.pco=65535");
+ 422              		.loc 1 579 9 is_stmt 1 view .LVU83
+ 423 0024 0221     		movs	r1, #2
+ 424 0026 0448     		ldr	r0, .L32+4
+ 425 0028 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 426              	.LVL19:
+ 580:Process/Src/process.c ****       }
+ 427              		.loc 1 580 9 view .LVU84
+ 428 002c 0448     		ldr	r0, .L32+12
+ 429 002e FFF7FEFF 		bl	NEXTION_SendCode
+ 430              	.LVL20:
+ 431              		.loc 1 582 1 is_stmt 0 view .LVU85
+ 432 0032 F3E7     		b	.L28
+ 433              	.L33:
+ 434              		.align	2
+ 435              	.L32:
+ 436 0034 00000000 		.word	status_green
+ 437 0038 00040048 		.word	1207960576
+ 438 003c 00000000 		.word	.LC9
+ 439 0040 10000000 		.word	.LC10
+ 440              		.cfi_endproc
+ 441              	.LFE148:
+ 443              		.section	.rodata.nextionPage1LightsSatus.str1.4,"aMS",%progbits,1
+ 444              		.align	2
+ 445              	.LC11:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 20
+
+
+ 446 0000 256400   		.ascii	"%d\000"
+ 447 0003 00       		.align	2
+ 448              	.LC12:
+ 449 0004 6E3100   		.ascii	"n1\000"
+ 450              		.section	.text.nextionPage1LightsSatus,"ax",%progbits
+ 451              		.align	1
+ 452              		.syntax unified
+ 453              		.thumb
+ 454              		.thumb_func
+ 456              	nextionPage1LightsSatus:
+ 457              	.LFB145:
+ 512:Process/Src/process.c ****   sprintf(str, "%d", eeprom_read_array[7]);
+ 458              		.loc 1 512 1 is_stmt 1 view -0
+ 459              		.cfi_startproc
+ 460              		@ args = 0, pretend = 0, frame = 0
+ 461              		@ frame_needed = 0, uses_anonymous_args = 0
+ 462 0000 10B5     		push	{r4, lr}
+ 463              		.cfi_def_cfa_offset 8
+ 464              		.cfi_offset 4, -8
+ 465              		.cfi_offset 14, -4
+ 513:Process/Src/process.c ****   NEXTION_SendValue("n1",str);
+ 466              		.loc 1 513 3 view .LVU87
+ 467 0002 164C     		ldr	r4, .L45
+ 468 0004 164B     		ldr	r3, .L45+4
+ 469 0006 DA79     		ldrb	r2, [r3, #7]	@ zero_extendqisi2
+ 470 0008 1649     		ldr	r1, .L45+8
+ 471 000a 2046     		mov	r0, r4
+ 472 000c FFF7FEFF 		bl	sprintf
+ 473              	.LVL21:
+ 514:Process/Src/process.c ****   if(status_blue == 1)
+ 474              		.loc 1 514 3 view .LVU88
+ 475 0010 2146     		mov	r1, r4
+ 476 0012 1548     		ldr	r0, .L45+12
+ 477 0014 FFF7FEFF 		bl	NEXTION_SendValue
+ 478              	.LVL22:
+ 515:Process/Src/process.c ****   {
+ 479              		.loc 1 515 3 view .LVU89
+ 515:Process/Src/process.c ****   {
+ 480              		.loc 1 515 18 is_stmt 0 view .LVU90
+ 481 0018 144B     		ldr	r3, .L45+16
+ 482 001a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 515:Process/Src/process.c ****   {
+ 483              		.loc 1 515 5 view .LVU91
+ 484 001c 012B     		cmp	r3, #1
+ 485 001e 11D0     		beq	.L42
+ 520:Process/Src/process.c ****   }
+ 486              		.loc 1 520 5 is_stmt 1 view .LVU92
+ 487 0020 1348     		ldr	r0, .L45+20
+ 488 0022 FFF7FEFF 		bl	NEXTION_SendCode
+ 489              	.LVL23:
+ 490              	.L36:
+ 522:Process/Src/process.c ****   {
+ 491              		.loc 1 522 3 view .LVU93
+ 522:Process/Src/process.c ****   {
+ 492              		.loc 1 522 17 is_stmt 0 view .LVU94
+ 493 0026 134B     		ldr	r3, .L45+24
+ 494 0028 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 21
+
+
+ 522:Process/Src/process.c ****   {
+ 495              		.loc 1 522 5 view .LVU95
+ 496 002a 012B     		cmp	r3, #1
+ 497 002c 0ED0     		beq	.L43
+ 527:Process/Src/process.c ****   }
+ 498              		.loc 1 527 5 is_stmt 1 view .LVU96
+ 499 002e 1248     		ldr	r0, .L45+28
+ 500 0030 FFF7FEFF 		bl	NEXTION_SendCode
+ 501              	.LVL24:
+ 502              	.L38:
+ 529:Process/Src/process.c ****   {
+ 503              		.loc 1 529 3 view .LVU97
+ 529:Process/Src/process.c ****   {
+ 504              		.loc 1 529 19 is_stmt 0 view .LVU98
+ 505 0034 114B     		ldr	r3, .L45+32
+ 506 0036 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 529:Process/Src/process.c ****   {
+ 507              		.loc 1 529 5 view .LVU99
+ 508 0038 012B     		cmp	r3, #1
+ 509 003a 0BD0     		beq	.L44
+ 534:Process/Src/process.c ****   }
+ 510              		.loc 1 534 5 is_stmt 1 view .LVU100
+ 511 003c 1048     		ldr	r0, .L45+36
+ 512 003e FFF7FEFF 		bl	NEXTION_SendCode
+ 513              	.LVL25:
+ 514              	.L34:
+ 536:Process/Src/process.c **** 
+ 515              		.loc 1 536 1 is_stmt 0 view .LVU101
+ 516 0042 10BD     		pop	{r4, pc}
+ 517              	.L42:
+ 517:Process/Src/process.c ****   }else
+ 518              		.loc 1 517 5 is_stmt 1 view .LVU102
+ 519 0044 0F48     		ldr	r0, .L45+40
+ 520 0046 FFF7FEFF 		bl	NEXTION_SendCode
+ 521              	.LVL26:
+ 522 004a ECE7     		b	.L36
+ 523              	.L43:
+ 524:Process/Src/process.c ****   }else
+ 524              		.loc 1 524 5 view .LVU103
+ 525 004c 0E48     		ldr	r0, .L45+44
+ 526 004e FFF7FEFF 		bl	NEXTION_SendCode
+ 527              	.LVL27:
+ 528 0052 EFE7     		b	.L38
+ 529              	.L44:
+ 531:Process/Src/process.c ****   }else
+ 530              		.loc 1 531 5 view .LVU104
+ 531 0054 0D48     		ldr	r0, .L45+48
+ 532 0056 FFF7FEFF 		bl	NEXTION_SendCode
+ 533              	.LVL28:
+ 534 005a F2E7     		b	.L34
+ 535              	.L46:
+ 536              		.align	2
+ 537              	.L45:
+ 538 005c 00000000 		.word	str
+ 539 0060 00000000 		.word	eeprom_read_array
+ 540 0064 00000000 		.word	.LC11
+ 541 0068 04000000 		.word	.LC12
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 22
+
+
+ 542 006c 00000000 		.word	status_blue
+ 543 0070 0C000000 		.word	.LC6
+ 544 0074 00000000 		.word	status_red
+ 545 0078 10000000 		.word	.LC8
+ 546 007c 00000000 		.word	status_green
+ 547 0080 10000000 		.word	.LC10
+ 548 0084 00000000 		.word	.LC5
+ 549 0088 00000000 		.word	.LC7
+ 550 008c 00000000 		.word	.LC9
+ 551              		.cfi_endproc
+ 552              	.LFE145:
+ 554              		.section	.rodata.nextionSetPassword.str1.4,"aMS",%progbits,1
+ 555              		.align	2
+ 556              	.LC13:
+ 557 0000 73696672 		.ascii	"sifre: %d\000"
+ 557      653A2025 
+ 557      6400
+ 558              		.section	.text.nextionSetPassword,"ax",%progbits
+ 559              		.align	1
+ 560              		.syntax unified
+ 561              		.thumb
+ 562              		.thumb_func
+ 564              	nextionSetPassword:
+ 565              	.LFB141:
+ 335:Process/Src/process.c ****   if(delay_tick_1ms(&last_tick, 50))
+ 566              		.loc 1 335 1 view -0
+ 567              		.cfi_startproc
+ 568              		@ args = 0, pretend = 0, frame = 0
+ 569              		@ frame_needed = 0, uses_anonymous_args = 0
+ 570 0000 10B5     		push	{r4, lr}
+ 571              		.cfi_def_cfa_offset 8
+ 572              		.cfi_offset 4, -8
+ 573              		.cfi_offset 14, -4
+ 336:Process/Src/process.c ****   {
+ 574              		.loc 1 336 3 view .LVU106
+ 336:Process/Src/process.c ****   {
+ 575              		.loc 1 336 6 is_stmt 0 view .LVU107
+ 576 0002 3221     		movs	r1, #50
+ 577 0004 0D48     		ldr	r0, .L53
+ 578 0006 FFF7FEFF 		bl	delay_tick_1ms
+ 579              	.LVL29:
+ 336:Process/Src/process.c ****   {
+ 580              		.loc 1 336 5 discriminator 1 view .LVU108
+ 581 000a 00B9     		cbnz	r0, .L51
+ 582              	.L47:
+ 347:Process/Src/process.c **** 
+ 583              		.loc 1 347 1 view .LVU109
+ 584 000c 10BD     		pop	{r4, pc}
+ 585              	.L51:
+ 338:Process/Src/process.c ****     if(rxbuffer_uart1[0] == password)
+ 586              		.loc 1 338 5 is_stmt 1 view .LVU110
+ 587 000e 0C4C     		ldr	r4, .L53+4
+ 588 0010 2178     		ldrb	r1, [r4]	@ zero_extendqisi2
+ 589 0012 0C48     		ldr	r0, .L53+8
+ 590 0014 FFF7FEFF 		bl	serial_message
+ 591              	.LVL30:
+ 339:Process/Src/process.c ****     {
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 23
+
+
+ 592              		.loc 1 339 5 view .LVU111
+ 339:Process/Src/process.c ****     {
+ 593              		.loc 1 339 22 is_stmt 0 view .LVU112
+ 594 0018 0B4B     		ldr	r3, .L53+12
+ 595 001a 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 339:Process/Src/process.c ****     {
+ 596              		.loc 1 339 26 view .LVU113
+ 597 001c 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 339:Process/Src/process.c ****     {
+ 598              		.loc 1 339 7 view .LVU114
+ 599 001e 9A42     		cmp	r2, r3
+ 600 0020 03D0     		beq	.L52
+ 601              	.L49:
+ 345:Process/Src/process.c ****   }
+ 602              		.loc 1 345 5 is_stmt 1 view .LVU115
+ 345:Process/Src/process.c ****   }
+ 603              		.loc 1 345 16 is_stmt 0 view .LVU116
+ 604 0022 0A4B     		ldr	r3, .L53+16
+ 605 0024 0022     		movs	r2, #0
+ 606 0026 1A70     		strb	r2, [r3]
+ 347:Process/Src/process.c **** 
+ 607              		.loc 1 347 1 view .LVU117
+ 608 0028 F0E7     		b	.L47
+ 609              	.L52:
+ 341:Process/Src/process.c ****       nextion_page_state = NEXTION_PAGE1; 
+ 610              		.loc 1 341 7 is_stmt 1 view .LVU118
+ 611 002a 0948     		ldr	r0, .L53+20
+ 612 002c FFF7FEFF 		bl	NEXTION_SendPage
+ 613              	.LVL31:
+ 342:Process/Src/process.c ****       nextionPage1LightsSatus();
+ 614              		.loc 1 342 7 view .LVU119
+ 342:Process/Src/process.c ****       nextionPage1LightsSatus();
+ 615              		.loc 1 342 26 is_stmt 0 view .LVU120
+ 616 0030 084B     		ldr	r3, .L53+24
+ 617 0032 0122     		movs	r2, #1
+ 618 0034 1A70     		strb	r2, [r3]
+ 343:Process/Src/process.c ****     }
+ 619              		.loc 1 343 7 is_stmt 1 view .LVU121
+ 620 0036 FFF7FEFF 		bl	nextionPage1LightsSatus
+ 621              	.LVL32:
+ 622 003a F2E7     		b	.L49
+ 623              	.L54:
+ 624              		.align	2
+ 625              	.L53:
+ 626 003c 00000000 		.word	last_tick
+ 627 0040 00000000 		.word	password
+ 628 0044 00000000 		.word	.LC13
+ 629 0048 00000000 		.word	rxbuffer_uart1
+ 630 004c 00000000 		.word	step_touch
+ 631 0050 04000000 		.word	.LC1
+ 632 0054 00000000 		.word	nextion_page_state
+ 633              		.cfi_endproc
+ 634              	.LFE141:
+ 636              		.section	.rodata.nextionSetSleep.str1.4,"aMS",%progbits,1
+ 637              		.align	2
+ 638              	.LC14:
+ 639 0000 736C6565 		.ascii	"sleep=0\000"
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 24
+
+
+ 639      703D3000 
+ 640              		.section	.text.nextionSetSleep,"ax",%progbits
+ 641              		.align	1
+ 642              		.syntax unified
+ 643              		.thumb
+ 644              		.thumb_func
+ 646              	nextionSetSleep:
+ 647              	.LFB140:
+ 318:Process/Src/process.c ****   if(!delay_tick_1ms_no_rst(&last_tick,500))
+ 648              		.loc 1 318 1 view -0
+ 649              		.cfi_startproc
+ 650              		@ args = 0, pretend = 0, frame = 0
+ 651              		@ frame_needed = 0, uses_anonymous_args = 0
+ 652 0000 08B5     		push	{r3, lr}
+ 653              		.cfi_def_cfa_offset 8
+ 654              		.cfi_offset 3, -8
+ 655              		.cfi_offset 14, -4
+ 319:Process/Src/process.c ****   {
+ 656              		.loc 1 319 3 view .LVU123
+ 319:Process/Src/process.c ****   {
+ 657              		.loc 1 319 7 is_stmt 0 view .LVU124
+ 658 0002 4FF4FA71 		mov	r1, #500
+ 659 0006 0C48     		ldr	r0, .L60
+ 660 0008 FFF7FEFF 		bl	delay_tick_1ms_no_rst
+ 661              	.LVL33:
+ 319:Process/Src/process.c ****   {
+ 662              		.loc 1 319 5 discriminator 1 view .LVU125
+ 663 000c 10B9     		cbnz	r0, .L56
+ 321:Process/Src/process.c ****   }
+ 664              		.loc 1 321 5 is_stmt 1 view .LVU126
+ 321:Process/Src/process.c ****   }
+ 665              		.loc 1 321 34 is_stmt 0 view .LVU127
+ 666 000e 0B4B     		ldr	r3, .L60+4
+ 667 0010 0022     		movs	r2, #0
+ 668 0012 1A70     		strb	r2, [r3]
+ 669              	.L56:
+ 323:Process/Src/process.c ****   {
+ 670              		.loc 1 323 3 is_stmt 1 view .LVU128
+ 323:Process/Src/process.c ****   {
+ 671              		.loc 1 323 6 is_stmt 0 view .LVU129
+ 672 0014 4FF4AF61 		mov	r1, #1400
+ 673 0018 0748     		ldr	r0, .L60
+ 674 001a FFF7FEFF 		bl	delay_tick_1ms_no_rst
+ 675              	.LVL34:
+ 323:Process/Src/process.c ****   {
+ 676              		.loc 1 323 5 discriminator 1 view .LVU130
+ 677 001e 18B1     		cbz	r0, .L55
+ 325:Process/Src/process.c ****     {
+ 678              		.loc 1 325 5 is_stmt 1 view .LVU131
+ 325:Process/Src/process.c ****     {
+ 679              		.loc 1 325 26 is_stmt 0 view .LVU132
+ 680 0020 064B     		ldr	r3, .L60+4
+ 681 0022 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 325:Process/Src/process.c ****     {
+ 682              		.loc 1 325 8 view .LVU133
+ 683 0024 682B     		cmp	r3, #104
+ 684 0026 00D0     		beq	.L59
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 25
+
+
+ 685              	.L55:
+ 331:Process/Src/process.c **** 
+ 686              		.loc 1 331 1 view .LVU134
+ 687 0028 08BD     		pop	{r3, pc}
+ 688              	.L59:
+ 327:Process/Src/process.c ****       step_touch = SETTOUCH_STATE_IDLE;
+ 689              		.loc 1 327 7 is_stmt 1 view .LVU135
+ 690 002a 0548     		ldr	r0, .L60+8
+ 691 002c FFF7FEFF 		bl	NEXTION_SendCode
+ 692              	.LVL35:
+ 328:Process/Src/process.c ****     }
+ 693              		.loc 1 328 7 view .LVU136
+ 328:Process/Src/process.c ****     }
+ 694              		.loc 1 328 18 is_stmt 0 view .LVU137
+ 695 0030 044B     		ldr	r3, .L60+12
+ 696 0032 0022     		movs	r2, #0
+ 697 0034 1A70     		strb	r2, [r3]
+ 331:Process/Src/process.c **** 
+ 698              		.loc 1 331 1 view .LVU138
+ 699 0036 F7E7     		b	.L55
+ 700              	.L61:
+ 701              		.align	2
+ 702              	.L60:
+ 703 0038 00000000 		.word	last_tick
+ 704 003c 00000000 		.word	nextionTouchEvent
+ 705 0040 00000000 		.word	.LC14
+ 706 0044 00000000 		.word	step_touch
+ 707              		.cfi_endproc
+ 708              	.LFE140:
+ 710              		.section	.text.nextionSetTemp,"ax",%progbits
+ 711              		.align	1
+ 712              		.syntax unified
+ 713              		.thumb
+ 714              		.thumb_func
+ 716              	nextionSetTemp:
+ 717              	.LFB139:
+ 305:Process/Src/process.c ****   if(delay_tick_1ms_no_rst(&last_tick, 75))
+ 718              		.loc 1 305 1 is_stmt 1 view -0
+ 719              		.cfi_startproc
+ 720              		@ args = 0, pretend = 0, frame = 0
+ 721              		@ frame_needed = 0, uses_anonymous_args = 0
+ 722 0000 30B5     		push	{r4, r5, lr}
+ 723              		.cfi_def_cfa_offset 12
+ 724              		.cfi_offset 4, -12
+ 725              		.cfi_offset 5, -8
+ 726              		.cfi_offset 14, -4
+ 727 0002 83B0     		sub	sp, sp, #12
+ 728              		.cfi_def_cfa_offset 24
+ 306:Process/Src/process.c ****   {
+ 729              		.loc 1 306 3 view .LVU140
+ 306:Process/Src/process.c ****   {
+ 730              		.loc 1 306 6 is_stmt 0 view .LVU141
+ 731 0004 4B21     		movs	r1, #75
+ 732 0006 1048     		ldr	r0, .L66
+ 733 0008 FFF7FEFF 		bl	delay_tick_1ms_no_rst
+ 734              	.LVL36:
+ 306:Process/Src/process.c ****   {
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 26
+
+
+ 735              		.loc 1 306 5 discriminator 1 view .LVU142
+ 736 000c 08B9     		cbnz	r0, .L65
+ 737              	.L62:
+ 314:Process/Src/process.c **** 
+ 738              		.loc 1 314 1 view .LVU143
+ 739 000e 03B0     		add	sp, sp, #12
+ 740              		.cfi_remember_state
+ 741              		.cfi_def_cfa_offset 12
+ 742              		@ sp needed
+ 743 0010 30BD     		pop	{r4, r5, pc}
+ 744              	.L65:
+ 745              		.cfi_restore_state
+ 308:Process/Src/process.c ****     eeprom_read_array[7] = rxbuffer_uart1[0];
+ 746              		.loc 1 308 5 is_stmt 1 view .LVU144
+ 308:Process/Src/process.c ****     eeprom_read_array[7] = rxbuffer_uart1[0];
+ 747              		.loc 1 308 38 is_stmt 0 view .LVU145
+ 748 0012 0E4C     		ldr	r4, .L66+4
+ 308:Process/Src/process.c ****     eeprom_read_array[7] = rxbuffer_uart1[0];
+ 749              		.loc 1 308 5 view .LVU146
+ 750 0014 0E4D     		ldr	r5, .L66+8
+ 751 0016 2278     		ldrb	r2, [r4]	@ zero_extendqisi2
+ 752 0018 0E49     		ldr	r1, .L66+12
+ 753 001a 2846     		mov	r0, r5
+ 754 001c FFF7FEFF 		bl	sprintf
+ 755              	.LVL37:
+ 309:Process/Src/process.c ****     NEXTION_SendValue("n1",str);
+ 756              		.loc 1 309 5 is_stmt 1 view .LVU147
+ 309:Process/Src/process.c ****     NEXTION_SendValue("n1",str);
+ 757              		.loc 1 309 42 is_stmt 0 view .LVU148
+ 758 0020 2278     		ldrb	r2, [r4]	@ zero_extendqisi2
+ 309:Process/Src/process.c ****     NEXTION_SendValue("n1",str);
+ 759              		.loc 1 309 26 view .LVU149
+ 760 0022 0D4B     		ldr	r3, .L66+16
+ 761 0024 DA71     		strb	r2, [r3, #7]
+ 310:Process/Src/process.c ****     EE24_Write(&ee24,7,rxbuffer_uart1,1,1000);
+ 762              		.loc 1 310 5 is_stmt 1 view .LVU150
+ 763 0026 2946     		mov	r1, r5
+ 764 0028 0C48     		ldr	r0, .L66+20
+ 765 002a FFF7FEFF 		bl	NEXTION_SendValue
+ 766              	.LVL38:
+ 311:Process/Src/process.c ****     step_touch = SETTOUCH_STATE_IDLE;
+ 767              		.loc 1 311 5 view .LVU151
+ 768 002e 4FF47A73 		mov	r3, #1000
+ 769 0032 0093     		str	r3, [sp]
+ 770 0034 0123     		movs	r3, #1
+ 771 0036 2246     		mov	r2, r4
+ 772 0038 0721     		movs	r1, #7
+ 773 003a 0948     		ldr	r0, .L66+24
+ 774 003c FFF7FEFF 		bl	EE24_Write
+ 775              	.LVL39:
+ 312:Process/Src/process.c ****   }
+ 776              		.loc 1 312 5 view .LVU152
+ 312:Process/Src/process.c ****   }
+ 777              		.loc 1 312 16 is_stmt 0 view .LVU153
+ 778 0040 084B     		ldr	r3, .L66+28
+ 779 0042 0022     		movs	r2, #0
+ 780 0044 1A70     		strb	r2, [r3]
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 27
+
+
+ 314:Process/Src/process.c **** 
+ 781              		.loc 1 314 1 view .LVU154
+ 782 0046 E2E7     		b	.L62
+ 783              	.L67:
+ 784              		.align	2
+ 785              	.L66:
+ 786 0048 00000000 		.word	last_tick
+ 787 004c 00000000 		.word	rxbuffer_uart1
+ 788 0050 00000000 		.word	str
+ 789 0054 00000000 		.word	.LC11
+ 790 0058 00000000 		.word	eeprom_read_array
+ 791 005c 04000000 		.word	.LC12
+ 792 0060 00000000 		.word	ee24
+ 793 0064 00000000 		.word	step_touch
+ 794              		.cfi_endproc
+ 795              	.LFE139:
+ 797              		.section	.rodata.nextionSetChangePassword.str1.4,"aMS",%progbits,1
+ 798              		.align	2
+ 799              	.LC15:
+ 800 0000 3000     		.ascii	"0\000"
+ 801 0002 0000     		.align	2
+ 802              	.LC16:
+ 803 0004 6E3000   		.ascii	"n0\000"
+ 804              		.section	.text.nextionSetChangePassword,"ax",%progbits
+ 805              		.align	1
+ 806              		.syntax unified
+ 807              		.thumb
+ 808              		.thumb_func
+ 810              	nextionSetChangePassword:
+ 811              	.LFB144:
+ 496:Process/Src/process.c ****       if(delay_tick_1ms_no_rst(&last_tick, 75))
+ 812              		.loc 1 496 1 is_stmt 1 view -0
+ 813              		.cfi_startproc
+ 814              		@ args = 0, pretend = 0, frame = 0
+ 815              		@ frame_needed = 0, uses_anonymous_args = 0
+ 816 0000 10B5     		push	{r4, lr}
+ 817              		.cfi_def_cfa_offset 8
+ 818              		.cfi_offset 4, -8
+ 819              		.cfi_offset 14, -4
+ 820 0002 82B0     		sub	sp, sp, #8
+ 821              		.cfi_def_cfa_offset 16
+ 497:Process/Src/process.c ****     {
+ 822              		.loc 1 497 7 view .LVU156
+ 497:Process/Src/process.c ****     {
+ 823              		.loc 1 497 10 is_stmt 0 view .LVU157
+ 824 0004 4B21     		movs	r1, #75
+ 825 0006 1248     		ldr	r0, .L72
+ 826 0008 FFF7FEFF 		bl	delay_tick_1ms_no_rst
+ 827              	.LVL40:
+ 497:Process/Src/process.c ****     {
+ 828              		.loc 1 497 9 discriminator 1 view .LVU158
+ 829 000c 08B9     		cbnz	r0, .L71
+ 830              	.L68:
+ 508:Process/Src/process.c **** 
+ 831              		.loc 1 508 1 view .LVU159
+ 832 000e 02B0     		add	sp, sp, #8
+ 833              		.cfi_remember_state
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 28
+
+
+ 834              		.cfi_def_cfa_offset 8
+ 835              		@ sp needed
+ 836 0010 10BD     		pop	{r4, pc}
+ 837              	.L71:
+ 838              		.cfi_restore_state
+ 499:Process/Src/process.c ****       password = rxbuffer_uart1[0];
+ 839              		.loc 1 499 7 is_stmt 1 view .LVU160
+ 840 0012 104C     		ldr	r4, .L72+4
+ 841 0014 4FF47A73 		mov	r3, #1000
+ 842 0018 0093     		str	r3, [sp]
+ 843 001a 0123     		movs	r3, #1
+ 844 001c 2246     		mov	r2, r4
+ 845 001e 0021     		movs	r1, #0
+ 846 0020 0D48     		ldr	r0, .L72+8
+ 847 0022 FFF7FEFF 		bl	EE24_Write
+ 848              	.LVL41:
+ 500:Process/Src/process.c ****       rxbuffer_uart1[0] = -1;
+ 849              		.loc 1 500 7 view .LVU161
+ 500:Process/Src/process.c ****       rxbuffer_uart1[0] = -1;
+ 850              		.loc 1 500 32 is_stmt 0 view .LVU162
+ 851 0026 2278     		ldrb	r2, [r4]	@ zero_extendqisi2
+ 500:Process/Src/process.c ****       rxbuffer_uart1[0] = -1;
+ 852              		.loc 1 500 16 view .LVU163
+ 853 0028 0C4B     		ldr	r3, .L72+12
+ 854 002a 1A70     		strb	r2, [r3]
+ 501:Process/Src/process.c ****       NEXTION_SendPage("0");
+ 855              		.loc 1 501 7 is_stmt 1 view .LVU164
+ 501:Process/Src/process.c ****       NEXTION_SendPage("0");
+ 856              		.loc 1 501 25 is_stmt 0 view .LVU165
+ 857 002c FF23     		movs	r3, #255
+ 858 002e 2370     		strb	r3, [r4]
+ 502:Process/Src/process.c ****       NEXTION_SendValue("n0","0");
+ 859              		.loc 1 502 7 is_stmt 1 view .LVU166
+ 860 0030 0B4C     		ldr	r4, .L72+16
+ 861 0032 2046     		mov	r0, r4
+ 862 0034 FFF7FEFF 		bl	NEXTION_SendPage
+ 863              	.LVL42:
+ 503:Process/Src/process.c ****       nextion_page_state = Nextion_Page0;
+ 864              		.loc 1 503 7 view .LVU167
+ 865 0038 2146     		mov	r1, r4
+ 866 003a 0A48     		ldr	r0, .L72+20
+ 867 003c FFF7FEFF 		bl	NEXTION_SendValue
+ 868              	.LVL43:
+ 504:Process/Src/process.c ****       NEXTION_DMA_FLAG = DMA_FLAG_DISABLE;
+ 869              		.loc 1 504 7 view .LVU168
+ 504:Process/Src/process.c ****       NEXTION_DMA_FLAG = DMA_FLAG_DISABLE;
+ 870              		.loc 1 504 26 is_stmt 0 view .LVU169
+ 871 0040 0023     		movs	r3, #0
+ 872 0042 094A     		ldr	r2, .L72+24
+ 873 0044 1370     		strb	r3, [r2]
+ 505:Process/Src/process.c ****       step_touch = SETTOUCH_STATE_IDLE;
+ 874              		.loc 1 505 7 is_stmt 1 view .LVU170
+ 505:Process/Src/process.c ****       step_touch = SETTOUCH_STATE_IDLE;
+ 875              		.loc 1 505 24 is_stmt 0 view .LVU171
+ 876 0046 094A     		ldr	r2, .L72+28
+ 877 0048 1360     		str	r3, [r2]
+ 506:Process/Src/process.c ****     }
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 29
+
+
+ 878              		.loc 1 506 7 is_stmt 1 view .LVU172
+ 506:Process/Src/process.c ****     }
+ 879              		.loc 1 506 18 is_stmt 0 view .LVU173
+ 880 004a 094A     		ldr	r2, .L72+32
+ 881 004c 1370     		strb	r3, [r2]
+ 508:Process/Src/process.c **** 
+ 882              		.loc 1 508 1 view .LVU174
+ 883 004e DEE7     		b	.L68
+ 884              	.L73:
+ 885              		.align	2
+ 886              	.L72:
+ 887 0050 00000000 		.word	last_tick
+ 888 0054 00000000 		.word	rxbuffer_uart1
+ 889 0058 00000000 		.word	ee24
+ 890 005c 00000000 		.word	password
+ 891 0060 00000000 		.word	.LC15
+ 892 0064 04000000 		.word	.LC16
+ 893 0068 00000000 		.word	nextion_page_state
+ 894 006c 00000000 		.word	NEXTION_DMA_FLAG
+ 895 0070 00000000 		.word	step_touch
+ 896              		.cfi_endproc
+ 897              	.LFE144:
+ 899              		.section	.rodata.nextionSetTime.str1.4,"aMS",%progbits,1
+ 900              		.align	2
+ 901              	.LC17:
+ 902 0000 7072696E 		.ascii	"print n0.val\000"
+ 902      74206E30 
+ 902      2E76616C 
+ 902      00
+ 903 000d 000000   		.align	2
+ 904              	.LC18:
+ 905 0010 7072696E 		.ascii	"print n1.val\000"
+ 905      74206E31 
+ 905      2E76616C 
+ 905      00
+ 906 001d 000000   		.align	2
+ 907              	.LC19:
+ 908 0020 7072696E 		.ascii	"print n2.val\000"
+ 908      74206E32 
+ 908      2E76616C 
+ 908      00
+ 909 002d 000000   		.align	2
+ 910              	.LC20:
+ 911 0030 7072696E 		.ascii	"print n3.val\000"
+ 911      74206E33 
+ 911      2E76616C 
+ 911      00
+ 912 003d 000000   		.align	2
+ 913              	.LC21:
+ 914 0040 7072696E 		.ascii	"print n4.val\000"
+ 914      74206E34 
+ 914      2E76616C 
+ 914      00
+ 915 004d 000000   		.align	2
+ 916              	.LC22:
+ 917 0050 7072696E 		.ascii	"print n5.val\000"
+ 917      74206E35 
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 30
+
+
+ 917      2E76616C 
+ 917      00
+ 918 005d 000000   		.align	2
+ 919              	.LC23:
+ 920 0060 75706461 		.ascii	"update successfully\000"
+ 920      74652073 
+ 920      75636365 
+ 920      73736675 
+ 920      6C6C7900 
+ 921              		.align	2
+ 922              	.LC24:
+ 923 0074 743000   		.ascii	"t0\000"
+ 924              		.section	.text.nextionSetTime,"ax",%progbits
+ 925              		.align	1
+ 926              		.syntax unified
+ 927              		.thumb
+ 928              		.thumb_func
+ 930              	nextionSetTime:
+ 931              	.LFB142:
+ 351:Process/Src/process.c ****   uint8_t indata[1];
+ 932              		.loc 1 351 1 is_stmt 1 view -0
+ 933              		.cfi_startproc
+ 934              		@ args = 0, pretend = 0, frame = 0
+ 935              		@ frame_needed = 0, uses_anonymous_args = 0
+ 936 0000 08B5     		push	{r3, lr}
+ 937              		.cfi_def_cfa_offset 8
+ 938              		.cfi_offset 3, -8
+ 939              		.cfi_offset 14, -4
+ 352:Process/Src/process.c ****   switch (step_time)
+ 940              		.loc 1 352 3 view .LVU176
+ 353:Process/Src/process.c ****   {
+ 941              		.loc 1 353 3 view .LVU177
+ 942 0002 544B     		ldr	r3, .L91
+ 943 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 944 0006 0B2B     		cmp	r3, #11
+ 945 0008 11D8     		bhi	.L74
+ 946 000a DFE803F0 		tbb	[pc, r3]
+ 947              	.L77:
+ 948 000e 06       		.byte	(.L88-.L77)/2
+ 949 000f 11       		.byte	(.L87-.L77)/2
+ 950 0010 1F       		.byte	(.L86-.L77)/2
+ 951 0011 2A       		.byte	(.L85-.L77)/2
+ 952 0012 38       		.byte	(.L84-.L77)/2
+ 953 0013 43       		.byte	(.L83-.L77)/2
+ 954 0014 51       		.byte	(.L82-.L77)/2
+ 955 0015 5C       		.byte	(.L81-.L77)/2
+ 956 0016 6A       		.byte	(.L80-.L77)/2
+ 957 0017 75       		.byte	(.L79-.L77)/2
+ 958 0018 83       		.byte	(.L78-.L77)/2
+ 959 0019 8E       		.byte	(.L76-.L77)/2
+ 960              		.p2align 1
+ 961              	.L88:
+ 356:Process/Src/process.c ****       last_tick = HAL_GetTick();
+ 962              		.loc 1 356 7 view .LVU178
+ 963 001a 4F48     		ldr	r0, .L91+4
+ 964 001c FFF7FEFF 		bl	NEXTION_SendCode
+ 965              	.LVL44:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 31
+
+
+ 357:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_HOUR;
+ 966              		.loc 1 357 7 view .LVU179
+ 357:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_HOUR;
+ 967              		.loc 1 357 19 is_stmt 0 view .LVU180
+ 968 0020 FFF7FEFF 		bl	HAL_GetTick
+ 969              	.LVL45:
+ 357:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_HOUR;
+ 970              		.loc 1 357 17 discriminator 1 view .LVU181
+ 971 0024 4D4B     		ldr	r3, .L91+8
+ 972 0026 1860     		str	r0, [r3]
+ 358:Process/Src/process.c ****     break;
+ 973              		.loc 1 358 7 is_stmt 1 view .LVU182
+ 358:Process/Src/process.c ****     break;
+ 974              		.loc 1 358 17 is_stmt 0 view .LVU183
+ 975 0028 4A4B     		ldr	r3, .L91
+ 976 002a 0122     		movs	r2, #1
+ 977 002c 1A70     		strb	r2, [r3]
+ 359:Process/Src/process.c **** 
+ 978              		.loc 1 359 5 is_stmt 1 view .LVU184
+ 979              	.L74:
+ 449:Process/Src/process.c **** 
+ 980              		.loc 1 449 1 is_stmt 0 view .LVU185
+ 981 002e 08BD     		pop	{r3, pc}
+ 982              	.L87:
+ 362:Process/Src/process.c ****       {
+ 983              		.loc 1 362 7 is_stmt 1 view .LVU186
+ 362:Process/Src/process.c ****       {
+ 984              		.loc 1 362 10 is_stmt 0 view .LVU187
+ 985 0030 3221     		movs	r1, #50
+ 986 0032 4A48     		ldr	r0, .L91+8
+ 987 0034 FFF7FEFF 		bl	delay_tick_1ms_no_rst
+ 988              	.LVL46:
+ 362:Process/Src/process.c ****       {
+ 989              		.loc 1 362 9 discriminator 1 view .LVU188
+ 990 0038 0028     		cmp	r0, #0
+ 991 003a F8D0     		beq	.L74
+ 364:Process/Src/process.c ****         PCF85_SetHour(indata[0]);
+ 992              		.loc 1 364 9 is_stmt 1 view .LVU189
+ 365:Process/Src/process.c ****         //EE24_Write(&ee24,4,indata,1,1000);
+ 993              		.loc 1 365 9 view .LVU190
+ 994 003c 484B     		ldr	r3, .L91+12
+ 995 003e 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 996 0040 FFF7FEFF 		bl	PCF85_SetHour
+ 997              	.LVL47:
+ 367:Process/Src/process.c ****       }
+ 998              		.loc 1 367 9 view .LVU191
+ 367:Process/Src/process.c ****       }
+ 999              		.loc 1 367 19 is_stmt 0 view .LVU192
+ 1000 0044 434B     		ldr	r3, .L91
+ 1001 0046 0222     		movs	r2, #2
+ 1002 0048 1A70     		strb	r2, [r3]
+ 1003 004a F0E7     		b	.L74
+ 1004              	.L86:
+ 372:Process/Src/process.c ****       last_tick = HAL_GetTick();
+ 1005              		.loc 1 372 7 is_stmt 1 view .LVU193
+ 1006 004c 4548     		ldr	r0, .L91+16
+ 1007 004e FFF7FEFF 		bl	NEXTION_SendCode
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 32
+
+
+ 1008              	.LVL48:
+ 373:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_MINUTE;
+ 1009              		.loc 1 373 7 view .LVU194
+ 373:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_MINUTE;
+ 1010              		.loc 1 373 19 is_stmt 0 view .LVU195
+ 1011 0052 FFF7FEFF 		bl	HAL_GetTick
+ 1012              	.LVL49:
+ 373:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_MINUTE;
+ 1013              		.loc 1 373 17 discriminator 1 view .LVU196
+ 1014 0056 414B     		ldr	r3, .L91+8
+ 1015 0058 1860     		str	r0, [r3]
+ 374:Process/Src/process.c ****     break;
+ 1016              		.loc 1 374 7 is_stmt 1 view .LVU197
+ 374:Process/Src/process.c ****     break;
+ 1017              		.loc 1 374 17 is_stmt 0 view .LVU198
+ 1018 005a 3E4B     		ldr	r3, .L91
+ 1019 005c 0322     		movs	r2, #3
+ 1020 005e 1A70     		strb	r2, [r3]
+ 375:Process/Src/process.c **** 
+ 1021              		.loc 1 375 5 is_stmt 1 view .LVU199
+ 1022 0060 E5E7     		b	.L74
+ 1023              	.L85:
+ 378:Process/Src/process.c ****       {
+ 1024              		.loc 1 378 7 view .LVU200
+ 378:Process/Src/process.c ****       {
+ 1025              		.loc 1 378 10 is_stmt 0 view .LVU201
+ 1026 0062 3221     		movs	r1, #50
+ 1027 0064 3D48     		ldr	r0, .L91+8
+ 1028 0066 FFF7FEFF 		bl	delay_tick_1ms_no_rst
+ 1029              	.LVL50:
+ 378:Process/Src/process.c ****       {
+ 1030              		.loc 1 378 9 discriminator 1 view .LVU202
+ 1031 006a 0028     		cmp	r0, #0
+ 1032 006c DFD0     		beq	.L74
+ 381:Process/Src/process.c ****         PCF85_SetMinute(indata[0]);
+ 1033              		.loc 1 381 9 is_stmt 1 view .LVU203
+ 382:Process/Src/process.c ****         //EE24_Write(&ee24,5,indata,1,1000);
+ 1034              		.loc 1 382 9 view .LVU204
+ 1035 006e 3C4B     		ldr	r3, .L91+12
+ 1036 0070 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 1037 0072 FFF7FEFF 		bl	PCF85_SetMinute
+ 1038              	.LVL51:
+ 384:Process/Src/process.c ****       }
+ 1039              		.loc 1 384 9 view .LVU205
+ 384:Process/Src/process.c ****       }
+ 1040              		.loc 1 384 19 is_stmt 0 view .LVU206
+ 1041 0076 374B     		ldr	r3, .L91
+ 1042 0078 0422     		movs	r2, #4
+ 1043 007a 1A70     		strb	r2, [r3]
+ 1044 007c D7E7     		b	.L74
+ 1045              	.L84:
+ 389:Process/Src/process.c ****       last_tick = HAL_GetTick();
+ 1046              		.loc 1 389 7 is_stmt 1 view .LVU207
+ 1047 007e 3A48     		ldr	r0, .L91+20
+ 1048 0080 FFF7FEFF 		bl	NEXTION_SendCode
+ 1049              	.LVL52:
+ 390:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_SECOND;
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 33
+
+
+ 1050              		.loc 1 390 7 view .LVU208
+ 390:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_SECOND;
+ 1051              		.loc 1 390 19 is_stmt 0 view .LVU209
+ 1052 0084 FFF7FEFF 		bl	HAL_GetTick
+ 1053              	.LVL53:
+ 390:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_SECOND;
+ 1054              		.loc 1 390 17 discriminator 1 view .LVU210
+ 1055 0088 344B     		ldr	r3, .L91+8
+ 1056 008a 1860     		str	r0, [r3]
+ 391:Process/Src/process.c ****     break;
+ 1057              		.loc 1 391 7 is_stmt 1 view .LVU211
+ 391:Process/Src/process.c ****     break;
+ 1058              		.loc 1 391 17 is_stmt 0 view .LVU212
+ 1059 008c 314B     		ldr	r3, .L91
+ 1060 008e 0522     		movs	r2, #5
+ 1061 0090 1A70     		strb	r2, [r3]
+ 392:Process/Src/process.c **** 
+ 1062              		.loc 1 392 5 is_stmt 1 view .LVU213
+ 1063 0092 CCE7     		b	.L74
+ 1064              	.L83:
+ 395:Process/Src/process.c ****       {
+ 1065              		.loc 1 395 7 view .LVU214
+ 395:Process/Src/process.c ****       {
+ 1066              		.loc 1 395 10 is_stmt 0 view .LVU215
+ 1067 0094 3221     		movs	r1, #50
+ 1068 0096 3148     		ldr	r0, .L91+8
+ 1069 0098 FFF7FEFF 		bl	delay_tick_1ms_no_rst
+ 1070              	.LVL54:
+ 395:Process/Src/process.c ****       {
+ 1071              		.loc 1 395 9 discriminator 1 view .LVU216
+ 1072 009c 0028     		cmp	r0, #0
+ 1073 009e C6D0     		beq	.L74
+ 397:Process/Src/process.c ****         PCF85_SetSecond(indata[0]);
+ 1074              		.loc 1 397 9 is_stmt 1 view .LVU217
+ 398:Process/Src/process.c ****         step_time = SETTIME_STATE_SEND_DAY;
+ 1075              		.loc 1 398 9 view .LVU218
+ 1076 00a0 2F4B     		ldr	r3, .L91+12
+ 1077 00a2 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 1078 00a4 FFF7FEFF 		bl	PCF85_SetSecond
+ 1079              	.LVL55:
+ 399:Process/Src/process.c ****       }    
+ 1080              		.loc 1 399 9 view .LVU219
+ 399:Process/Src/process.c ****       }    
+ 1081              		.loc 1 399 19 is_stmt 0 view .LVU220
+ 1082 00a8 2A4B     		ldr	r3, .L91
+ 1083 00aa 0622     		movs	r2, #6
+ 1084 00ac 1A70     		strb	r2, [r3]
+ 1085 00ae BEE7     		b	.L74
+ 1086              	.L82:
+ 404:Process/Src/process.c ****       last_tick = HAL_GetTick();
+ 1087              		.loc 1 404 7 is_stmt 1 view .LVU221
+ 1088 00b0 2E48     		ldr	r0, .L91+24
+ 1089 00b2 FFF7FEFF 		bl	NEXTION_SendCode
+ 1090              	.LVL56:
+ 405:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_DAY;
+ 1091              		.loc 1 405 7 view .LVU222
+ 405:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_DAY;
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 34
+
+
+ 1092              		.loc 1 405 19 is_stmt 0 view .LVU223
+ 1093 00b6 FFF7FEFF 		bl	HAL_GetTick
+ 1094              	.LVL57:
+ 405:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_DAY;
+ 1095              		.loc 1 405 17 discriminator 1 view .LVU224
+ 1096 00ba 284B     		ldr	r3, .L91+8
+ 1097 00bc 1860     		str	r0, [r3]
+ 406:Process/Src/process.c ****     break;
+ 1098              		.loc 1 406 7 is_stmt 1 view .LVU225
+ 406:Process/Src/process.c ****     break;
+ 1099              		.loc 1 406 17 is_stmt 0 view .LVU226
+ 1100 00be 254B     		ldr	r3, .L91
+ 1101 00c0 0722     		movs	r2, #7
+ 1102 00c2 1A70     		strb	r2, [r3]
+ 407:Process/Src/process.c **** 
+ 1103              		.loc 1 407 5 is_stmt 1 view .LVU227
+ 1104 00c4 B3E7     		b	.L74
+ 1105              	.L81:
+ 410:Process/Src/process.c ****       {
+ 1106              		.loc 1 410 7 view .LVU228
+ 410:Process/Src/process.c ****       {
+ 1107              		.loc 1 410 10 is_stmt 0 view .LVU229
+ 1108 00c6 3221     		movs	r1, #50
+ 1109 00c8 2448     		ldr	r0, .L91+8
+ 1110 00ca FFF7FEFF 		bl	delay_tick_1ms_no_rst
+ 1111              	.LVL58:
+ 410:Process/Src/process.c ****       {
+ 1112              		.loc 1 410 9 discriminator 1 view .LVU230
+ 1113 00ce 0028     		cmp	r0, #0
+ 1114 00d0 ADD0     		beq	.L74
+ 412:Process/Src/process.c ****         PCF85_Setday(indata[0]);
+ 1115              		.loc 1 412 9 is_stmt 1 view .LVU231
+ 413:Process/Src/process.c ****         step_time = SETTIME_STATE_SEND_MONTH;
+ 1116              		.loc 1 413 9 view .LVU232
+ 1117 00d2 234B     		ldr	r3, .L91+12
+ 1118 00d4 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 1119 00d6 FFF7FEFF 		bl	PCF85_Setday
+ 1120              	.LVL59:
+ 414:Process/Src/process.c ****       }
+ 1121              		.loc 1 414 9 view .LVU233
+ 414:Process/Src/process.c ****       }
+ 1122              		.loc 1 414 19 is_stmt 0 view .LVU234
+ 1123 00da 1E4B     		ldr	r3, .L91
+ 1124 00dc 0822     		movs	r2, #8
+ 1125 00de 1A70     		strb	r2, [r3]
+ 1126 00e0 A5E7     		b	.L74
+ 1127              	.L80:
+ 419:Process/Src/process.c ****       last_tick = HAL_GetTick();
+ 1128              		.loc 1 419 7 is_stmt 1 view .LVU235
+ 1129 00e2 2348     		ldr	r0, .L91+28
+ 1130 00e4 FFF7FEFF 		bl	NEXTION_SendCode
+ 1131              	.LVL60:
+ 420:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_MONTH;
+ 1132              		.loc 1 420 7 view .LVU236
+ 420:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_MONTH;
+ 1133              		.loc 1 420 19 is_stmt 0 view .LVU237
+ 1134 00e8 FFF7FEFF 		bl	HAL_GetTick
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 35
+
+
+ 1135              	.LVL61:
+ 420:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_MONTH;
+ 1136              		.loc 1 420 17 discriminator 1 view .LVU238
+ 1137 00ec 1B4B     		ldr	r3, .L91+8
+ 1138 00ee 1860     		str	r0, [r3]
+ 421:Process/Src/process.c ****     break;
+ 1139              		.loc 1 421 7 is_stmt 1 view .LVU239
+ 421:Process/Src/process.c ****     break;
+ 1140              		.loc 1 421 17 is_stmt 0 view .LVU240
+ 1141 00f0 184B     		ldr	r3, .L91
+ 1142 00f2 0922     		movs	r2, #9
+ 1143 00f4 1A70     		strb	r2, [r3]
+ 422:Process/Src/process.c **** 
+ 1144              		.loc 1 422 5 is_stmt 1 view .LVU241
+ 1145 00f6 9AE7     		b	.L74
+ 1146              	.L79:
+ 425:Process/Src/process.c ****       {
+ 1147              		.loc 1 425 7 view .LVU242
+ 425:Process/Src/process.c ****       {
+ 1148              		.loc 1 425 10 is_stmt 0 view .LVU243
+ 1149 00f8 3221     		movs	r1, #50
+ 1150 00fa 1848     		ldr	r0, .L91+8
+ 1151 00fc FFF7FEFF 		bl	delay_tick_1ms_no_rst
+ 1152              	.LVL62:
+ 425:Process/Src/process.c ****       {
+ 1153              		.loc 1 425 9 discriminator 1 view .LVU244
+ 1154 0100 0028     		cmp	r0, #0
+ 1155 0102 94D0     		beq	.L74
+ 427:Process/Src/process.c ****         PCF85_Setmonth(indata[0]);
+ 1156              		.loc 1 427 9 is_stmt 1 view .LVU245
+ 428:Process/Src/process.c ****         step_time = SETTIME_STATE_SEND_YEAR;
+ 1157              		.loc 1 428 9 view .LVU246
+ 1158 0104 164B     		ldr	r3, .L91+12
+ 1159 0106 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 1160 0108 FFF7FEFF 		bl	PCF85_Setmonth
+ 1161              	.LVL63:
+ 429:Process/Src/process.c ****       }
+ 1162              		.loc 1 429 9 view .LVU247
+ 429:Process/Src/process.c ****       }
+ 1163              		.loc 1 429 19 is_stmt 0 view .LVU248
+ 1164 010c 114B     		ldr	r3, .L91
+ 1165 010e 0A22     		movs	r2, #10
+ 1166 0110 1A70     		strb	r2, [r3]
+ 1167 0112 8CE7     		b	.L74
+ 1168              	.L78:
+ 434:Process/Src/process.c ****       last_tick = HAL_GetTick();
+ 1169              		.loc 1 434 7 is_stmt 1 view .LVU249
+ 1170 0114 1748     		ldr	r0, .L91+32
+ 1171 0116 FFF7FEFF 		bl	NEXTION_SendCode
+ 1172              	.LVL64:
+ 435:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_YEAR;
+ 1173              		.loc 1 435 7 view .LVU250
+ 435:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_YEAR;
+ 1174              		.loc 1 435 19 is_stmt 0 view .LVU251
+ 1175 011a FFF7FEFF 		bl	HAL_GetTick
+ 1176              	.LVL65:
+ 435:Process/Src/process.c ****       step_time = SETTIME_STATE_OPERATION_YEAR;
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 36
+
+
+ 1177              		.loc 1 435 17 discriminator 1 view .LVU252
+ 1178 011e 0F4B     		ldr	r3, .L91+8
+ 1179 0120 1860     		str	r0, [r3]
+ 436:Process/Src/process.c ****     break;
+ 1180              		.loc 1 436 7 is_stmt 1 view .LVU253
+ 436:Process/Src/process.c ****     break;
+ 1181              		.loc 1 436 17 is_stmt 0 view .LVU254
+ 1182 0122 0C4B     		ldr	r3, .L91
+ 1183 0124 0B22     		movs	r2, #11
+ 1184 0126 1A70     		strb	r2, [r3]
+ 437:Process/Src/process.c **** 
+ 1185              		.loc 1 437 5 is_stmt 1 view .LVU255
+ 1186 0128 81E7     		b	.L74
+ 1187              	.L76:
+ 440:Process/Src/process.c ****       {
+ 1188              		.loc 1 440 7 view .LVU256
+ 440:Process/Src/process.c ****       {
+ 1189              		.loc 1 440 10 is_stmt 0 view .LVU257
+ 1190 012a 3221     		movs	r1, #50
+ 1191 012c 0B48     		ldr	r0, .L91+8
+ 1192 012e FFF7FEFF 		bl	delay_tick_1ms_no_rst
+ 1193              	.LVL66:
+ 440:Process/Src/process.c ****       {
+ 1194              		.loc 1 440 9 discriminator 1 view .LVU258
+ 1195 0132 0028     		cmp	r0, #0
+ 1196 0134 3FF47BAF 		beq	.L74
+ 442:Process/Src/process.c ****         PCF85_Setyear(indata[0]-178);
+ 1197              		.loc 1 442 9 is_stmt 1 view .LVU259
+ 442:Process/Src/process.c ****         PCF85_Setyear(indata[0]-178);
+ 1198              		.loc 1 442 35 is_stmt 0 view .LVU260
+ 1199 0138 094B     		ldr	r3, .L91+12
+ 1200 013a 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 443:Process/Src/process.c ****         NEXTION_SendString("t0", "update successfully");
+ 1201              		.loc 1 443 9 is_stmt 1 view .LVU261
+ 1202 013c B238     		subs	r0, r0, #178
+ 1203 013e 80B2     		uxth	r0, r0
+ 1204 0140 FFF7FEFF 		bl	PCF85_Setyear
+ 1205              	.LVL67:
+ 444:Process/Src/process.c ****         step_touch = SETTOUCH_STATE_IDLE;
+ 1206              		.loc 1 444 9 view .LVU262
+ 1207 0144 0C49     		ldr	r1, .L91+36
+ 1208 0146 0D48     		ldr	r0, .L91+40
+ 1209 0148 FFF7FEFF 		bl	NEXTION_SendString
+ 1210              	.LVL68:
+ 445:Process/Src/process.c ****       }
+ 1211              		.loc 1 445 9 view .LVU263
+ 445:Process/Src/process.c ****       }
+ 1212              		.loc 1 445 20 is_stmt 0 view .LVU264
+ 1213 014c 0C4B     		ldr	r3, .L91+44
+ 1214 014e 0022     		movs	r2, #0
+ 1215 0150 1A70     		strb	r2, [r3]
+ 449:Process/Src/process.c **** 
+ 1216              		.loc 1 449 1 view .LVU265
+ 1217 0152 6CE7     		b	.L74
+ 1218              	.L92:
+ 1219              		.align	2
+ 1220              	.L91:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 37
+
+
+ 1221 0154 00000000 		.word	step_time
+ 1222 0158 00000000 		.word	.LC17
+ 1223 015c 00000000 		.word	last_tick
+ 1224 0160 00000000 		.word	rxbuffer_uart1
+ 1225 0164 10000000 		.word	.LC18
+ 1226 0168 20000000 		.word	.LC19
+ 1227 016c 30000000 		.word	.LC20
+ 1228 0170 40000000 		.word	.LC21
+ 1229 0174 50000000 		.word	.LC22
+ 1230 0178 60000000 		.word	.LC23
+ 1231 017c 74000000 		.word	.LC24
+ 1232 0180 00000000 		.word	step_touch
+ 1233              		.cfi_endproc
+ 1234              	.LFE142:
+ 1236              		.section	.rodata.nextionSetAlarm.str1.4,"aMS",%progbits,1
+ 1237              		.align	2
+ 1238              	.LC25:
+ 1239 0000 616C6172 		.ascii	"alarm set successfully %02d:%02d\000"
+ 1239      6D207365 
+ 1239      74207375 
+ 1239      63636573 
+ 1239      7366756C 
+ 1240 0021 000000   		.align	2
+ 1241              	.LC26:
+ 1242 0024 743200   		.ascii	"t2\000"
+ 1243              		.section	.text.nextionSetAlarm,"ax",%progbits
+ 1244              		.align	1
+ 1245              		.syntax unified
+ 1246              		.thumb
+ 1247              		.thumb_func
+ 1249              	nextionSetAlarm:
+ 1250              	.LFB143:
+ 453:Process/Src/process.c ****   switch (step_alarm)
+ 1251              		.loc 1 453 1 is_stmt 1 view -0
+ 1252              		.cfi_startproc
+ 1253              		@ args = 0, pretend = 0, frame = 0
+ 1254              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1255 0000 10B5     		push	{r4, lr}
+ 1256              		.cfi_def_cfa_offset 8
+ 1257              		.cfi_offset 4, -8
+ 1258              		.cfi_offset 14, -4
+ 454:Process/Src/process.c ****   {
+ 1259              		.loc 1 454 3 view .LVU267
+ 1260 0002 224B     		ldr	r3, .L103
+ 1261 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1262 0006 042B     		cmp	r3, #4
+ 1263 0008 0AD8     		bhi	.L93
+ 1264 000a DFE803F0 		tbb	[pc, r3]
+ 1265              	.L96:
+ 1266 000e 03       		.byte	(.L100-.L96)/2
+ 1267 000f 0A       		.byte	(.L99-.L96)/2
+ 1268 0010 18       		.byte	(.L98-.L96)/2
+ 1269 0011 1F       		.byte	(.L97-.L96)/2
+ 1270 0012 2D       		.byte	(.L95-.L96)/2
+ 1271 0013 00       		.p2align 1
+ 1272              	.L100:
+ 457:Process/Src/process.c ****     step_alarm = SETALARM_STATE_OPERATION_HOUR;
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 38
+
+
+ 1273              		.loc 1 457 5 view .LVU268
+ 1274 0014 1E48     		ldr	r0, .L103+4
+ 1275 0016 FFF7FEFF 		bl	NEXTION_SendCode
+ 1276              	.LVL69:
+ 458:Process/Src/process.c ****   break;
+ 1277              		.loc 1 458 5 view .LVU269
+ 458:Process/Src/process.c ****   break;
+ 1278              		.loc 1 458 16 is_stmt 0 view .LVU270
+ 1279 001a 1C4B     		ldr	r3, .L103
+ 1280 001c 0122     		movs	r2, #1
+ 1281 001e 1A70     		strb	r2, [r3]
+ 459:Process/Src/process.c **** 
+ 1282              		.loc 1 459 3 is_stmt 1 view .LVU271
+ 1283              	.L93:
+ 492:Process/Src/process.c **** 
+ 1284              		.loc 1 492 1 is_stmt 0 view .LVU272
+ 1285 0020 10BD     		pop	{r4, pc}
+ 1286              	.L99:
+ 462:Process/Src/process.c ****     {
+ 1287              		.loc 1 462 5 is_stmt 1 view .LVU273
+ 462:Process/Src/process.c ****     {
+ 1288              		.loc 1 462 8 is_stmt 0 view .LVU274
+ 1289 0022 4B21     		movs	r1, #75
+ 1290 0024 1B48     		ldr	r0, .L103+8
+ 1291 0026 FFF7FEFF 		bl	delay_tick_1ms_no_rst
+ 1292              	.LVL70:
+ 462:Process/Src/process.c ****     {
+ 1293              		.loc 1 462 7 discriminator 1 view .LVU275
+ 1294 002a 0028     		cmp	r0, #0
+ 1295 002c F8D0     		beq	.L93
+ 1296              	.LBB2:
+ 464:Process/Src/process.c ****       indata = rxbuffer_uart1[0];
+ 1297              		.loc 1 464 7 is_stmt 1 view .LVU276
+ 465:Process/Src/process.c ****       alarm_hour = indata;
+ 1298              		.loc 1 465 7 view .LVU277
+ 465:Process/Src/process.c ****       alarm_hour = indata;
+ 1299              		.loc 1 465 14 is_stmt 0 view .LVU278
+ 1300 002e 1A4B     		ldr	r3, .L103+12
+ 1301 0030 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 1302              	.LVL71:
+ 466:Process/Src/process.c ****       step_alarm = SETALARM_STATE_SEND_MINUTE;
+ 1303              		.loc 1 466 7 is_stmt 1 view .LVU279
+ 466:Process/Src/process.c ****       step_alarm = SETALARM_STATE_SEND_MINUTE;
+ 1304              		.loc 1 466 18 is_stmt 0 view .LVU280
+ 1305 0032 1A4B     		ldr	r3, .L103+16
+ 1306 0034 1A70     		strb	r2, [r3]
+ 467:Process/Src/process.c ****     }
+ 1307              		.loc 1 467 7 is_stmt 1 view .LVU281
+ 467:Process/Src/process.c ****     }
+ 1308              		.loc 1 467 18 is_stmt 0 view .LVU282
+ 1309 0036 154B     		ldr	r3, .L103
+ 1310 0038 0222     		movs	r2, #2
+ 1311              	.LVL72:
+ 467:Process/Src/process.c ****     }
+ 1312              		.loc 1 467 18 view .LVU283
+ 1313 003a 1A70     		strb	r2, [r3]
+ 1314 003c F0E7     		b	.L93
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 39
+
+
+ 1315              	.LVL73:
+ 1316              	.L98:
+ 467:Process/Src/process.c ****     }
+ 1317              		.loc 1 467 18 view .LVU284
+ 1318              	.LBE2:
+ 472:Process/Src/process.c ****     step_alarm = SETALARM_STATE_OPERATION_MINUTE;
+ 1319              		.loc 1 472 5 is_stmt 1 view .LVU285
+ 1320 003e 1848     		ldr	r0, .L103+20
+ 1321 0040 FFF7FEFF 		bl	NEXTION_SendCode
+ 1322              	.LVL74:
+ 473:Process/Src/process.c ****   break;
+ 1323              		.loc 1 473 5 view .LVU286
+ 473:Process/Src/process.c ****   break;
+ 1324              		.loc 1 473 16 is_stmt 0 view .LVU287
+ 1325 0044 114B     		ldr	r3, .L103
+ 1326 0046 0322     		movs	r2, #3
+ 1327 0048 1A70     		strb	r2, [r3]
+ 474:Process/Src/process.c **** 
+ 1328              		.loc 1 474 3 is_stmt 1 view .LVU288
+ 1329 004a E9E7     		b	.L93
+ 1330              	.L97:
+ 477:Process/Src/process.c ****     {
+ 1331              		.loc 1 477 5 view .LVU289
+ 477:Process/Src/process.c ****     {
+ 1332              		.loc 1 477 8 is_stmt 0 view .LVU290
+ 1333 004c C821     		movs	r1, #200
+ 1334 004e 1148     		ldr	r0, .L103+8
+ 1335 0050 FFF7FEFF 		bl	delay_tick_1ms_no_rst
+ 1336              	.LVL75:
+ 477:Process/Src/process.c ****     {
+ 1337              		.loc 1 477 7 discriminator 1 view .LVU291
+ 1338 0054 0028     		cmp	r0, #0
+ 1339 0056 E3D0     		beq	.L93
+ 1340              	.LBB3:
+ 479:Process/Src/process.c ****       indata = rxbuffer_uart1[0];
+ 1341              		.loc 1 479 7 is_stmt 1 view .LVU292
+ 480:Process/Src/process.c ****       Alarm_minute = indata;
+ 1342              		.loc 1 480 7 view .LVU293
+ 480:Process/Src/process.c ****       Alarm_minute = indata;
+ 1343              		.loc 1 480 14 is_stmt 0 view .LVU294
+ 1344 0058 0F4B     		ldr	r3, .L103+12
+ 1345 005a 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 1346              	.LVL76:
+ 481:Process/Src/process.c ****       step_alarm = SETALARM_STATE_SEND_ALARMTIME;
+ 1347              		.loc 1 481 7 is_stmt 1 view .LVU295
+ 481:Process/Src/process.c ****       step_alarm = SETALARM_STATE_SEND_ALARMTIME;
+ 1348              		.loc 1 481 20 is_stmt 0 view .LVU296
+ 1349 005c 114B     		ldr	r3, .L103+24
+ 1350 005e 1A70     		strb	r2, [r3]
+ 482:Process/Src/process.c ****     }
+ 1351              		.loc 1 482 7 is_stmt 1 view .LVU297
+ 482:Process/Src/process.c ****     }
+ 1352              		.loc 1 482 18 is_stmt 0 view .LVU298
+ 1353 0060 0A4B     		ldr	r3, .L103
+ 1354 0062 0422     		movs	r2, #4
+ 1355              	.LVL77:
+ 482:Process/Src/process.c ****     }
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 40
+
+
+ 1356              		.loc 1 482 18 view .LVU299
+ 1357 0064 1A70     		strb	r2, [r3]
+ 1358 0066 DBE7     		b	.L93
+ 1359              	.LVL78:
+ 1360              	.L95:
+ 482:Process/Src/process.c ****     }
+ 1361              		.loc 1 482 18 view .LVU300
+ 1362              	.LBE3:
+ 487:Process/Src/process.c ****     NEXTION_SendString("t2", str);
+ 1363              		.loc 1 487 5 is_stmt 1 view .LVU301
+ 1364 0068 0F4C     		ldr	r4, .L103+28
+ 1365 006a 0E4B     		ldr	r3, .L103+24
+ 1366 006c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1367 006e 0B4A     		ldr	r2, .L103+16
+ 1368 0070 1278     		ldrb	r2, [r2]	@ zero_extendqisi2
+ 1369 0072 0E49     		ldr	r1, .L103+32
+ 1370 0074 2046     		mov	r0, r4
+ 1371 0076 FFF7FEFF 		bl	sprintf
+ 1372              	.LVL79:
+ 488:Process/Src/process.c ****     step_touch = SETTOUCH_STATE_IDLE;
+ 1373              		.loc 1 488 5 view .LVU302
+ 1374 007a 2146     		mov	r1, r4
+ 1375 007c 0C48     		ldr	r0, .L103+36
+ 1376 007e FFF7FEFF 		bl	NEXTION_SendString
+ 1377              	.LVL80:
+ 489:Process/Src/process.c ****   break;
+ 1378              		.loc 1 489 5 view .LVU303
+ 489:Process/Src/process.c ****   break;
+ 1379              		.loc 1 489 16 is_stmt 0 view .LVU304
+ 1380 0082 0C4B     		ldr	r3, .L103+40
+ 1381 0084 0022     		movs	r2, #0
+ 1382 0086 1A70     		strb	r2, [r3]
+ 490:Process/Src/process.c ****   }
+ 1383              		.loc 1 490 3 is_stmt 1 view .LVU305
+ 492:Process/Src/process.c **** 
+ 1384              		.loc 1 492 1 is_stmt 0 view .LVU306
+ 1385 0088 CAE7     		b	.L93
+ 1386              	.L104:
+ 1387 008a 00BF     		.align	2
+ 1388              	.L103:
+ 1389 008c 00000000 		.word	step_alarm
+ 1390 0090 20000000 		.word	.LC19
+ 1391 0094 00000000 		.word	last_tick
+ 1392 0098 00000000 		.word	rxbuffer_uart1
+ 1393 009c 00000000 		.word	alarm_hour
+ 1394 00a0 10000000 		.word	.LC18
+ 1395 00a4 00000000 		.word	Alarm_minute
+ 1396 00a8 00000000 		.word	str
+ 1397 00ac 00000000 		.word	.LC25
+ 1398 00b0 24000000 		.word	.LC26
+ 1399 00b4 00000000 		.word	step_touch
+ 1400              		.cfi_endproc
+ 1401              	.LFE143:
+ 1403              		.section	.text.nextionAlarmSendString,"ax",%progbits
+ 1404              		.align	1
+ 1405              		.syntax unified
+ 1406              		.thumb
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 41
+
+
+ 1407              		.thumb_func
+ 1409              	nextionAlarmSendString:
+ 1410              	.LFB137:
+ 258:Process/Src/process.c ****   sprintf(str, "alarm set successfully %02d:%02d", alarm_hour, Alarm_minute);
+ 1411              		.loc 1 258 1 is_stmt 1 view -0
+ 1412              		.cfi_startproc
+ 1413              		@ args = 0, pretend = 0, frame = 0
+ 1414              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1415 0000 10B5     		push	{r4, lr}
+ 1416              		.cfi_def_cfa_offset 8
+ 1417              		.cfi_offset 4, -8
+ 1418              		.cfi_offset 14, -4
+ 259:Process/Src/process.c ****   NEXTION_SendString("t2", str);
+ 1419              		.loc 1 259 3 view .LVU308
+ 1420 0002 074C     		ldr	r4, .L107
+ 1421 0004 074B     		ldr	r3, .L107+4
+ 1422 0006 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1423 0008 074A     		ldr	r2, .L107+8
+ 1424 000a 1278     		ldrb	r2, [r2]	@ zero_extendqisi2
+ 1425 000c 0749     		ldr	r1, .L107+12
+ 1426 000e 2046     		mov	r0, r4
+ 1427 0010 FFF7FEFF 		bl	sprintf
+ 1428              	.LVL81:
+ 260:Process/Src/process.c **** }
+ 1429              		.loc 1 260 3 view .LVU309
+ 1430 0014 2146     		mov	r1, r4
+ 1431 0016 0648     		ldr	r0, .L107+16
+ 1432 0018 FFF7FEFF 		bl	NEXTION_SendString
+ 1433              	.LVL82:
+ 261:Process/Src/process.c **** 
+ 1434              		.loc 1 261 1 is_stmt 0 view .LVU310
+ 1435 001c 10BD     		pop	{r4, pc}
+ 1436              	.L108:
+ 1437 001e 00BF     		.align	2
+ 1438              	.L107:
+ 1439 0020 00000000 		.word	str
+ 1440 0024 00000000 		.word	Alarm_minute
+ 1441 0028 00000000 		.word	alarm_hour
+ 1442 002c 00000000 		.word	.LC25
+ 1443 0030 24000000 		.word	.LC26
+ 1444              		.cfi_endproc
+ 1445              	.LFE137:
+ 1447              		.section	.rodata.process_INIT.str1.4,"aMS",%progbits,1
+ 1448              		.align	2
+ 1449              	.LC27:
+ 1450 0000 455900   		.ascii	"EY\000"
+ 1451 0003 00       		.align	2
+ 1452              	.LC28:
+ 1453 0004 4F4B2573 		.ascii	"OK%s\012\000"
+ 1453      0A00
+ 1454              		.section	.text.process_INIT,"ax",%progbits
+ 1455              		.align	1
+ 1456              		.global	process_INIT
+ 1457              		.syntax unified
+ 1458              		.thumb
+ 1459              		.thumb_func
+ 1461              	process_INIT:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 42
+
+
+ 1462              	.LFB135:
+  40:Process/Src/process.c **** 
+ 1463              		.loc 1 40 1 is_stmt 1 view -0
+ 1464              		.cfi_startproc
+ 1465              		@ args = 0, pretend = 0, frame = 0
+ 1466              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1467 0000 10B5     		push	{r4, lr}
+ 1468              		.cfi_def_cfa_offset 8
+ 1469              		.cfi_offset 4, -8
+ 1470              		.cfi_offset 14, -4
+ 1471 0002 82B0     		sub	sp, sp, #8
+ 1472              		.cfi_def_cfa_offset 16
+  43:Process/Src/process.c ****   packetsteps         = PACKAGE_İS_VALİD;
+ 1473              		.loc 1 43 3 view .LVU312
+  43:Process/Src/process.c ****   packetsteps         = PACKAGE_İS_VALİD;
+ 1474              		.loc 1 43 23 is_stmt 0 view .LVU313
+ 1475 0004 0023     		movs	r3, #0
+ 1476 0006 1C4A     		ldr	r2, .L113
+ 1477 0008 1370     		strb	r3, [r2]
+  44:Process/Src/process.c ****   step_touch          = SETTOUCH_STATE_IDLE;
+ 1478              		.loc 1 44 3 is_stmt 1 view .LVU314
+  44:Process/Src/process.c ****   step_touch          = SETTOUCH_STATE_IDLE;
+ 1479              		.loc 1 44 23 is_stmt 0 view .LVU315
+ 1480 000a 1C4A     		ldr	r2, .L113+4
+ 1481 000c 1370     		strb	r3, [r2]
+  45:Process/Src/process.c **** 
+ 1482              		.loc 1 45 3 is_stmt 1 view .LVU316
+  45:Process/Src/process.c **** 
+ 1483              		.loc 1 45 23 is_stmt 0 view .LVU317
+ 1484 000e 1C4A     		ldr	r2, .L113+8
+ 1485 0010 1370     		strb	r3, [r2]
+  47:Process/Src/process.c **** 
+ 1486              		.loc 1 47 5 is_stmt 1 view .LVU318
+ 1487 0012 1C49     		ldr	r1, .L113+12
+ 1488 0014 1C48     		ldr	r0, .L113+16
+ 1489 0016 FFF7FEFF 		bl	serial_message
+ 1490              	.LVL83:
+  49:Process/Src/process.c ****   {
+ 1491              		.loc 1 49 3 view .LVU319
+  49:Process/Src/process.c ****   {
+ 1492              		.loc 1 49 7 is_stmt 0 view .LVU320
+ 1493 001a FFF7FEFF 		bl	get_pointer_hi2c2
+ 1494              	.LVL84:
+ 1495 001e 0146     		mov	r1, r0
+  49:Process/Src/process.c ****   {
+ 1496              		.loc 1 49 7 discriminator 1 view .LVU321
+ 1497 0020 4FF40043 		mov	r3, #32768
+ 1498 0024 0093     		str	r3, [sp]
+ 1499 0026 4FF09043 		mov	r3, #1207959552
+ 1500 002a A022     		movs	r2, #160
+ 1501 002c 1748     		ldr	r0, .L113+20
+ 1502 002e FFF7FEFF 		bl	EE24_Init
+ 1503              	.LVL85:
+  49:Process/Src/process.c ****   {
+ 1504              		.loc 1 49 6 discriminator 2 view .LVU322
+ 1505 0032 98B9     		cbnz	r0, .L112
+ 1506              	.L110:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 43
+
+
+  54:Process/Src/process.c ****   PCF85_SetDate(0,eeprom_read_array[1],eeprom_read_array[2],eeprom_read_array[3]+1970);
+ 1507              		.loc 1 54 3 is_stmt 1 view .LVU323
+ 1508 0034 FFF7FEFF 		bl	get_pointer_hi2c2
+ 1509              	.LVL86:
+  54:Process/Src/process.c ****   PCF85_SetDate(0,eeprom_read_array[1],eeprom_read_array[2],eeprom_read_array[3]+1970);
+ 1510              		.loc 1 54 3 is_stmt 0 discriminator 1 view .LVU324
+ 1511 0038 FFF7FEFF 		bl	PCF85_Init
+ 1512              	.LVL87:
+  55:Process/Src/process.c ****   PCF85_SetTime(eeprom_read_array[4],eeprom_read_array[5],eeprom_read_array[6]);
+ 1513              		.loc 1 55 3 is_stmt 1 view .LVU325
+  55:Process/Src/process.c ****   PCF85_SetTime(eeprom_read_array[4],eeprom_read_array[5],eeprom_read_array[6]);
+ 1514              		.loc 1 55 78 is_stmt 0 view .LVU326
+ 1515 003c 144C     		ldr	r4, .L113+24
+ 1516 003e E378     		ldrb	r3, [r4, #3]	@ zero_extendqisi2
+  55:Process/Src/process.c ****   PCF85_SetTime(eeprom_read_array[4],eeprom_read_array[5],eeprom_read_array[6]);
+ 1517              		.loc 1 55 3 view .LVU327
+ 1518 0040 03F2B273 		addw	r3, r3, #1970
+ 1519 0044 A278     		ldrb	r2, [r4, #2]	@ zero_extendqisi2
+ 1520 0046 6178     		ldrb	r1, [r4, #1]	@ zero_extendqisi2
+ 1521 0048 0020     		movs	r0, #0
+ 1522 004a FFF7FEFF 		bl	PCF85_SetDate
+ 1523              	.LVL88:
+  56:Process/Src/process.c ****   
+ 1524              		.loc 1 56 3 is_stmt 1 view .LVU328
+ 1525 004e A279     		ldrb	r2, [r4, #6]	@ zero_extendqisi2
+ 1526 0050 6179     		ldrb	r1, [r4, #5]	@ zero_extendqisi2
+ 1527 0052 2079     		ldrb	r0, [r4, #4]	@ zero_extendqisi2
+ 1528 0054 FFF7FEFF 		bl	PCF85_SetTime
+ 1529              	.LVL89:
+  59:Process/Src/process.c **** 
+ 1530              		.loc 1 59 1 is_stmt 0 view .LVU329
+ 1531 0058 02B0     		add	sp, sp, #8
+ 1532              		.cfi_remember_state
+ 1533              		.cfi_def_cfa_offset 8
+ 1534              		@ sp needed
+ 1535 005a 10BD     		pop	{r4, pc}
+ 1536              	.L112:
+ 1537              		.cfi_restore_state
+  51:Process/Src/process.c ****       password = eeprom_read_array[0];
+ 1538              		.loc 1 51 7 is_stmt 1 view .LVU330
+ 1539 005c 0C4C     		ldr	r4, .L113+24
+ 1540 005e 4FF47A73 		mov	r3, #1000
+ 1541 0062 0093     		str	r3, [sp]
+ 1542 0064 0823     		movs	r3, #8
+ 1543 0066 2246     		mov	r2, r4
+ 1544 0068 0021     		movs	r1, #0
+ 1545 006a 0848     		ldr	r0, .L113+20
+ 1546 006c FFF7FEFF 		bl	EE24_Read
+ 1547              	.LVL90:
+  52:Process/Src/process.c ****   }
+ 1548              		.loc 1 52 7 view .LVU331
+  52:Process/Src/process.c ****   }
+ 1549              		.loc 1 52 35 is_stmt 0 view .LVU332
+ 1550 0070 2278     		ldrb	r2, [r4]	@ zero_extendqisi2
+  52:Process/Src/process.c ****   }
+ 1551              		.loc 1 52 16 view .LVU333
+ 1552 0072 084B     		ldr	r3, .L113+28
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 44
+
+
+ 1553 0074 1A70     		strb	r2, [r3]
+ 1554 0076 DDE7     		b	.L110
+ 1555              	.L114:
+ 1556              		.align	2
+ 1557              	.L113:
+ 1558 0078 00000000 		.word	nextion_page_state
+ 1559 007c 00000000 		.word	packetsteps
+ 1560 0080 00000000 		.word	step_touch
+ 1561 0084 00000000 		.word	.LC27
+ 1562 0088 04000000 		.word	.LC28
+ 1563 008c 00000000 		.word	ee24
+ 1564 0090 00000000 		.word	eeprom_read_array
+ 1565 0094 00000000 		.word	password
+ 1566              		.cfi_endproc
+ 1567              	.LFE135:
+ 1569              		.section	.rodata.Process_Nextion.str1.4,"aMS",%progbits,1
+ 1570              		.align	2
+ 1571              	.LC29:
+ 1572 0000 736C6565 		.ascii	"sleep=1\000"
+ 1572      703D3100 
+ 1573              		.section	.text.Process_Nextion,"ax",%progbits
+ 1574              		.align	1
+ 1575              		.global	Process_Nextion
+ 1576              		.syntax unified
+ 1577              		.thumb
+ 1578              		.thumb_func
+ 1580              	Process_Nextion:
+ 1581              	.LFB136:
+  64:Process/Src/process.c ****   if(NEXTION_DMA_FLAG == DMA_FLAG_ENABLE)
+ 1582              		.loc 1 64 1 is_stmt 1 view -0
+ 1583              		.cfi_startproc
+ 1584              		@ args = 0, pretend = 0, frame = 0
+ 1585              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1586 0000 08B5     		push	{r3, lr}
+ 1587              		.cfi_def_cfa_offset 8
+ 1588              		.cfi_offset 3, -8
+ 1589              		.cfi_offset 14, -4
+  65:Process/Src/process.c ****   {
+ 1590              		.loc 1 65 3 view .LVU335
+  65:Process/Src/process.c ****   {
+ 1591              		.loc 1 65 23 is_stmt 0 view .LVU336
+ 1592 0002 AA4B     		ldr	r3, .L167
+ 1593 0004 1B68     		ldr	r3, [r3]
+  65:Process/Src/process.c ****   {
+ 1594              		.loc 1 65 5 view .LVU337
+ 1595 0006 012B     		cmp	r3, #1
+ 1596 0008 0CD0     		beq	.L164
+ 1597              	.L116:
+  71:Process/Src/process.c **** 
+ 1598              		.loc 1 71 3 is_stmt 1 view .LVU338
+ 1599 000a FFF7FEFF 		bl	nextionAlarmOperation
+ 1600              	.LVL91:
+  73:Process/Src/process.c ****   {
+ 1601              		.loc 1 73 3 view .LVU339
+ 1602 000e A84B     		ldr	r3, .L167+4
+ 1603 0010 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1604 0012 042B     		cmp	r3, #4
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 45
+
+
+ 1605 0014 16D8     		bhi	.L117
+ 1606 0016 DFE813F0 		tbh	[pc, r3, lsl #1]
+ 1607              	.L119:
+ 1608 001a 1100     		.2byte	(.L123-.L119)/2
+ 1609 001c 3100     		.2byte	(.L122-.L119)/2
+ 1610 001e 8600     		.2byte	(.L121-.L119)/2
+ 1611 0020 BB00     		.2byte	(.L120-.L119)/2
+ 1612 0022 FF00     		.2byte	(.L118-.L119)/2
+ 1613              		.p2align 1
+ 1614              	.L164:
+  67:Process/Src/process.c ****      memcpy(&nextionTouchEvent, rxbuffer_uart1, sizeof(nextionTouchEvent));
+ 1615              		.loc 1 67 6 view .LVU340
+  67:Process/Src/process.c ****      memcpy(&nextionTouchEvent, rxbuffer_uart1, sizeof(nextionTouchEvent));
+ 1616              		.loc 1 67 23 is_stmt 0 view .LVU341
+ 1617 0024 A14B     		ldr	r3, .L167
+ 1618 0026 0022     		movs	r2, #0
+ 1619 0028 1A60     		str	r2, [r3]
+  68:Process/Src/process.c ****   }
+ 1620              		.loc 1 68 6 is_stmt 1 view .LVU342
+ 1621 002a A24B     		ldr	r3, .L167+8
+ 1622 002c A24A     		ldr	r2, .L167+12
+ 1623 002e 1068     		ldr	r0, [r2]	@ unaligned
+ 1624 0030 1860     		str	r0, [r3]
+ 1625 0032 9188     		ldrh	r1, [r2, #4]	@ unaligned
+ 1626 0034 9279     		ldrb	r2, [r2, #6]	@ zero_extendqisi2
+ 1627 0036 9980     		strh	r1, [r3, #4]	@ unaligned
+ 1628 0038 9A71     		strb	r2, [r3, #6]
+ 1629 003a E6E7     		b	.L116
+ 1630              	.L123:
+  76:Process/Src/process.c ****       {
+ 1631              		.loc 1 76 7 view .LVU343
+  76:Process/Src/process.c ****       {
+ 1632              		.loc 1 76 27 is_stmt 0 view .LVU344
+ 1633 003c 9D4B     		ldr	r3, .L167+8
+ 1634 003e 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+  76:Process/Src/process.c ****       {
+ 1635              		.loc 1 76 9 view .LVU345
+ 1636 0040 022B     		cmp	r3, #2
+ 1637 0042 10D0     		beq	.L165
+ 1638              	.L117:
+ 217:Process/Src/process.c **** 
+ 1639              		.loc 1 217 3 is_stmt 1 view .LVU346
+ 217:Process/Src/process.c **** 
+ 1640              		.loc 1 217 33 is_stmt 0 view .LVU347
+ 1641 0044 9B4B     		ldr	r3, .L167+8
+ 1642 0046 0022     		movs	r2, #0
+ 1643 0048 9A70     		strb	r2, [r3, #2]
+ 220:Process/Src/process.c ****   {
+ 1644              		.loc 1 220 3 is_stmt 1 view .LVU348
+ 1645 004a 9C4B     		ldr	r3, .L167+16
+ 1646 004c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1647 004e 013B     		subs	r3, r3, #1
+ 1648 0050 052B     		cmp	r3, #5
+ 1649 0052 00F20F81 		bhi	.L148
+ 1650 0056 DFE813F0 		tbh	[pc, r3, lsl #1]
+ 1651              	.L150:
+ 1652 005a 0B01     		.2byte	(.L155-.L150)/2
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 46
+
+
+ 1653 005c 1201     		.2byte	(.L154-.L150)/2
+ 1654 005e 1501     		.2byte	(.L153-.L150)/2
+ 1655 0060 1801     		.2byte	(.L152-.L150)/2
+ 1656 0062 1B01     		.2byte	(.L151-.L150)/2
+ 1657 0064 1E01     		.2byte	(.L149-.L150)/2
+ 1658              		.p2align 1
+ 1659              	.L165:
+  78:Process/Src/process.c ****         last_tick = HAL_GetTick();
+ 1660              		.loc 1 78 9 view .LVU349
+ 1661 0066 9648     		ldr	r0, .L167+20
+ 1662 0068 FFF7FEFF 		bl	NEXTION_SendCode
+ 1663              	.LVL92:
+  79:Process/Src/process.c ****         step_touch = SETTOUCH_STATE_PASSWORD;
+ 1664              		.loc 1 79 9 view .LVU350
+  79:Process/Src/process.c ****         step_touch = SETTOUCH_STATE_PASSWORD;
+ 1665              		.loc 1 79 21 is_stmt 0 view .LVU351
+ 1666 006c FFF7FEFF 		bl	HAL_GetTick
+ 1667              	.LVL93:
+  79:Process/Src/process.c ****         step_touch = SETTOUCH_STATE_PASSWORD;
+ 1668              		.loc 1 79 19 discriminator 1 view .LVU352
+ 1669 0070 944B     		ldr	r3, .L167+24
+ 1670 0072 1860     		str	r0, [r3]
+  80:Process/Src/process.c ****       }
+ 1671              		.loc 1 80 9 is_stmt 1 view .LVU353
+  80:Process/Src/process.c ****       }
+ 1672              		.loc 1 80 20 is_stmt 0 view .LVU354
+ 1673 0074 914B     		ldr	r3, .L167+16
+ 1674 0076 0122     		movs	r2, #1
+ 1675 0078 1A70     		strb	r2, [r3]
+ 1676 007a E3E7     		b	.L117
+ 1677              	.L122:
+  86:Process/Src/process.c ****       {
+ 1678              		.loc 1 86 7 is_stmt 1 view .LVU355
+  86:Process/Src/process.c ****       {
+ 1679              		.loc 1 86 32 is_stmt 0 view .LVU356
+ 1680 007c 8D4B     		ldr	r3, .L167+8
+ 1681 007e 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+ 1682 0080 043B     		subs	r3, r3, #4
+ 1683 0082 0A2B     		cmp	r3, #10
+ 1684 0084 DED8     		bhi	.L117
+ 1685 0086 01A2     		adr	r2, .L125
+ 1686 0088 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 1687              		.p2align 2
+ 1688              	.L125:
+ 1689 008c EF000000 		.word	.L132+1
+ 1690 0090 B9000000 		.word	.L131+1
+ 1691 0094 C7000000 		.word	.L130+1
+ 1692 0098 D5000000 		.word	.L129+1
+ 1693 009c E9000000 		.word	.L128+1
+ 1694 00a0 45000000 		.word	.L117+1
+ 1695 00a4 E3000000 		.word	.L127+1
+ 1696 00a8 45000000 		.word	.L117+1
+ 1697 00ac F5000000 		.word	.L126+1
+ 1698 00b0 45000000 		.word	.L117+1
+ 1699 00b4 11010000 		.word	.L124+1
+ 1700              		.p2align 1
+ 1701              	.L131:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 47
+
+
+  89:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE2;
+ 1702              		.loc 1 89 11 is_stmt 1 view .LVU357
+ 1703 00b8 8348     		ldr	r0, .L167+28
+ 1704 00ba FFF7FEFF 		bl	NEXTION_SendPage
+ 1705              	.LVL94:
+  90:Process/Src/process.c ****         break;
+ 1706              		.loc 1 90 11 view .LVU358
+  90:Process/Src/process.c ****         break;
+ 1707              		.loc 1 90 30 is_stmt 0 view .LVU359
+ 1708 00be 7C4B     		ldr	r3, .L167+4
+ 1709 00c0 0222     		movs	r2, #2
+ 1710 00c2 1A70     		strb	r2, [r3]
+  91:Process/Src/process.c ****         
+ 1711              		.loc 1 91 9 is_stmt 1 view .LVU360
+ 1712 00c4 BEE7     		b	.L117
+ 1713              	.L130:
+  94:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE3;
+ 1714              		.loc 1 94 11 view .LVU361
+ 1715 00c6 8148     		ldr	r0, .L167+32
+ 1716 00c8 FFF7FEFF 		bl	NEXTION_SendPage
+ 1717              	.LVL95:
+  95:Process/Src/process.c ****         break;
+ 1718              		.loc 1 95 11 view .LVU362
+  95:Process/Src/process.c ****         break;
+ 1719              		.loc 1 95 30 is_stmt 0 view .LVU363
+ 1720 00cc 784B     		ldr	r3, .L167+4
+ 1721 00ce 0322     		movs	r2, #3
+ 1722 00d0 1A70     		strb	r2, [r3]
+  96:Process/Src/process.c ****     
+ 1723              		.loc 1 96 9 is_stmt 1 view .LVU364
+ 1724 00d2 B7E7     		b	.L117
+ 1725              	.L129:
+  99:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE4;
+ 1726              		.loc 1 99 11 view .LVU365
+ 1727 00d4 7E48     		ldr	r0, .L167+36
+ 1728 00d6 FFF7FEFF 		bl	NEXTION_SendPage
+ 1729              	.LVL96:
+ 100:Process/Src/process.c ****         break;
+ 1730              		.loc 1 100 11 view .LVU366
+ 100:Process/Src/process.c ****         break;
+ 1731              		.loc 1 100 30 is_stmt 0 view .LVU367
+ 1732 00da 754B     		ldr	r3, .L167+4
+ 1733 00dc 0422     		movs	r2, #4
+ 1734 00de 1A70     		strb	r2, [r3]
+ 101:Process/Src/process.c ****     
+ 1735              		.loc 1 101 9 is_stmt 1 view .LVU368
+ 1736 00e0 B0E7     		b	.L117
+ 1737              	.L127:
+ 104:Process/Src/process.c ****         break;
+ 1738              		.loc 1 104 11 view .LVU369
+ 1739 00e2 FFF7FEFF 		bl	nextionBlueLightsStatus
+ 1740              	.LVL97:
+ 105:Process/Src/process.c ****     
+ 1741              		.loc 1 105 9 view .LVU370
+ 1742 00e6 ADE7     		b	.L117
+ 1743              	.L128:
+ 108:Process/Src/process.c ****         break;
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 48
+
+
+ 1744              		.loc 1 108 11 view .LVU371
+ 1745 00e8 FFF7FEFF 		bl	nextionRedLightsStatus
+ 1746              	.LVL98:
+ 109:Process/Src/process.c ****     
+ 1747              		.loc 1 109 9 view .LVU372
+ 1748 00ec AAE7     		b	.L117
+ 1749              	.L132:
+ 112:Process/Src/process.c ****         break;
+ 1750              		.loc 1 112 11 view .LVU373
+ 1751 00ee FFF7FEFF 		bl	nextionGreenLightsStatus
+ 1752              	.LVL99:
+ 113:Process/Src/process.c ****     
+ 1753              		.loc 1 113 9 view .LVU374
+ 1754 00f2 A7E7     		b	.L117
+ 1755              	.L126:
+ 116:Process/Src/process.c ****           step_touch = SETTOUCH_STATE_TEMP;
+ 1756              		.loc 1 116 11 view .LVU375
+ 1757 00f4 7748     		ldr	r0, .L167+40
+ 1758 00f6 FFF7FEFF 		bl	NEXTION_SendCode
+ 1759              	.LVL100:
+ 117:Process/Src/process.c ****           NEXTION_DMA_FLAG = DMA_FLAG_DISABLE;
+ 1760              		.loc 1 117 11 view .LVU376
+ 117:Process/Src/process.c ****           NEXTION_DMA_FLAG = DMA_FLAG_DISABLE;
+ 1761              		.loc 1 117 22 is_stmt 0 view .LVU377
+ 1762 00fa 704B     		ldr	r3, .L167+16
+ 1763 00fc 0222     		movs	r2, #2
+ 1764 00fe 1A70     		strb	r2, [r3]
+ 118:Process/Src/process.c ****           last_tick = HAL_GetTick();
+ 1765              		.loc 1 118 11 is_stmt 1 view .LVU378
+ 118:Process/Src/process.c ****           last_tick = HAL_GetTick();
+ 1766              		.loc 1 118 28 is_stmt 0 view .LVU379
+ 1767 0100 6A4B     		ldr	r3, .L167
+ 1768 0102 0022     		movs	r2, #0
+ 1769 0104 1A60     		str	r2, [r3]
+ 119:Process/Src/process.c ****           
+ 1770              		.loc 1 119 11 is_stmt 1 view .LVU380
+ 119:Process/Src/process.c ****           
+ 1771              		.loc 1 119 23 is_stmt 0 view .LVU381
+ 1772 0106 FFF7FEFF 		bl	HAL_GetTick
+ 1773              	.LVL101:
+ 119:Process/Src/process.c ****           
+ 1774              		.loc 1 119 21 discriminator 1 view .LVU382
+ 1775 010a 6E4B     		ldr	r3, .L167+24
+ 1776 010c 1860     		str	r0, [r3]
+ 121:Process/Src/process.c ****     
+ 1777              		.loc 1 121 9 is_stmt 1 view .LVU383
+ 1778 010e 99E7     		b	.L117
+ 1779              	.L124:
+ 124:Process/Src/process.c ****         NEXTION_SendCode("sleep=1");
+ 1780              		.loc 1 124 9 view .LVU384
+ 124:Process/Src/process.c ****         NEXTION_SendCode("sleep=1");
+ 1781              		.loc 1 124 21 is_stmt 0 view .LVU385
+ 1782 0110 FFF7FEFF 		bl	HAL_GetTick
+ 1783              	.LVL102:
+ 124:Process/Src/process.c ****         NEXTION_SendCode("sleep=1");
+ 1784              		.loc 1 124 19 discriminator 1 view .LVU386
+ 1785 0114 6B4B     		ldr	r3, .L167+24
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 49
+
+
+ 1786 0116 1860     		str	r0, [r3]
+ 125:Process/Src/process.c ****         step_touch = SETTOUCH_STATE_SLEEP;
+ 1787              		.loc 1 125 9 is_stmt 1 view .LVU387
+ 1788 0118 6F48     		ldr	r0, .L167+44
+ 1789 011a FFF7FEFF 		bl	NEXTION_SendCode
+ 1790              	.LVL103:
+ 126:Process/Src/process.c ****         break;
+ 1791              		.loc 1 126 9 view .LVU388
+ 126:Process/Src/process.c ****         break;
+ 1792              		.loc 1 126 20 is_stmt 0 view .LVU389
+ 1793 011e 674B     		ldr	r3, .L167+16
+ 1794 0120 0322     		movs	r2, #3
+ 1795 0122 1A70     		strb	r2, [r3]
+ 127:Process/Src/process.c ****       }
+ 1796              		.loc 1 127 9 is_stmt 1 view .LVU390
+ 1797 0124 8EE7     		b	.L117
+ 1798              	.L121:
+ 133:Process/Src/process.c ****       {
+ 1799              		.loc 1 133 7 view .LVU391
+ 133:Process/Src/process.c ****       {
+ 1800              		.loc 1 133 32 is_stmt 0 view .LVU392
+ 1801 0126 634B     		ldr	r3, .L167+8
+ 1802 0128 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+ 1803 012a 093B     		subs	r3, r3, #9
+ 1804 012c 042B     		cmp	r3, #4
+ 1805 012e 89D8     		bhi	.L117
+ 1806 0130 01A2     		adr	r2, .L134
+ 1807 0132 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 1808 0136 00BF     		.p2align 2
+ 1809              	.L134:
+ 1810 0138 7B010000 		.word	.L137+1
+ 1811 013c 4D010000 		.word	.L136+1
+ 1812 0140 45000000 		.word	.L117+1
+ 1813 0144 5F010000 		.word	.L135+1
+ 1814 0148 6D010000 		.word	.L133+1
+ 1815              		.p2align 1
+ 1816              	.L136:
+ 136:Process/Src/process.c ****           nextionPage1LightsSatus ();
+ 1817              		.loc 1 136 11 is_stmt 1 view .LVU393
+ 1818 014c 6348     		ldr	r0, .L167+48
+ 1819 014e FFF7FEFF 		bl	NEXTION_SendPage
+ 1820              	.LVL104:
+ 137:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE1;
+ 1821              		.loc 1 137 11 view .LVU394
+ 1822 0152 FFF7FEFF 		bl	nextionPage1LightsSatus
+ 1823              	.LVL105:
+ 138:Process/Src/process.c ****         break;
+ 1824              		.loc 1 138 11 view .LVU395
+ 138:Process/Src/process.c ****         break;
+ 1825              		.loc 1 138 30 is_stmt 0 view .LVU396
+ 1826 0156 564B     		ldr	r3, .L167+4
+ 1827 0158 0122     		movs	r2, #1
+ 1828 015a 1A70     		strb	r2, [r3]
+ 139:Process/Src/process.c ****   
+ 1829              		.loc 1 139 9 is_stmt 1 view .LVU397
+ 1830 015c 72E7     		b	.L117
+ 1831              	.L135:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 50
+
+
+ 142:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE3;
+ 1832              		.loc 1 142 11 view .LVU398
+ 1833 015e 5B48     		ldr	r0, .L167+32
+ 1834 0160 FFF7FEFF 		bl	NEXTION_SendPage
+ 1835              	.LVL106:
+ 143:Process/Src/process.c ****         break;
+ 1836              		.loc 1 143 11 view .LVU399
+ 143:Process/Src/process.c ****         break;
+ 1837              		.loc 1 143 30 is_stmt 0 view .LVU400
+ 1838 0164 524B     		ldr	r3, .L167+4
+ 1839 0166 0322     		movs	r2, #3
+ 1840 0168 1A70     		strb	r2, [r3]
+ 144:Process/Src/process.c ****   
+ 1841              		.loc 1 144 9 is_stmt 1 view .LVU401
+ 1842 016a 6BE7     		b	.L117
+ 1843              	.L133:
+ 147:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE4;
+ 1844              		.loc 1 147 11 view .LVU402
+ 1845 016c 5848     		ldr	r0, .L167+36
+ 1846 016e FFF7FEFF 		bl	NEXTION_SendPage
+ 1847              	.LVL107:
+ 148:Process/Src/process.c ****         break;
+ 1848              		.loc 1 148 11 view .LVU403
+ 148:Process/Src/process.c ****         break;
+ 1849              		.loc 1 148 30 is_stmt 0 view .LVU404
+ 1850 0172 4F4B     		ldr	r3, .L167+4
+ 1851 0174 0422     		movs	r2, #4
+ 1852 0176 1A70     		strb	r2, [r3]
+ 149:Process/Src/process.c ****   
+ 1853              		.loc 1 149 9 is_stmt 1 view .LVU405
+ 1854 0178 64E7     		b	.L117
+ 1855              	.L137:
+ 152:Process/Src/process.c ****           step_time = SETTIME_STATE_SEND_HOUR;
+ 1856              		.loc 1 152 11 view .LVU406
+ 152:Process/Src/process.c ****           step_time = SETTIME_STATE_SEND_HOUR;
+ 1857              		.loc 1 152 23 is_stmt 0 view .LVU407
+ 1858 017a FFF7FEFF 		bl	HAL_GetTick
+ 1859              	.LVL108:
+ 152:Process/Src/process.c ****           step_time = SETTIME_STATE_SEND_HOUR;
+ 1860              		.loc 1 152 21 discriminator 1 view .LVU408
+ 1861 017e 514B     		ldr	r3, .L167+24
+ 1862 0180 1860     		str	r0, [r3]
+ 153:Process/Src/process.c ****           step_touch = SETTOUCH_STATE_TIME;
+ 1863              		.loc 1 153 11 is_stmt 1 view .LVU409
+ 153:Process/Src/process.c ****           step_touch = SETTOUCH_STATE_TIME;
+ 1864              		.loc 1 153 21 is_stmt 0 view .LVU410
+ 1865 0182 574B     		ldr	r3, .L167+52
+ 1866 0184 0022     		movs	r2, #0
+ 1867 0186 1A70     		strb	r2, [r3]
+ 154:Process/Src/process.c ****         break;
+ 1868              		.loc 1 154 11 is_stmt 1 view .LVU411
+ 154:Process/Src/process.c ****         break;
+ 1869              		.loc 1 154 22 is_stmt 0 view .LVU412
+ 1870 0188 4C4B     		ldr	r3, .L167+16
+ 1871 018a 0422     		movs	r2, #4
+ 1872 018c 1A70     		strb	r2, [r3]
+ 155:Process/Src/process.c ****       }
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 51
+
+
+ 1873              		.loc 1 155 9 is_stmt 1 view .LVU413
+ 1874 018e 59E7     		b	.L117
+ 1875              	.L120:
+ 161:Process/Src/process.c ****       {
+ 1876              		.loc 1 161 7 view .LVU414
+ 161:Process/Src/process.c ****       {
+ 1877              		.loc 1 161 32 is_stmt 0 view .LVU415
+ 1878 0190 484B     		ldr	r3, .L167+8
+ 1879 0192 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+ 1880 0194 023B     		subs	r3, r3, #2
+ 1881 0196 082B     		cmp	r3, #8
+ 1882 0198 3FF654AF 		bhi	.L117
+ 1883 019c 01A2     		adr	r2, .L139
+ 1884 019e 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 1885 01a2 00BF     		.p2align 2
+ 1886              	.L139:
+ 1887 01a4 C9010000 		.word	.L142+1
+ 1888 01a8 E1010000 		.word	.L141+1
+ 1889 01ac 45000000 		.word	.L117+1
+ 1890 01b0 EF010000 		.word	.L140+1
+ 1891 01b4 45000000 		.word	.L117+1
+ 1892 01b8 45000000 		.word	.L117+1
+ 1893 01bc 45000000 		.word	.L117+1
+ 1894 01c0 45000000 		.word	.L117+1
+ 1895 01c4 FD010000 		.word	.L138+1
+ 1896              		.p2align 1
+ 1897              	.L142:
+ 164:Process/Src/process.c ****           NEXTION_SendPage("1");
+ 1898              		.loc 1 164 11 is_stmt 1 view .LVU416
+ 164:Process/Src/process.c ****           NEXTION_SendPage("1");
+ 1899              		.loc 1 164 28 is_stmt 0 view .LVU417
+ 1900 01c8 384B     		ldr	r3, .L167
+ 1901 01ca 0022     		movs	r2, #0
+ 1902 01cc 1A60     		str	r2, [r3]
+ 165:Process/Src/process.c ****           nextionPage1LightsSatus ();
+ 1903              		.loc 1 165 11 is_stmt 1 view .LVU418
+ 1904 01ce 4348     		ldr	r0, .L167+48
+ 1905 01d0 FFF7FEFF 		bl	NEXTION_SendPage
+ 1906              	.LVL109:
+ 166:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE1;
+ 1907              		.loc 1 166 11 view .LVU419
+ 1908 01d4 FFF7FEFF 		bl	nextionPage1LightsSatus
+ 1909              	.LVL110:
+ 167:Process/Src/process.c ****         break;
+ 1910              		.loc 1 167 11 view .LVU420
+ 167:Process/Src/process.c ****         break;
+ 1911              		.loc 1 167 30 is_stmt 0 view .LVU421
+ 1912 01d8 354B     		ldr	r3, .L167+4
+ 1913 01da 0122     		movs	r2, #1
+ 1914 01dc 1A70     		strb	r2, [r3]
+ 168:Process/Src/process.c ****   
+ 1915              		.loc 1 168 9 is_stmt 1 view .LVU422
+ 1916 01de 31E7     		b	.L117
+ 1917              	.L141:
+ 171:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE2;
+ 1918              		.loc 1 171 11 view .LVU423
+ 1919 01e0 3948     		ldr	r0, .L167+28
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 52
+
+
+ 1920 01e2 FFF7FEFF 		bl	NEXTION_SendPage
+ 1921              	.LVL111:
+ 172:Process/Src/process.c ****         break;
+ 1922              		.loc 1 172 11 view .LVU424
+ 172:Process/Src/process.c ****         break;
+ 1923              		.loc 1 172 30 is_stmt 0 view .LVU425
+ 1924 01e6 324B     		ldr	r3, .L167+4
+ 1925 01e8 0222     		movs	r2, #2
+ 1926 01ea 1A70     		strb	r2, [r3]
+ 173:Process/Src/process.c ****   
+ 1927              		.loc 1 173 9 is_stmt 1 view .LVU426
+ 1928 01ec 2AE7     		b	.L117
+ 1929              	.L140:
+ 176:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE4;
+ 1930              		.loc 1 176 11 view .LVU427
+ 1931 01ee 3848     		ldr	r0, .L167+36
+ 1932 01f0 FFF7FEFF 		bl	NEXTION_SendPage
+ 1933              	.LVL112:
+ 177:Process/Src/process.c ****         break;
+ 1934              		.loc 1 177 11 view .LVU428
+ 177:Process/Src/process.c ****         break;
+ 1935              		.loc 1 177 30 is_stmt 0 view .LVU429
+ 1936 01f4 2E4B     		ldr	r3, .L167+4
+ 1937 01f6 0422     		movs	r2, #4
+ 1938 01f8 1A70     		strb	r2, [r3]
+ 178:Process/Src/process.c ****   
+ 1939              		.loc 1 178 9 is_stmt 1 view .LVU430
+ 1940 01fa 23E7     		b	.L117
+ 1941              	.L138:
+ 181:Process/Src/process.c ****           step_alarm = SETALARM_STATE_SEND_HOUR;
+ 1942              		.loc 1 181 11 view .LVU431
+ 181:Process/Src/process.c ****           step_alarm = SETALARM_STATE_SEND_HOUR;
+ 1943              		.loc 1 181 23 is_stmt 0 view .LVU432
+ 1944 01fc FFF7FEFF 		bl	HAL_GetTick
+ 1945              	.LVL113:
+ 181:Process/Src/process.c ****           step_alarm = SETALARM_STATE_SEND_HOUR;
+ 1946              		.loc 1 181 21 discriminator 1 view .LVU433
+ 1947 0200 304B     		ldr	r3, .L167+24
+ 1948 0202 1860     		str	r0, [r3]
+ 182:Process/Src/process.c ****           alarm_on_off = 1;
+ 1949              		.loc 1 182 11 is_stmt 1 view .LVU434
+ 182:Process/Src/process.c ****           alarm_on_off = 1;
+ 1950              		.loc 1 182 22 is_stmt 0 view .LVU435
+ 1951 0204 374B     		ldr	r3, .L167+56
+ 1952 0206 0022     		movs	r2, #0
+ 1953 0208 1A70     		strb	r2, [r3]
+ 183:Process/Src/process.c ****           step_touch = SETTOUCH_STATE_ALARM;
+ 1954              		.loc 1 183 11 is_stmt 1 view .LVU436
+ 183:Process/Src/process.c ****           step_touch = SETTOUCH_STATE_ALARM;
+ 1955              		.loc 1 183 24 is_stmt 0 view .LVU437
+ 1956 020a 374B     		ldr	r3, .L167+60
+ 1957 020c 0122     		movs	r2, #1
+ 1958 020e 1A70     		strb	r2, [r3]
+ 184:Process/Src/process.c ****         break;
+ 1959              		.loc 1 184 11 is_stmt 1 view .LVU438
+ 184:Process/Src/process.c ****         break;
+ 1960              		.loc 1 184 22 is_stmt 0 view .LVU439
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 53
+
+
+ 1961 0210 2A4B     		ldr	r3, .L167+16
+ 1962 0212 0522     		movs	r2, #5
+ 1963 0214 1A70     		strb	r2, [r3]
+ 185:Process/Src/process.c ****       }
+ 1964              		.loc 1 185 9 is_stmt 1 view .LVU440
+ 1965 0216 15E7     		b	.L117
+ 1966              	.L118:
+ 191:Process/Src/process.c ****       {
+ 1967              		.loc 1 191 7 view .LVU441
+ 191:Process/Src/process.c ****       {
+ 1968              		.loc 1 191 32 is_stmt 0 view .LVU442
+ 1969 0218 264B     		ldr	r3, .L167+8
+ 1970 021a 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+ 1971 021c 033B     		subs	r3, r3, #3
+ 1972 021e 032B     		cmp	r3, #3
+ 1973 0220 3FF610AF 		bhi	.L117
+ 1974 0224 DFE803F0 		tbb	[pc, r3]
+ 1975              	.L144:
+ 1976 0228 19       		.byte	(.L147-.L144)/2
+ 1977 0229 02       		.byte	(.L146-.L144)/2
+ 1978 022a 0B       		.byte	(.L145-.L144)/2
+ 1979 022b 12       		.byte	(.L143-.L144)/2
+ 1980              		.p2align 1
+ 1981              	.L146:
+ 194:Process/Src/process.c ****           nextionPage1LightsSatus();
+ 1982              		.loc 1 194 11 is_stmt 1 view .LVU443
+ 1983 022c 2B48     		ldr	r0, .L167+48
+ 1984 022e FFF7FEFF 		bl	NEXTION_SendPage
+ 1985              	.LVL114:
+ 195:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE1;
+ 1986              		.loc 1 195 11 view .LVU444
+ 1987 0232 FFF7FEFF 		bl	nextionPage1LightsSatus
+ 1988              	.LVL115:
+ 196:Process/Src/process.c ****         break;
+ 1989              		.loc 1 196 11 view .LVU445
+ 196:Process/Src/process.c ****         break;
+ 1990              		.loc 1 196 30 is_stmt 0 view .LVU446
+ 1991 0236 1E4B     		ldr	r3, .L167+4
+ 1992 0238 0122     		movs	r2, #1
+ 1993 023a 1A70     		strb	r2, [r3]
+ 197:Process/Src/process.c ****   
+ 1994              		.loc 1 197 9 is_stmt 1 view .LVU447
+ 1995 023c 02E7     		b	.L117
+ 1996              	.L145:
+ 200:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE2;    
+ 1997              		.loc 1 200 11 view .LVU448
+ 1998 023e 2248     		ldr	r0, .L167+28
+ 1999 0240 FFF7FEFF 		bl	NEXTION_SendPage
+ 2000              	.LVL116:
+ 201:Process/Src/process.c ****         break;
+ 2001              		.loc 1 201 11 view .LVU449
+ 201:Process/Src/process.c ****         break;
+ 2002              		.loc 1 201 30 is_stmt 0 view .LVU450
+ 2003 0244 1A4B     		ldr	r3, .L167+4
+ 2004 0246 0222     		movs	r2, #2
+ 2005 0248 1A70     		strb	r2, [r3]
+ 202:Process/Src/process.c ****   
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 54
+
+
+ 2006              		.loc 1 202 9 is_stmt 1 view .LVU451
+ 2007 024a FBE6     		b	.L117
+ 2008              	.L143:
+ 205:Process/Src/process.c ****           nextion_page_state = NEXTION_PAGE3;
+ 2009              		.loc 1 205 11 view .LVU452
+ 2010 024c 1F48     		ldr	r0, .L167+32
+ 2011 024e FFF7FEFF 		bl	NEXTION_SendPage
+ 2012              	.LVL117:
+ 206:Process/Src/process.c ****         break;
+ 2013              		.loc 1 206 11 view .LVU453
+ 206:Process/Src/process.c ****         break;
+ 2014              		.loc 1 206 30 is_stmt 0 view .LVU454
+ 2015 0252 174B     		ldr	r3, .L167+4
+ 2016 0254 0322     		movs	r2, #3
+ 2017 0256 1A70     		strb	r2, [r3]
+ 207:Process/Src/process.c ****   
+ 2018              		.loc 1 207 9 is_stmt 1 view .LVU455
+ 2019 0258 F4E6     		b	.L117
+ 2020              	.L147:
+ 210:Process/Src/process.c ****           last_tick = HAL_GetTick();
+ 2021              		.loc 1 210 11 view .LVU456
+ 2022 025a 1948     		ldr	r0, .L167+20
+ 2023 025c FFF7FEFF 		bl	NEXTION_SendCode
+ 2024              	.LVL118:
+ 211:Process/Src/process.c ****           step_touch = SETTOUCH_STATE_CHANGE_PASSWORD;
+ 2025              		.loc 1 211 11 view .LVU457
+ 211:Process/Src/process.c ****           step_touch = SETTOUCH_STATE_CHANGE_PASSWORD;
+ 2026              		.loc 1 211 23 is_stmt 0 view .LVU458
+ 2027 0260 FFF7FEFF 		bl	HAL_GetTick
+ 2028              	.LVL119:
+ 211:Process/Src/process.c ****           step_touch = SETTOUCH_STATE_CHANGE_PASSWORD;
+ 2029              		.loc 1 211 21 discriminator 1 view .LVU459
+ 2030 0264 174B     		ldr	r3, .L167+24
+ 2031 0266 1860     		str	r0, [r3]
+ 212:Process/Src/process.c ****         break;
+ 2032              		.loc 1 212 11 is_stmt 1 view .LVU460
+ 212:Process/Src/process.c ****         break;
+ 2033              		.loc 1 212 22 is_stmt 0 view .LVU461
+ 2034 0268 144B     		ldr	r3, .L167+16
+ 2035 026a 0622     		movs	r2, #6
+ 2036 026c 1A70     		strb	r2, [r3]
+ 213:Process/Src/process.c ****       }
+ 2037              		.loc 1 213 9 is_stmt 1 view .LVU462
+ 2038 026e E9E6     		b	.L117
+ 2039              	.L155:
+ 226:Process/Src/process.c ****     break;
+ 2040              		.loc 1 226 7 view .LVU463
+ 2041 0270 FFF7FEFF 		bl	nextionSetPassword
+ 2042              	.LVL120:
+ 227:Process/Src/process.c **** 
+ 2043              		.loc 1 227 5 view .LVU464
+ 2044              	.L148:
+ 250:Process/Src/process.c ****   {
+ 2045              		.loc 1 250 3 view .LVU465
+ 250:Process/Src/process.c ****   {
+ 2046              		.loc 1 250 19 is_stmt 0 view .LVU466
+ 2047 0274 1C4B     		ldr	r3, .L167+60
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 55
+
+
+ 2048 0276 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 250:Process/Src/process.c ****   {
+ 2049              		.loc 1 250 5 view .LVU467
+ 2050 0278 012B     		cmp	r3, #1
+ 2051 027a 0FD0     		beq	.L166
+ 2052              	.L115:
+ 255:Process/Src/process.c **** 
+ 2053              		.loc 1 255 1 view .LVU468
+ 2054 027c 08BD     		pop	{r3, pc}
+ 2055              	.L154:
+ 230:Process/Src/process.c ****     break;
+ 2056              		.loc 1 230 7 is_stmt 1 view .LVU469
+ 2057 027e FFF7FEFF 		bl	nextionSetTemp
+ 2058              	.LVL121:
+ 231:Process/Src/process.c **** 
+ 2059              		.loc 1 231 5 view .LVU470
+ 2060 0282 F7E7     		b	.L148
+ 2061              	.L153:
+ 234:Process/Src/process.c ****     break;
+ 2062              		.loc 1 234 7 view .LVU471
+ 2063 0284 FFF7FEFF 		bl	nextionSetSleep
+ 2064              	.LVL122:
+ 235:Process/Src/process.c **** 
+ 2065              		.loc 1 235 5 view .LVU472
+ 2066 0288 F4E7     		b	.L148
+ 2067              	.L152:
+ 238:Process/Src/process.c ****     break;
+ 2068              		.loc 1 238 7 view .LVU473
+ 2069 028a FFF7FEFF 		bl	nextionSetTime
+ 2070              	.LVL123:
+ 239:Process/Src/process.c **** 
+ 2071              		.loc 1 239 5 view .LVU474
+ 2072 028e F1E7     		b	.L148
+ 2073              	.L151:
+ 242:Process/Src/process.c ****     break;
+ 2074              		.loc 1 242 7 view .LVU475
+ 2075 0290 FFF7FEFF 		bl	nextionSetAlarm
+ 2076              	.LVL124:
+ 243:Process/Src/process.c **** 
+ 2077              		.loc 1 243 5 view .LVU476
+ 2078 0294 EEE7     		b	.L148
+ 2079              	.L149:
+ 246:Process/Src/process.c ****     break;
+ 2080              		.loc 1 246 7 view .LVU477
+ 2081 0296 FFF7FEFF 		bl	nextionSetChangePassword
+ 2082              	.LVL125:
+ 247:Process/Src/process.c ****   }
+ 2083              		.loc 1 247 5 view .LVU478
+ 2084 029a EBE7     		b	.L148
+ 2085              	.L166:
+ 250:Process/Src/process.c ****   {
+ 2086              		.loc 1 250 46 is_stmt 0 discriminator 1 view .LVU479
+ 2087 029c 044B     		ldr	r3, .L167+4
+ 2088 029e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 250:Process/Src/process.c ****   {
+ 2089              		.loc 1 250 24 discriminator 1 view .LVU480
+ 2090 02a0 032B     		cmp	r3, #3
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 56
+
+
+ 2091 02a2 EBD1     		bne	.L115
+ 252:Process/Src/process.c ****   }
+ 2092              		.loc 1 252 5 is_stmt 1 view .LVU481
+ 2093 02a4 FFF7FEFF 		bl	nextionAlarmSendString
+ 2094              	.LVL126:
+ 255:Process/Src/process.c **** 
+ 2095              		.loc 1 255 1 is_stmt 0 view .LVU482
+ 2096 02a8 E8E7     		b	.L115
+ 2097              	.L168:
+ 2098 02aa 00BF     		.align	2
+ 2099              	.L167:
+ 2100 02ac 00000000 		.word	NEXTION_DMA_FLAG
+ 2101 02b0 00000000 		.word	nextion_page_state
+ 2102 02b4 00000000 		.word	nextionTouchEvent
+ 2103 02b8 00000000 		.word	rxbuffer_uart1
+ 2104 02bc 00000000 		.word	step_touch
+ 2105 02c0 00000000 		.word	.LC17
+ 2106 02c4 00000000 		.word	last_tick
+ 2107 02c8 08000000 		.word	.LC2
+ 2108 02cc 0C000000 		.word	.LC3
+ 2109 02d0 10000000 		.word	.LC4
+ 2110 02d4 10000000 		.word	.LC18
+ 2111 02d8 00000000 		.word	.LC29
+ 2112 02dc 04000000 		.word	.LC1
+ 2113 02e0 00000000 		.word	step_time
+ 2114 02e4 00000000 		.word	step_alarm
+ 2115 02e8 00000000 		.word	alarm_on_off
+ 2116              		.cfi_endproc
+ 2117              	.LFE136:
+ 2119              		.section	.rodata.Prosess_PacketComminication.str1.4,"aMS",%progbits,1
+ 2120              		.align	2
+ 2121              	.LC30:
+ 2122 0000 73746172 		.ascii	"start byte: 0x%02X\012\000"
+ 2122      74206279 
+ 2122      74653A20 
+ 2122      30782530 
+ 2122      32580A00 
+ 2123              		.align	2
+ 2124              	.LC31:
+ 2125 0014 6C656E67 		.ascii	"lenght: %d \012\000"
+ 2125      68743A20 
+ 2125      2564200A 
+ 2125      00
+ 2126 0021 000000   		.align	2
+ 2127              	.LC32:
+ 2128 0024 7061796C 		.ascii	"payload: 0x%02X \012\000"
+ 2128      6F61643A 
+ 2128      20307825 
+ 2128      30325820 
+ 2128      0A00
+ 2129 0036 0000     		.align	2
+ 2130              	.LC33:
+ 2131 0038 4352433A 		.ascii	"CRC: 0x%02X \012\000"
+ 2131      20307825 
+ 2131      30325820 
+ 2131      0A00
+ 2132 0046 0000     		.align	2
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 57
+
+
+ 2133              	.LC34:
+ 2134 0048 73746F70 		.ascii	"stop byte: 0x%02X\000"
+ 2134      20627974 
+ 2134      653A2030 
+ 2134      78253032 
+ 2134      5800
+ 2135              		.section	.text.Prosess_PacketComminication,"ax",%progbits
+ 2136              		.align	1
+ 2137              		.global	Prosess_PacketComminication
+ 2138              		.syntax unified
+ 2139              		.thumb
+ 2140              		.thumb_func
+ 2142              	Prosess_PacketComminication:
+ 2143              	.LFB149:
+ 583:Process/Src/process.c **** 
+ 584:Process/Src/process.c **** 
+ 585:Process/Src/process.c **** void Prosess_PacketComminication (void)
+ 586:Process/Src/process.c **** {
+ 2144              		.loc 1 586 1 is_stmt 1 view -0
+ 2145              		.cfi_startproc
+ 2146              		@ args = 0, pretend = 0, frame = 264
+ 2147              		@ frame_needed = 0, uses_anonymous_args = 0
+ 587:Process/Src/process.c ****   if(uart_dma_flag)
+ 2148              		.loc 1 587 3 view .LVU484
+ 2149              		.loc 1 587 6 is_stmt 0 view .LVU485
+ 2150 0000 554B     		ldr	r3, .L190
+ 2151 0002 1B68     		ldr	r3, [r3]
+ 2152              		.loc 1 587 5 view .LVU486
+ 2153 0004 002B     		cmp	r3, #0
+ 2154 0006 00F0A580 		beq	.L187
+ 586:Process/Src/process.c ****   if(uart_dma_flag)
+ 2155              		.loc 1 586 1 view .LVU487
+ 2156 000a 10B5     		push	{r4, lr}
+ 2157              		.cfi_def_cfa_offset 8
+ 2158              		.cfi_offset 4, -8
+ 2159              		.cfi_offset 14, -4
+ 2160 000c C2B0     		sub	sp, sp, #264
+ 2161              		.cfi_def_cfa_offset 272
+ 588:Process/Src/process.c ****   {
+ 589:Process/Src/process.c ****     switch (packetsteps)
+ 2162              		.loc 1 589 5 is_stmt 1 view .LVU488
+ 2163 000e 534B     		ldr	r3, .L190+4
+ 2164 0010 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 2165 0012 062B     		cmp	r3, #6
+ 2166 0014 41D8     		bhi	.L169
+ 2167 0016 DFE803F0 		tbb	[pc, r3]
+ 2168              	.L172:
+ 2169 001a 04       		.byte	(.L178-.L172)/2
+ 2170 001b 14       		.byte	(.L177-.L172)/2
+ 2171 001c 2D       		.byte	(.L176-.L172)/2
+ 2172 001d 42       		.byte	(.L175-.L172)/2
+ 2173 001e 5E       		.byte	(.L174-.L172)/2
+ 2174 001f 79       		.byte	(.L173-.L172)/2
+ 2175 0020 8E       		.byte	(.L171-.L172)/2
+ 2176 0021 00       		.p2align 1
+ 2177              	.L178:
+ 590:Process/Src/process.c ****     {
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 58
+
+
+ 591:Process/Src/process.c ****     case PACKAGE_İS_VALİD:
+ 592:Process/Src/process.c ****       HAL_Delay(150);  
+ 2178              		.loc 1 592 7 view .LVU489
+ 2179 0022 9620     		movs	r0, #150
+ 2180 0024 FFF7FEFF 		bl	HAL_Delay
+ 2181              	.LVL127:
+ 593:Process/Src/process.c ****       if(isPacketValid(MainBuf,120) )
+ 2182              		.loc 1 593 7 view .LVU490
+ 2183              		.loc 1 593 10 is_stmt 0 view .LVU491
+ 2184 0028 7821     		movs	r1, #120
+ 2185 002a 4D48     		ldr	r0, .L190+8
+ 2186 002c FFF7FEFF 		bl	isPacketValid
+ 2187              	.LVL128:
+ 2188              		.loc 1 593 9 discriminator 1 view .LVU492
+ 2189 0030 18B1     		cbz	r0, .L179
+ 594:Process/Src/process.c ****       {
+ 595:Process/Src/process.c ****         packetsteps = PACKAGE_ENDING;
+ 2190              		.loc 1 595 9 is_stmt 1 view .LVU493
+ 2191              		.loc 1 595 21 is_stmt 0 view .LVU494
+ 2192 0032 4A4B     		ldr	r3, .L190+4
+ 2193 0034 0622     		movs	r2, #6
+ 2194 0036 1A70     		strb	r2, [r3]
+ 596:Process/Src/process.c ****         break;
+ 2195              		.loc 1 596 9 is_stmt 1 view .LVU495
+ 2196 0038 2FE0     		b	.L169
+ 2197              	.L179:
+ 597:Process/Src/process.c ****       }
+ 598:Process/Src/process.c ****       packetsteps = PACKAGE_START_BYTE;
+ 2198              		.loc 1 598 7 view .LVU496
+ 2199              		.loc 1 598 19 is_stmt 0 view .LVU497
+ 2200 003a 484B     		ldr	r3, .L190+4
+ 2201 003c 0122     		movs	r2, #1
+ 2202 003e 1A70     		strb	r2, [r3]
+ 599:Process/Src/process.c ****     break;
+ 2203              		.loc 1 599 5 is_stmt 1 view .LVU498
+ 2204 0040 2BE0     		b	.L169
+ 2205              	.L177:
+ 600:Process/Src/process.c **** 
+ 601:Process/Src/process.c ****     case PACKAGE_START_BYTE:
+ 602:Process/Src/process.c ****       {
+ 603:Process/Src/process.c **** 
+ 604:Process/Src/process.c ****         packetData = function_ptr[PACKAGE_START_BYTE](MainBuf);
+ 2206              		.loc 1 604 9 view .LVU499
+ 2207              		.loc 1 604 34 is_stmt 0 view .LVU500
+ 2208 0042 484B     		ldr	r3, .L190+12
+ 2209 0044 5B68     		ldr	r3, [r3, #4]
+ 2210              		.loc 1 604 22 view .LVU501
+ 2211 0046 484C     		ldr	r4, .L190+16
+ 2212 0048 4549     		ldr	r1, .L190+8
+ 2213 004a 6846     		mov	r0, sp
+ 2214 004c 9847     		blx	r3
+ 2215              	.LVL129:
+ 2216 004e 40F20512 		movw	r2, #261
+ 2217 0052 6946     		mov	r1, sp
+ 2218 0054 2046     		mov	r0, r4
+ 2219 0056 FFF7FEFF 		bl	memcpy
+ 2220              	.LVL130:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 59
+
+
+ 605:Process/Src/process.c ****         if(packetData.Start_byte == 0)
+ 2221              		.loc 1 605 9 is_stmt 1 view .LVU502
+ 2222              		.loc 1 605 22 is_stmt 0 view .LVU503
+ 2223 005a 2178     		ldrb	r1, [r4]	@ zero_extendqisi2
+ 2224              		.loc 1 605 11 view .LVU504
+ 2225 005c 19B9     		cbnz	r1, .L180
+ 606:Process/Src/process.c ****         {
+ 607:Process/Src/process.c ****           packetsteps = PACKAGE_ENDING;
+ 2226              		.loc 1 607 11 is_stmt 1 view .LVU505
+ 2227              		.loc 1 607 23 is_stmt 0 view .LVU506
+ 2228 005e 3F4B     		ldr	r3, .L190+4
+ 2229 0060 0622     		movs	r2, #6
+ 2230 0062 1A70     		strb	r2, [r3]
+ 608:Process/Src/process.c ****           break;
+ 2231              		.loc 1 608 11 is_stmt 1 view .LVU507
+ 2232 0064 19E0     		b	.L169
+ 2233              	.L180:
+ 609:Process/Src/process.c ****         }
+ 610:Process/Src/process.c ****         serial_message("start byte: 0x%02X\n", packetData.Start_byte);
+ 2234              		.loc 1 610 9 view .LVU508
+ 2235 0066 4148     		ldr	r0, .L190+20
+ 2236 0068 FFF7FEFF 		bl	serial_message
+ 2237              	.LVL131:
+ 611:Process/Src/process.c ****         packetsteps = PACKAGE_LENGTH;
+ 2238              		.loc 1 611 9 view .LVU509
+ 2239              		.loc 1 611 21 is_stmt 0 view .LVU510
+ 2240 006c 3B4B     		ldr	r3, .L190+4
+ 2241 006e 0222     		movs	r2, #2
+ 2242 0070 1A70     		strb	r2, [r3]
+ 612:Process/Src/process.c ****       }
+ 613:Process/Src/process.c ****       break;
+ 2243              		.loc 1 613 7 is_stmt 1 view .LVU511
+ 2244 0072 12E0     		b	.L169
+ 2245              	.L176:
+ 614:Process/Src/process.c **** 
+ 615:Process/Src/process.c ****     case PACKAGE_LENGTH:
+ 616:Process/Src/process.c ****       {
+ 617:Process/Src/process.c ****         packetData = function_ptr[PACKAGE_LENGTH](MainBuf);
+ 2246              		.loc 1 617 9 view .LVU512
+ 2247              		.loc 1 617 34 is_stmt 0 view .LVU513
+ 2248 0074 3B4B     		ldr	r3, .L190+12
+ 2249 0076 9B68     		ldr	r3, [r3, #8]
+ 2250              		.loc 1 617 22 view .LVU514
+ 2251 0078 3B4C     		ldr	r4, .L190+16
+ 2252 007a 3949     		ldr	r1, .L190+8
+ 2253 007c 6846     		mov	r0, sp
+ 2254 007e 9847     		blx	r3
+ 2255              	.LVL132:
+ 2256 0080 40F20512 		movw	r2, #261
+ 2257 0084 6946     		mov	r1, sp
+ 2258 0086 2046     		mov	r0, r4
+ 2259 0088 FFF7FEFF 		bl	memcpy
+ 2260              	.LVL133:
+ 618:Process/Src/process.c ****         serial_message("lenght: %d \n",packetData.Data_Lengh);
+ 2261              		.loc 1 618 9 is_stmt 1 view .LVU515
+ 2262 008c 6178     		ldrb	r1, [r4, #1]	@ zero_extendqisi2
+ 2263 008e 3848     		ldr	r0, .L190+24
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 60
+
+
+ 2264 0090 FFF7FEFF 		bl	serial_message
+ 2265              	.LVL134:
+ 619:Process/Src/process.c ****         packetsteps = PACKAGE_PAYLOUD;
+ 2266              		.loc 1 619 9 view .LVU516
+ 2267              		.loc 1 619 21 is_stmt 0 view .LVU517
+ 2268 0094 314B     		ldr	r3, .L190+4
+ 2269 0096 0322     		movs	r2, #3
+ 2270 0098 1A70     		strb	r2, [r3]
+ 620:Process/Src/process.c ****       }
+ 621:Process/Src/process.c ****       break;
+ 2271              		.loc 1 621 7 is_stmt 1 view .LVU518
+ 2272              	.L169:
+ 622:Process/Src/process.c ****       case PACKAGE_PAYLOUD:
+ 623:Process/Src/process.c ****           packetData = function_ptr[PACKAGE_PAYLOUD](MainBuf);
+ 624:Process/Src/process.c ****           for(int i=0; i<packetData.Data_Lengh; i++)
+ 625:Process/Src/process.c ****           serial_message("payload: 0x%02X \n",packetData.Payload[i]);
+ 626:Process/Src/process.c ****           packetsteps = PACKAGE_CRC;
+ 627:Process/Src/process.c ****       break;
+ 628:Process/Src/process.c ****       
+ 629:Process/Src/process.c ****       case PACKAGE_CRC:
+ 630:Process/Src/process.c ****       packetData = function_ptr[PACKAGE_CRC](MainBuf);
+ 631:Process/Src/process.c ****       for(int i=0; i<3; i++)
+ 632:Process/Src/process.c ****       serial_message("CRC: 0x%02X \n",packetData.CRC_byte[i]);
+ 633:Process/Src/process.c ****       packetsteps = PACKAGE_STOP_BYTE;
+ 634:Process/Src/process.c ****       break;
+ 635:Process/Src/process.c **** 
+ 636:Process/Src/process.c ****       case PACKAGE_STOP_BYTE:
+ 637:Process/Src/process.c ****       packetData =function_ptr[PACKAGE_STOP_BYTE](MainBuf);
+ 638:Process/Src/process.c ****       serial_message("stop byte: 0x%02X", packetData.Stop_byte);
+ 639:Process/Src/process.c ****       packetsteps = PACKAGE_ENDING;
+ 640:Process/Src/process.c ****       break;
+ 641:Process/Src/process.c **** 
+ 642:Process/Src/process.c ****       case PACKAGE_ENDING:
+ 643:Process/Src/process.c ****       {
+ 644:Process/Src/process.c ****         uart_dma_flag = DMA_FLAG_DISABLE;
+ 645:Process/Src/process.c ****         oldPos = newPos = 0; 
+ 646:Process/Src/process.c ****         memset((uint8_t*)MainBuf,0,MainBuf_SIZE );
+ 647:Process/Src/process.c ****         packetsteps = PACKAGE_İS_VALİD;
+ 648:Process/Src/process.c ****       }
+ 649:Process/Src/process.c ****       break;
+ 650:Process/Src/process.c ****     }
+ 651:Process/Src/process.c **** 
+ 652:Process/Src/process.c ****   }
+ 653:Process/Src/process.c **** }
+ 2273              		.loc 1 653 1 is_stmt 0 view .LVU519
+ 2274 009a 42B0     		add	sp, sp, #264
+ 2275              		.cfi_remember_state
+ 2276              		.cfi_def_cfa_offset 8
+ 2277              		@ sp needed
+ 2278 009c 10BD     		pop	{r4, pc}
+ 2279              	.L175:
+ 2280              		.cfi_restore_state
+ 623:Process/Src/process.c ****           for(int i=0; i<packetData.Data_Lengh; i++)
+ 2281              		.loc 1 623 11 is_stmt 1 view .LVU520
+ 623:Process/Src/process.c ****           for(int i=0; i<packetData.Data_Lengh; i++)
+ 2282              		.loc 1 623 36 is_stmt 0 view .LVU521
+ 2283 009e 314B     		ldr	r3, .L190+12
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 61
+
+
+ 2284 00a0 DB68     		ldr	r3, [r3, #12]
+ 623:Process/Src/process.c ****           for(int i=0; i<packetData.Data_Lengh; i++)
+ 2285              		.loc 1 623 24 view .LVU522
+ 2286 00a2 2F49     		ldr	r1, .L190+8
+ 2287 00a4 6846     		mov	r0, sp
+ 2288 00a6 9847     		blx	r3
+ 2289              	.LVL135:
+ 2290 00a8 40F20512 		movw	r2, #261
+ 2291 00ac 6946     		mov	r1, sp
+ 2292 00ae 2E48     		ldr	r0, .L190+16
+ 2293 00b0 FFF7FEFF 		bl	memcpy
+ 2294              	.LVL136:
+ 624:Process/Src/process.c ****           serial_message("payload: 0x%02X \n",packetData.Payload[i]);
+ 2295              		.loc 1 624 11 is_stmt 1 view .LVU523
+ 2296              	.LBB4:
+ 624:Process/Src/process.c ****           serial_message("payload: 0x%02X \n",packetData.Payload[i]);
+ 2297              		.loc 1 624 15 view .LVU524
+ 624:Process/Src/process.c ****           serial_message("payload: 0x%02X \n",packetData.Payload[i]);
+ 2298              		.loc 1 624 19 is_stmt 0 view .LVU525
+ 2299 00b4 0024     		movs	r4, #0
+ 624:Process/Src/process.c ****           serial_message("payload: 0x%02X \n",packetData.Payload[i]);
+ 2300              		.loc 1 624 11 view .LVU526
+ 2301 00b6 06E0     		b	.L181
+ 2302              	.LVL137:
+ 2303              	.L182:
+ 625:Process/Src/process.c ****           packetsteps = PACKAGE_CRC;
+ 2304              		.loc 1 625 11 is_stmt 1 view .LVU527
+ 625:Process/Src/process.c ****           packetsteps = PACKAGE_CRC;
+ 2305              		.loc 1 625 65 is_stmt 0 view .LVU528
+ 2306 00b8 2B4B     		ldr	r3, .L190+16
+ 2307 00ba 2344     		add	r3, r3, r4
+ 625:Process/Src/process.c ****           packetsteps = PACKAGE_CRC;
+ 2308              		.loc 1 625 11 view .LVU529
+ 2309 00bc 9978     		ldrb	r1, [r3, #2]	@ zero_extendqisi2
+ 2310 00be 2D48     		ldr	r0, .L190+28
+ 2311 00c0 FFF7FEFF 		bl	serial_message
+ 2312              	.LVL138:
+ 624:Process/Src/process.c ****           serial_message("payload: 0x%02X \n",packetData.Payload[i]);
+ 2313              		.loc 1 624 50 is_stmt 1 discriminator 3 view .LVU530
+ 2314 00c4 0134     		adds	r4, r4, #1
+ 2315              	.LVL139:
+ 2316              	.L181:
+ 624:Process/Src/process.c ****           serial_message("payload: 0x%02X \n",packetData.Payload[i]);
+ 2317              		.loc 1 624 25 discriminator 1 view .LVU531
+ 624:Process/Src/process.c ****           serial_message("payload: 0x%02X \n",packetData.Payload[i]);
+ 2318              		.loc 1 624 36 is_stmt 0 discriminator 1 view .LVU532
+ 2319 00c6 284B     		ldr	r3, .L190+16
+ 2320 00c8 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 624:Process/Src/process.c ****           serial_message("payload: 0x%02X \n",packetData.Payload[i]);
+ 2321              		.loc 1 624 25 discriminator 1 view .LVU533
+ 2322 00ca A342     		cmp	r3, r4
+ 2323 00cc F4DC     		bgt	.L182
+ 2324              	.LBE4:
+ 626:Process/Src/process.c ****       break;
+ 2325              		.loc 1 626 11 is_stmt 1 view .LVU534
+ 626:Process/Src/process.c ****       break;
+ 2326              		.loc 1 626 23 is_stmt 0 view .LVU535
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 62
+
+
+ 2327 00ce 234B     		ldr	r3, .L190+4
+ 2328 00d0 0422     		movs	r2, #4
+ 2329 00d2 1A70     		strb	r2, [r3]
+ 627:Process/Src/process.c ****       
+ 2330              		.loc 1 627 7 is_stmt 1 view .LVU536
+ 2331 00d4 E1E7     		b	.L169
+ 2332              	.LVL140:
+ 2333              	.L174:
+ 630:Process/Src/process.c ****       for(int i=0; i<3; i++)
+ 2334              		.loc 1 630 7 view .LVU537
+ 630:Process/Src/process.c ****       for(int i=0; i<3; i++)
+ 2335              		.loc 1 630 32 is_stmt 0 view .LVU538
+ 2336 00d6 234B     		ldr	r3, .L190+12
+ 2337 00d8 1B69     		ldr	r3, [r3, #16]
+ 630:Process/Src/process.c ****       for(int i=0; i<3; i++)
+ 2338              		.loc 1 630 20 view .LVU539
+ 2339 00da 2149     		ldr	r1, .L190+8
+ 2340 00dc 6846     		mov	r0, sp
+ 2341 00de 9847     		blx	r3
+ 2342              	.LVL141:
+ 2343 00e0 40F20512 		movw	r2, #261
+ 2344 00e4 6946     		mov	r1, sp
+ 2345 00e6 2048     		ldr	r0, .L190+16
+ 2346 00e8 FFF7FEFF 		bl	memcpy
+ 2347              	.LVL142:
+ 631:Process/Src/process.c ****       serial_message("CRC: 0x%02X \n",packetData.CRC_byte[i]);
+ 2348              		.loc 1 631 7 is_stmt 1 view .LVU540
+ 2349              	.LBB5:
+ 631:Process/Src/process.c ****       serial_message("CRC: 0x%02X \n",packetData.CRC_byte[i]);
+ 2350              		.loc 1 631 11 view .LVU541
+ 631:Process/Src/process.c ****       serial_message("CRC: 0x%02X \n",packetData.CRC_byte[i]);
+ 2351              		.loc 1 631 15 is_stmt 0 view .LVU542
+ 2352 00ec 0024     		movs	r4, #0
+ 631:Process/Src/process.c ****       serial_message("CRC: 0x%02X \n",packetData.CRC_byte[i]);
+ 2353              		.loc 1 631 7 view .LVU543
+ 2354 00ee 07E0     		b	.L183
+ 2355              	.LVL143:
+ 2356              	.L184:
+ 632:Process/Src/process.c ****       packetsteps = PACKAGE_STOP_BYTE;
+ 2357              		.loc 1 632 7 is_stmt 1 view .LVU544
+ 632:Process/Src/process.c ****       packetsteps = PACKAGE_STOP_BYTE;
+ 2358              		.loc 1 632 58 is_stmt 0 view .LVU545
+ 2359 00f0 1D4B     		ldr	r3, .L190+16
+ 2360 00f2 2344     		add	r3, r3, r4
+ 632:Process/Src/process.c ****       packetsteps = PACKAGE_STOP_BYTE;
+ 2361              		.loc 1 632 7 view .LVU546
+ 2362 00f4 93F80111 		ldrb	r1, [r3, #257]	@ zero_extendqisi2
+ 2363 00f8 1F48     		ldr	r0, .L190+32
+ 2364 00fa FFF7FEFF 		bl	serial_message
+ 2365              	.LVL144:
+ 631:Process/Src/process.c ****       serial_message("CRC: 0x%02X \n",packetData.CRC_byte[i]);
+ 2366              		.loc 1 631 26 is_stmt 1 discriminator 3 view .LVU547
+ 2367 00fe 0134     		adds	r4, r4, #1
+ 2368              	.LVL145:
+ 2369              	.L183:
+ 631:Process/Src/process.c ****       serial_message("CRC: 0x%02X \n",packetData.CRC_byte[i]);
+ 2370              		.loc 1 631 21 discriminator 1 view .LVU548
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 63
+
+
+ 2371 0100 022C     		cmp	r4, #2
+ 2372 0102 F5DD     		ble	.L184
+ 2373              	.LBE5:
+ 633:Process/Src/process.c ****       break;
+ 2374              		.loc 1 633 7 view .LVU549
+ 633:Process/Src/process.c ****       break;
+ 2375              		.loc 1 633 19 is_stmt 0 view .LVU550
+ 2376 0104 154B     		ldr	r3, .L190+4
+ 2377 0106 0522     		movs	r2, #5
+ 2378 0108 1A70     		strb	r2, [r3]
+ 634:Process/Src/process.c **** 
+ 2379              		.loc 1 634 7 is_stmt 1 view .LVU551
+ 2380 010a C6E7     		b	.L169
+ 2381              	.LVL146:
+ 2382              	.L173:
+ 637:Process/Src/process.c ****       serial_message("stop byte: 0x%02X", packetData.Stop_byte);
+ 2383              		.loc 1 637 7 view .LVU552
+ 637:Process/Src/process.c ****       serial_message("stop byte: 0x%02X", packetData.Stop_byte);
+ 2384              		.loc 1 637 31 is_stmt 0 view .LVU553
+ 2385 010c 154B     		ldr	r3, .L190+12
+ 2386 010e 5B69     		ldr	r3, [r3, #20]
+ 637:Process/Src/process.c ****       serial_message("stop byte: 0x%02X", packetData.Stop_byte);
+ 2387              		.loc 1 637 19 view .LVU554
+ 2388 0110 154C     		ldr	r4, .L190+16
+ 2389 0112 1349     		ldr	r1, .L190+8
+ 2390 0114 6846     		mov	r0, sp
+ 2391 0116 9847     		blx	r3
+ 2392              	.LVL147:
+ 2393 0118 40F20512 		movw	r2, #261
+ 2394 011c 6946     		mov	r1, sp
+ 2395 011e 2046     		mov	r0, r4
+ 2396 0120 FFF7FEFF 		bl	memcpy
+ 2397              	.LVL148:
+ 638:Process/Src/process.c ****       packetsteps = PACKAGE_ENDING;
+ 2398              		.loc 1 638 7 is_stmt 1 view .LVU555
+ 2399 0124 94F80411 		ldrb	r1, [r4, #260]	@ zero_extendqisi2
+ 2400 0128 1448     		ldr	r0, .L190+36
+ 2401 012a FFF7FEFF 		bl	serial_message
+ 2402              	.LVL149:
+ 639:Process/Src/process.c ****       break;
+ 2403              		.loc 1 639 7 view .LVU556
+ 639:Process/Src/process.c ****       break;
+ 2404              		.loc 1 639 19 is_stmt 0 view .LVU557
+ 2405 012e 0B4B     		ldr	r3, .L190+4
+ 2406 0130 0622     		movs	r2, #6
+ 2407 0132 1A70     		strb	r2, [r3]
+ 640:Process/Src/process.c **** 
+ 2408              		.loc 1 640 7 is_stmt 1 view .LVU558
+ 2409 0134 B1E7     		b	.L169
+ 2410              	.L171:
+ 644:Process/Src/process.c ****         oldPos = newPos = 0; 
+ 2411              		.loc 1 644 9 view .LVU559
+ 644:Process/Src/process.c ****         oldPos = newPos = 0; 
+ 2412              		.loc 1 644 23 is_stmt 0 view .LVU560
+ 2413 0136 0024     		movs	r4, #0
+ 2414 0138 074B     		ldr	r3, .L190
+ 2415 013a 1C60     		str	r4, [r3]
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 64
+
+
+ 645:Process/Src/process.c ****         memset((uint8_t*)MainBuf,0,MainBuf_SIZE );
+ 2416              		.loc 1 645 9 is_stmt 1 view .LVU561
+ 645:Process/Src/process.c ****         memset((uint8_t*)MainBuf,0,MainBuf_SIZE );
+ 2417              		.loc 1 645 25 is_stmt 0 view .LVU562
+ 2418 013c 104B     		ldr	r3, .L190+40
+ 2419 013e 1C80     		strh	r4, [r3]	@ movhi
+ 645:Process/Src/process.c ****         memset((uint8_t*)MainBuf,0,MainBuf_SIZE );
+ 2420              		.loc 1 645 16 view .LVU563
+ 2421 0140 104B     		ldr	r3, .L190+44
+ 2422 0142 1C80     		strh	r4, [r3]	@ movhi
+ 646:Process/Src/process.c ****         packetsteps = PACKAGE_İS_VALİD;
+ 2423              		.loc 1 646 9 is_stmt 1 view .LVU564
+ 2424 0144 8022     		movs	r2, #128
+ 2425 0146 2146     		mov	r1, r4
+ 2426 0148 0548     		ldr	r0, .L190+8
+ 2427 014a FFF7FEFF 		bl	memset
+ 2428              	.LVL150:
+ 647:Process/Src/process.c ****       }
+ 2429              		.loc 1 647 9 view .LVU565
+ 647:Process/Src/process.c ****       }
+ 2430              		.loc 1 647 21 is_stmt 0 view .LVU566
+ 2431 014e 034B     		ldr	r3, .L190+4
+ 2432 0150 1C70     		strb	r4, [r3]
+ 649:Process/Src/process.c ****     }
+ 2433              		.loc 1 649 7 is_stmt 1 view .LVU567
+ 2434              		.loc 1 653 1 is_stmt 0 view .LVU568
+ 2435 0152 A2E7     		b	.L169
+ 2436              	.L187:
+ 2437              		.cfi_def_cfa_offset 0
+ 2438              		.cfi_restore 4
+ 2439              		.cfi_restore 14
+ 2440 0154 7047     		bx	lr
+ 2441              	.L191:
+ 2442 0156 00BF     		.align	2
+ 2443              	.L190:
+ 2444 0158 00000000 		.word	uart_dma_flag
+ 2445 015c 00000000 		.word	packetsteps
+ 2446 0160 00000000 		.word	MainBuf
+ 2447 0164 00000000 		.word	function_ptr
+ 2448 0168 00000000 		.word	packetData
+ 2449 016c 00000000 		.word	.LC30
+ 2450 0170 14000000 		.word	.LC31
+ 2451 0174 24000000 		.word	.LC32
+ 2452 0178 38000000 		.word	.LC33
+ 2453 017c 48000000 		.word	.LC34
+ 2454 0180 00000000 		.word	newPos
+ 2455 0184 00000000 		.word	oldPos
+ 2456              		.cfi_endproc
+ 2457              	.LFE149:
+ 2459              		.section	.text.get_nextion_page_state,"ax",%progbits
+ 2460              		.align	1
+ 2461              		.global	get_nextion_page_state
+ 2462              		.syntax unified
+ 2463              		.thumb
+ 2464              		.thumb_func
+ 2466              	get_nextion_page_state:
+ 2467              	.LFB150:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 65
+
+
+ 654:Process/Src/process.c **** 
+ 655:Process/Src/process.c **** 
+ 656:Process/Src/process.c **** nextion_page_state_t get_nextion_page_state(void)
+ 657:Process/Src/process.c **** {
+ 2468              		.loc 1 657 1 is_stmt 1 view -0
+ 2469              		.cfi_startproc
+ 2470              		@ args = 0, pretend = 0, frame = 0
+ 2471              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2472              		@ link register save eliminated.
+ 658:Process/Src/process.c ****   return nextion_page_state;
+ 2473              		.loc 1 658 3 view .LVU570
+ 659:Process/Src/process.c **** }
+ 2474              		.loc 1 659 1 is_stmt 0 view .LVU571
+ 2475 0000 014B     		ldr	r3, .L193
+ 2476 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 2477 0004 7047     		bx	lr
+ 2478              	.L194:
+ 2479 0006 00BF     		.align	2
+ 2480              	.L193:
+ 2481 0008 00000000 		.word	nextion_page_state
+ 2482              		.cfi_endproc
+ 2483              	.LFE150:
+ 2485              		.section	.bss.step_touch,"aw",%nobits
+ 2488              	step_touch:
+ 2489 0000 00       		.space	1
+ 2490              		.section	.bss.step_time,"aw",%nobits
+ 2493              	step_time:
+ 2494 0000 00       		.space	1
+ 2495              		.section	.bss.step_alarm,"aw",%nobits
+ 2498              	step_alarm:
+ 2499 0000 00       		.space	1
+ 2500              		.section	.bss.packetsteps,"aw",%nobits
+ 2503              	packetsteps:
+ 2504 0000 00       		.space	1
+ 2505              		.section	.bss.packetData,"aw",%nobits
+ 2506              		.align	2
+ 2509              	packetData:
+ 2510 0000 00000000 		.space	261
+ 2510      00000000 
+ 2510      00000000 
+ 2510      00000000 
+ 2510      00000000 
+ 2511              		.section	.bss.nextionTouchEvent,"aw",%nobits
+ 2512              		.align	2
+ 2515              	nextionTouchEvent:
+ 2516 0000 00000000 		.space	7
+ 2516      000000
+ 2517              		.section	.bss.ee24,"aw",%nobits
+ 2518              		.align	2
+ 2521              	ee24:
+ 2522 0000 00000000 		.space	16
+ 2522      00000000 
+ 2522      00000000 
+ 2522      00000000 
+ 2523              		.section	.bss.nextion_page_state,"aw",%nobits
+ 2526              	nextion_page_state:
+ 2527 0000 00       		.space	1
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 66
+
+
+ 2528              		.section	.bss.last_tick,"aw",%nobits
+ 2529              		.align	2
+ 2532              	last_tick:
+ 2533 0000 00000000 		.space	4
+ 2534              		.section	.bss.status_green,"aw",%nobits
+ 2537              	status_green:
+ 2538 0000 00       		.space	1
+ 2539              		.section	.bss.status_red,"aw",%nobits
+ 2542              	status_red:
+ 2543 0000 00       		.space	1
+ 2544              		.section	.bss.status_blue,"aw",%nobits
+ 2547              	status_blue:
+ 2548 0000 00       		.space	1
+ 2549              		.section	.bss.alarm_operation,"aw",%nobits
+ 2552              	alarm_operation:
+ 2553 0000 00       		.space	1
+ 2554              		.section	.bss.alarm_on_off,"aw",%nobits
+ 2557              	alarm_on_off:
+ 2558 0000 00       		.space	1
+ 2559              		.section	.bss.Alarm_minute,"aw",%nobits
+ 2562              	Alarm_minute:
+ 2563 0000 00       		.space	1
+ 2564              		.section	.bss.alarm_hour,"aw",%nobits
+ 2567              	alarm_hour:
+ 2568 0000 00       		.space	1
+ 2569              		.section	.bss.str,"aw",%nobits
+ 2570              		.align	2
+ 2573              	str:
+ 2574 0000 00000000 		.space	35
+ 2574      00000000 
+ 2574      00000000 
+ 2574      00000000 
+ 2574      00000000 
+ 2575              		.section	.bss.eeprom_read_array,"aw",%nobits
+ 2576              		.align	2
+ 2579              	eeprom_read_array:
+ 2580 0000 00000000 		.space	50
+ 2580      00000000 
+ 2580      00000000 
+ 2580      00000000 
+ 2580      00000000 
+ 2581              		.section	.bss.password,"aw",%nobits
+ 2584              	password:
+ 2585 0000 00       		.space	1
+ 2586              		.text
+ 2587              	.Letext0:
+ 2588              		.file 2 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 2589              		.file 3 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 2590              		.file 4 "Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g431xx.h"
+ 2591              		.file 5 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 2592              		.file 6 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_def.h"
+ 2593              		.file 7 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_gpio.h"
+ 2594              		.file 8 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_dma.h"
+ 2595              		.file 9 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_i2c.h"
+ 2596              		.file 10 "EEpromConfig/Inc/M24C64.h"
+ 2597              		.file 11 "TimeDateConfig/Inc/PCF85063.h"
+ 2598              		.file 12 "PacketReciveConfig/Inc/packetreceive.h"
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 67
+
+
+ 2599              		.file 13 "NEXTIONconfig/Inc/nextion.h"
+ 2600              		.file 14 "UARTconfig/Inc/uart_configuration.h"
+ 2601              		.file 15 "Process/Inc/staticprocess.h"
+ 2602              		.file 16 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev
+ 2603              		.file 17 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h"
+ 2604              		.file 18 "delayHandler/Inc/delay_handler.h"
+ 2605              		.file 19 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev
+ 2606              		.file 20 "Core/Inc/stm32g4xx_it.h"
+ 2607              		.file 21 "Core/Inc/main.h"
+ 2608              		.file 22 "<built-in>"
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 68
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 process.c
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:21     .rodata.nextionAlarmOperation.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:37     .text.nextionAlarmOperation:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:42     .text.nextionAlarmOperation:00000000 nextionAlarmOperation
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:166    .text.nextionAlarmOperation:000000b0 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:170    .text.nextionAlarmOperation:000000b4 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:209    .text.nextionAlarmOperation:000000dc $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2557   .bss.alarm_on_off:00000000 alarm_on_off
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2552   .bss.alarm_operation:00000000 alarm_operation
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2562   .bss.Alarm_minute:00000000 Alarm_minute
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2567   .bss.alarm_hour:00000000 alarm_hour
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2515   .bss.nextionTouchEvent:00000000 nextionTouchEvent
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2526   .bss.nextion_page_state:00000000 nextion_page_state
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:225    .rodata.nextionBlueLightsStatus.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:232    .text.nextionBlueLightsStatus:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:237    .text.nextionBlueLightsStatus:00000000 nextionBlueLightsStatus
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:290    .text.nextionBlueLightsStatus:00000034 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2547   .bss.status_blue:00000000 status_blue
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:298    .rodata.nextionRedLightsStatus.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:305    .text.nextionRedLightsStatus:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:310    .text.nextionRedLightsStatus:00000000 nextionRedLightsStatus
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:363    .text.nextionRedLightsStatus:00000034 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2542   .bss.status_red:00000000 status_red
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:371    .rodata.nextionGreenLightsStatus.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:378    .text.nextionGreenLightsStatus:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:383    .text.nextionGreenLightsStatus:00000000 nextionGreenLightsStatus
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:436    .text.nextionGreenLightsStatus:00000034 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2537   .bss.status_green:00000000 status_green
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:444    .rodata.nextionPage1LightsSatus.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:451    .text.nextionPage1LightsSatus:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:456    .text.nextionPage1LightsSatus:00000000 nextionPage1LightsSatus
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:538    .text.nextionPage1LightsSatus:0000005c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2573   .bss.str:00000000 str
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2579   .bss.eeprom_read_array:00000000 eeprom_read_array
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:555    .rodata.nextionSetPassword.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:559    .text.nextionSetPassword:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:564    .text.nextionSetPassword:00000000 nextionSetPassword
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:626    .text.nextionSetPassword:0000003c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2532   .bss.last_tick:00000000 last_tick
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2584   .bss.password:00000000 password
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2488   .bss.step_touch:00000000 step_touch
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:637    .rodata.nextionSetSleep.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:641    .text.nextionSetSleep:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:646    .text.nextionSetSleep:00000000 nextionSetSleep
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:703    .text.nextionSetSleep:00000038 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:711    .text.nextionSetTemp:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:716    .text.nextionSetTemp:00000000 nextionSetTemp
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:786    .text.nextionSetTemp:00000048 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2521   .bss.ee24:00000000 ee24
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:798    .rodata.nextionSetChangePassword.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:805    .text.nextionSetChangePassword:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:810    .text.nextionSetChangePassword:00000000 nextionSetChangePassword
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:887    .text.nextionSetChangePassword:00000050 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:900    .rodata.nextionSetTime.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:925    .text.nextionSetTime:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:930    .text.nextionSetTime:00000000 nextionSetTime
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 69
+
+
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:948    .text.nextionSetTime:0000000e $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:960    .text.nextionSetTime:0000001a $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1221   .text.nextionSetTime:00000154 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2493   .bss.step_time:00000000 step_time
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1237   .rodata.nextionSetAlarm.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1244   .text.nextionSetAlarm:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1249   .text.nextionSetAlarm:00000000 nextionSetAlarm
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1266   .text.nextionSetAlarm:0000000e $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1389   .text.nextionSetAlarm:0000008c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2498   .bss.step_alarm:00000000 step_alarm
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1404   .text.nextionAlarmSendString:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1409   .text.nextionAlarmSendString:00000000 nextionAlarmSendString
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1439   .text.nextionAlarmSendString:00000020 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1448   .rodata.process_INIT.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1455   .text.process_INIT:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1461   .text.process_INIT:00000000 process_INIT
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1558   .text.process_INIT:00000078 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2503   .bss.packetsteps:00000000 packetsteps
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1570   .rodata.Process_Nextion.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1574   .text.Process_Nextion:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1580   .text.Process_Nextion:00000000 Process_Nextion
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1608   .text.Process_Nextion:0000001a $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1613   .text.Process_Nextion:00000024 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1652   .text.Process_Nextion:0000005a $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1658   .text.Process_Nextion:00000066 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1689   .text.Process_Nextion:0000008c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1700   .text.Process_Nextion:000000b8 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1810   .text.Process_Nextion:00000138 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1815   .text.Process_Nextion:0000014c $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1887   .text.Process_Nextion:000001a4 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1896   .text.Process_Nextion:000001c8 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1976   .text.Process_Nextion:00000228 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1980   .text.Process_Nextion:0000022c $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2100   .text.Process_Nextion:000002ac $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2120   .rodata.Prosess_PacketComminication.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2136   .text.Prosess_PacketComminication:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2142   .text.Prosess_PacketComminication:00000000 Prosess_PacketComminication
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2169   .text.Prosess_PacketComminication:0000001a $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2444   .text.Prosess_PacketComminication:00000158 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2509   .bss.packetData:00000000 packetData
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2460   .text.get_nextion_page_state:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2466   .text.get_nextion_page_state:00000000 get_nextion_page_state
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2481   .text.get_nextion_page_state:00000008 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2489   .bss.step_touch:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2494   .bss.step_time:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2499   .bss.step_alarm:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2504   .bss.packetsteps:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2506   .bss.packetData:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2512   .bss.nextionTouchEvent:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2518   .bss.ee24:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2527   .bss.nextion_page_state:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2529   .bss.last_tick:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2538   .bss.status_green:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2543   .bss.status_red:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2548   .bss.status_blue:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2553   .bss.alarm_operation:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2558   .bss.alarm_on_off:00000000 $d
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s 			page 70
+
+
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2563   .bss.Alarm_minute:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2568   .bss.alarm_hour:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2570   .bss.str:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2576   .bss.eeprom_read_array:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2585   .bss.password:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1271   .text.nextionSetAlarm:00000013 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:1271   .text.nextionSetAlarm:00000014 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2176   .text.Prosess_PacketComminication:00000021 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccMgM6Ja.s:2176   .text.Prosess_PacketComminication:00000022 $t
+
+UNDEFINED SYMBOLS
+get_st_time
+NEXTION_SendPage
+HAL_GPIO_WritePin
+NEXTION_SendCode
+sprintf
+NEXTION_SendValue
+delay_tick_1ms
+serial_message
+rxbuffer_uart1
+delay_tick_1ms_no_rst
+EE24_Write
+NEXTION_DMA_FLAG
+HAL_GetTick
+PCF85_SetHour
+PCF85_SetMinute
+PCF85_SetSecond
+PCF85_Setday
+PCF85_Setmonth
+PCF85_Setyear
+NEXTION_SendString
+get_pointer_hi2c2
+EE24_Init
+PCF85_Init
+PCF85_SetDate
+PCF85_SetTime
+EE24_Read
+HAL_Delay
+isPacketValid
+memcpy
+memset
+uart_dma_flag
+MainBuf
+function_ptr
+newPos
+oldPos

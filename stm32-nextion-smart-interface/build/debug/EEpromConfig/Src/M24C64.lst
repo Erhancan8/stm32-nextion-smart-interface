@@ -1,0 +1,816 @@
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"M24C64.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "EEpromConfig/Src/M24C64.c"
+  20              		.section	.text.EE24_Delay,"ax",%progbits
+  21              		.align	1
+  22              		.global	EE24_Delay
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	EE24_Delay:
+  28              	.LVL0:
+  29              	.LFB132:
+   1:EEpromConfig/Src/M24C64.c **** 
+   2:EEpromConfig/Src/M24C64.c **** /**************************************************************************************************
+   3:EEpromConfig/Src/M24C64.c **** **************    Include Headers
+   4:EEpromConfig/Src/M24C64.c **** ***************************************************************************************************
+   5:EEpromConfig/Src/M24C64.c **** 
+   6:EEpromConfig/Src/M24C64.c **** #include "M24C64.h"
+   7:EEpromConfig/Src/M24C64.c **** #if EE24_RTOS == EE24_RTOS_DISABLE
+   8:EEpromConfig/Src/M24C64.c **** #elif EE24_RTOS == EE24_RTOS_CMSIS_V1
+   9:EEpromConfig/Src/M24C64.c **** #include "cmsis_os.h"
+  10:EEpromConfig/Src/M24C64.c **** #include "freertos.h"
+  11:EEpromConfig/Src/M24C64.c **** #elif EE24_RTOS == EE24_RTOS_CMSIS_V2
+  12:EEpromConfig/Src/M24C64.c **** #include "cmsis_os2.h"
+  13:EEpromConfig/Src/M24C64.c **** #include "freertos.h"
+  14:EEpromConfig/Src/M24C64.c **** #elif EE24_RTOS == EE24_RTOS_THREADX
+  15:EEpromConfig/Src/M24C64.c **** #include "app_threadx.h"
+  16:EEpromConfig/Src/M24C64.c **** #endif
+  17:EEpromConfig/Src/M24C64.c **** 
+  18:EEpromConfig/Src/M24C64.c **** /**************************************************************************************************
+  19:EEpromConfig/Src/M24C64.c **** **************    Private Definitions
+  20:EEpromConfig/Src/M24C64.c **** ***************************************************************************************************
+  21:EEpromConfig/Src/M24C64.c **** 
+  22:EEpromConfig/Src/M24C64.c **** #if (EE24_SIZE <= 2)
+  23:EEpromConfig/Src/M24C64.c **** #define EE24_PSIZE     8
+  24:EEpromConfig/Src/M24C64.c **** #elif (EE24_SIZE <= 16)
+  25:EEpromConfig/Src/M24C64.c **** #define EE24_PSIZE     16               
+  26:EEpromConfig/Src/M24C64.c **** #else
+  27:EEpromConfig/Src/M24C64.c **** #define EE24_PSIZE     32
+  28:EEpromConfig/Src/M24C64.c **** #endif
+  29:EEpromConfig/Src/M24C64.c **** 
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 2
+
+
+  30:EEpromConfig/Src/M24C64.c **** /**************************************************************************************************
+  31:EEpromConfig/Src/M24C64.c **** **************    Private Functions
+  32:EEpromConfig/Src/M24C64.c **** ***************************************************************************************************
+  33:EEpromConfig/Src/M24C64.c **** 
+  34:EEpromConfig/Src/M24C64.c **** void EE24_Delay(uint32_t Delay);
+  35:EEpromConfig/Src/M24C64.c **** void EE24_Lock(EE24_HandleTypeDef *Handle);
+  36:EEpromConfig/Src/M24C64.c **** void EE24_UnLock(EE24_HandleTypeDef *Handle);
+  37:EEpromConfig/Src/M24C64.c **** 
+  38:EEpromConfig/Src/M24C64.c **** /**************************************************************************************************
+  39:EEpromConfig/Src/M24C64.c **** 
+  40:EEpromConfig/Src/M24C64.c **** void EE24_Delay(uint32_t Delay)
+  41:EEpromConfig/Src/M24C64.c **** {
+  30              		.loc 1 41 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 41 1 is_stmt 0 view .LVU1
+  35 0000 08B5     		push	{r3, lr}
+  36              		.cfi_def_cfa_offset 8
+  37              		.cfi_offset 3, -8
+  38              		.cfi_offset 14, -4
+  42:EEpromConfig/Src/M24C64.c **** #if EE24_RTOS == EE24_RTOS_DISABLE
+  43:EEpromConfig/Src/M24C64.c ****   HAL_Delay(Delay);
+  39              		.loc 1 43 3 is_stmt 1 view .LVU2
+  40 0002 FFF7FEFF 		bl	HAL_Delay
+  41              	.LVL1:
+  44:EEpromConfig/Src/M24C64.c **** #elif (EE24_RTOS == EE24_RTOS_CMSIS_V1) || (EE24_RTOS == EE24_RTOS_CMSIS_V2)
+  45:EEpromConfig/Src/M24C64.c ****   uint32_t d = (configTICK_RATE_HZ * Delay) / 1000;
+  46:EEpromConfig/Src/M24C64.c ****   if (d == 0)
+  47:EEpromConfig/Src/M24C64.c ****       d = 1;
+  48:EEpromConfig/Src/M24C64.c ****   osDelay(d);
+  49:EEpromConfig/Src/M24C64.c **** #elif EE24_RTOS == EE24_RTOS_THREADX
+  50:EEpromConfig/Src/M24C64.c ****   uint32_t d = (TX_TIMER_TICKS_PER_SECOND * Delay) / 1000;
+  51:EEpromConfig/Src/M24C64.c ****   if (d == 0)
+  52:EEpromConfig/Src/M24C64.c ****     d = 1;
+  53:EEpromConfig/Src/M24C64.c ****   tx_thread_sleep(d);
+  54:EEpromConfig/Src/M24C64.c **** #endif
+  55:EEpromConfig/Src/M24C64.c **** }
+  42              		.loc 1 55 1 is_stmt 0 view .LVU3
+  43 0006 08BD     		pop	{r3, pc}
+  44              		.cfi_endproc
+  45              	.LFE132:
+  47              		.section	.text.EE24_Lock,"ax",%progbits
+  48              		.align	1
+  49              		.global	EE24_Lock
+  50              		.syntax unified
+  51              		.thumb
+  52              		.thumb_func
+  54              	EE24_Lock:
+  55              	.LVL2:
+  56              	.LFB133:
+  56:EEpromConfig/Src/M24C64.c **** 
+  57:EEpromConfig/Src/M24C64.c **** /**************************************************************************************************
+  58:EEpromConfig/Src/M24C64.c **** 
+  59:EEpromConfig/Src/M24C64.c **** void EE24_Lock(EE24_HandleTypeDef *Handle)
+  60:EEpromConfig/Src/M24C64.c **** {
+  57              		.loc 1 60 1 is_stmt 1 view -0
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 3
+
+
+  58              		.cfi_startproc
+  59              		@ args = 0, pretend = 0, frame = 0
+  60              		@ frame_needed = 0, uses_anonymous_args = 0
+  61              		.loc 1 60 1 is_stmt 0 view .LVU5
+  62 0000 10B5     		push	{r4, lr}
+  63              		.cfi_def_cfa_offset 8
+  64              		.cfi_offset 4, -8
+  65              		.cfi_offset 14, -4
+  66 0002 0446     		mov	r4, r0
+  61:EEpromConfig/Src/M24C64.c ****   while (Handle->Lock)
+  67              		.loc 1 61 3 is_stmt 1 view .LVU6
+  68              		.loc 1 61 9 is_stmt 0 view .LVU7
+  69 0004 02E0     		b	.L4
+  70              	.LVL3:
+  71              	.L5:
+  62:EEpromConfig/Src/M24C64.c ****   {
+  63:EEpromConfig/Src/M24C64.c ****     EE24_Delay(1);
+  72              		.loc 1 63 5 is_stmt 1 view .LVU8
+  73 0006 0120     		movs	r0, #1
+  74 0008 FFF7FEFF 		bl	EE24_Delay
+  75              	.LVL4:
+  76              	.L4:
+  61:EEpromConfig/Src/M24C64.c ****   while (Handle->Lock)
+  77              		.loc 1 61 10 view .LVU9
+  61:EEpromConfig/Src/M24C64.c ****   while (Handle->Lock)
+  78              		.loc 1 61 16 is_stmt 0 view .LVU10
+  79 000c 6379     		ldrb	r3, [r4, #5]	@ zero_extendqisi2
+  61:EEpromConfig/Src/M24C64.c ****   while (Handle->Lock)
+  80              		.loc 1 61 10 view .LVU11
+  81 000e 002B     		cmp	r3, #0
+  82 0010 F9D1     		bne	.L5
+  64:EEpromConfig/Src/M24C64.c ****   }
+  65:EEpromConfig/Src/M24C64.c ****   Handle->Lock = 1;
+  83              		.loc 1 65 3 is_stmt 1 view .LVU12
+  84              		.loc 1 65 16 is_stmt 0 view .LVU13
+  85 0012 0123     		movs	r3, #1
+  86 0014 6371     		strb	r3, [r4, #5]
+  66:EEpromConfig/Src/M24C64.c **** }
+  87              		.loc 1 66 1 view .LVU14
+  88 0016 10BD     		pop	{r4, pc}
+  89              		.loc 1 66 1 view .LVU15
+  90              		.cfi_endproc
+  91              	.LFE133:
+  93              		.section	.text.EE24_UnLock,"ax",%progbits
+  94              		.align	1
+  95              		.global	EE24_UnLock
+  96              		.syntax unified
+  97              		.thumb
+  98              		.thumb_func
+ 100              	EE24_UnLock:
+ 101              	.LVL5:
+ 102              	.LFB134:
+  67:EEpromConfig/Src/M24C64.c **** 
+  68:EEpromConfig/Src/M24C64.c **** /**************************************************************************************************
+  69:EEpromConfig/Src/M24C64.c **** 
+  70:EEpromConfig/Src/M24C64.c **** void EE24_UnLock(EE24_HandleTypeDef *Handle)
+  71:EEpromConfig/Src/M24C64.c **** {
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 4
+
+
+ 103              		.loc 1 71 1 is_stmt 1 view -0
+ 104              		.cfi_startproc
+ 105              		@ args = 0, pretend = 0, frame = 0
+ 106              		@ frame_needed = 0, uses_anonymous_args = 0
+ 107              		@ link register save eliminated.
+  72:EEpromConfig/Src/M24C64.c ****   Handle->Lock = 0;
+ 108              		.loc 1 72 3 view .LVU17
+ 109              		.loc 1 72 16 is_stmt 0 view .LVU18
+ 110 0000 0023     		movs	r3, #0
+ 111 0002 4371     		strb	r3, [r0, #5]
+  73:EEpromConfig/Src/M24C64.c **** }
+ 112              		.loc 1 73 1 view .LVU19
+ 113 0004 7047     		bx	lr
+ 114              		.cfi_endproc
+ 115              	.LFE134:
+ 117              		.section	.text.EE24_Init,"ax",%progbits
+ 118              		.align	1
+ 119              		.global	EE24_Init
+ 120              		.syntax unified
+ 121              		.thumb
+ 122              		.thumb_func
+ 124              	EE24_Init:
+ 125              	.LVL6:
+ 126              	.LFB135:
+  74:EEpromConfig/Src/M24C64.c **** 
+  75:EEpromConfig/Src/M24C64.c **** /**************************************************************************************************
+  76:EEpromConfig/Src/M24C64.c **** **************    Public Functions
+  77:EEpromConfig/Src/M24C64.c **** ***************************************************************************************************
+  78:EEpromConfig/Src/M24C64.c **** 
+  79:EEpromConfig/Src/M24C64.c **** #if EE24_USE_WP_PIN == false
+  80:EEpromConfig/Src/M24C64.c **** /**
+  81:EEpromConfig/Src/M24C64.c ****   * @brief  Initialize EEPROM handle
+  82:EEpromConfig/Src/M24C64.c ****   * @note   Initialize EEPROM handle and set EEPROM address
+  83:EEpromConfig/Src/M24C64.c ****   *
+  84:EEpromConfig/Src/M24C64.c ****   * @param  *Handle: Pointer to EE24_HandleTypeDef structure
+  85:EEpromConfig/Src/M24C64.c ****   * @param  *HI2c: Pointer to I2C_HandleTypeDef structure
+  86:EEpromConfig/Src/M24C64.c ****   * @param  I2CAddress: I2C Memory address
+  87:EEpromConfig/Src/M24C64.c ****   *
+  88:EEpromConfig/Src/M24C64.c ****   * @retval bool: true or false
+  89:EEpromConfig/Src/M24C64.c ****   */
+  90:EEpromConfig/Src/M24C64.c **** bool EE24_Init(EE24_HandleTypeDef *Handle, I2C_HandleTypeDef *HI2c, uint8_t I2CAddress)
+  91:EEpromConfig/Src/M24C64.c **** {
+  92:EEpromConfig/Src/M24C64.c ****   bool answer = false;
+  93:EEpromConfig/Src/M24C64.c ****   do
+  94:EEpromConfig/Src/M24C64.c ****   {
+  95:EEpromConfig/Src/M24C64.c ****     if ((Handle == NULL) || (HI2c == NULL))
+  96:EEpromConfig/Src/M24C64.c ****     {
+  97:EEpromConfig/Src/M24C64.c ****       break;
+  98:EEpromConfig/Src/M24C64.c ****     }
+  99:EEpromConfig/Src/M24C64.c ****     Handle->HI2c = HI2c;
+ 100:EEpromConfig/Src/M24C64.c ****     Handle->Address = I2CAddress;
+ 101:EEpromConfig/Src/M24C64.c ****     if (HAL_I2C_IsDeviceReady(Handle->HI2c, Handle->Address, 2, 100) == HAL_OK)
+ 102:EEpromConfig/Src/M24C64.c ****     {
+ 103:EEpromConfig/Src/M24C64.c ****       answer = true;
+ 104:EEpromConfig/Src/M24C64.c ****     }
+ 105:EEpromConfig/Src/M24C64.c ****   }
+ 106:EEpromConfig/Src/M24C64.c ****   while (0);
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 5
+
+
+ 107:EEpromConfig/Src/M24C64.c **** 
+ 108:EEpromConfig/Src/M24C64.c ****   return answer;
+ 109:EEpromConfig/Src/M24C64.c **** }
+ 110:EEpromConfig/Src/M24C64.c **** #else
+ 111:EEpromConfig/Src/M24C64.c **** /**
+ 112:EEpromConfig/Src/M24C64.c ****   * @brief  Initialize EEPROM handle
+ 113:EEpromConfig/Src/M24C64.c ****   * @note   Initialize EEPROM handle and set memory address
+ 114:EEpromConfig/Src/M24C64.c ****   *
+ 115:EEpromConfig/Src/M24C64.c ****   * @param  *Handle: Pointer to EE24_HandleTypeDef structure
+ 116:EEpromConfig/Src/M24C64.c ****   * @param  *HI2c: Pointer to I2C_HandleTypeDef structure
+ 117:EEpromConfig/Src/M24C64.c ****   * @param  I2CAddress: I2C Memory address
+ 118:EEpromConfig/Src/M24C64.c ****   * @param  *GPIO_TypeDef: Pointer to GPIO_TypeDef structure for Write protected pin
+ 119:EEpromConfig/Src/M24C64.c ****   * @param  WpPin: PinNumber of write protected pin
+ 120:EEpromConfig/Src/M24C64.c ****   *
+ 121:EEpromConfig/Src/M24C64.c ****   * @retval bool: true or false
+ 122:EEpromConfig/Src/M24C64.c ****   */
+ 123:EEpromConfig/Src/M24C64.c **** bool EE24_Init(EE24_HandleTypeDef *Handle, I2C_HandleTypeDef *HI2c, uint8_t I2CAddress, GPIO_TypeDe
+ 124:EEpromConfig/Src/M24C64.c **** {
+ 127              		.loc 1 124 1 is_stmt 1 view -0
+ 128              		.cfi_startproc
+ 129              		@ args = 4, pretend = 0, frame = 0
+ 130              		@ frame_needed = 0, uses_anonymous_args = 0
+ 131              		.loc 1 124 1 is_stmt 0 view .LVU21
+ 132 0000 10B5     		push	{r4, lr}
+ 133              		.cfi_def_cfa_offset 8
+ 134              		.cfi_offset 4, -8
+ 135              		.cfi_offset 14, -4
+ 136 0002 BDF808C0 		ldrh	ip, [sp, #8]
+ 125:EEpromConfig/Src/M24C64.c ****   bool answer = false;
+ 137              		.loc 1 125 3 is_stmt 1 view .LVU22
+ 138              	.LVL7:
+ 126:EEpromConfig/Src/M24C64.c ****   do
+ 139              		.loc 1 126 3 view .LVU23
+ 127:EEpromConfig/Src/M24C64.c ****   {
+ 128:EEpromConfig/Src/M24C64.c ****     if ((Handle == NULL) || (HI2c == NULL) || (WpGpio == NULL))
+ 140              		.loc 1 128 5 view .LVU24
+ 141              		.loc 1 128 8 is_stmt 0 view .LVU25
+ 142 0006 B0B1     		cbz	r0, .L10
+ 143 0008 0446     		mov	r4, r0
+ 144              		.loc 1 128 26 discriminator 1 view .LVU26
+ 145 000a B1B1     		cbz	r1, .L11
+ 146              		.loc 1 128 44 discriminator 2 view .LVU27
+ 147 000c BBB1     		cbz	r3, .L12
+ 129:EEpromConfig/Src/M24C64.c ****     {
+ 130:EEpromConfig/Src/M24C64.c ****       break;
+ 131:EEpromConfig/Src/M24C64.c ****     }
+ 132:EEpromConfig/Src/M24C64.c ****     Handle->HI2c = HI2c;
+ 148              		.loc 1 132 5 is_stmt 1 view .LVU28
+ 149              		.loc 1 132 18 is_stmt 0 view .LVU29
+ 150 000e 0160     		str	r1, [r0]
+ 133:EEpromConfig/Src/M24C64.c ****     Handle->Address = I2CAddress;
+ 151              		.loc 1 133 5 is_stmt 1 view .LVU30
+ 152              		.loc 1 133 21 is_stmt 0 view .LVU31
+ 153 0010 0271     		strb	r2, [r0, #4]
+ 134:EEpromConfig/Src/M24C64.c ****     Handle->WpGpio = WpGpio;
+ 154              		.loc 1 134 5 is_stmt 1 view .LVU32
+ 155              		.loc 1 134 20 is_stmt 0 view .LVU33
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 6
+
+
+ 156 0012 8360     		str	r3, [r0, #8]
+ 135:EEpromConfig/Src/M24C64.c ****     Handle->WpPin = WpPin;
+ 157              		.loc 1 135 5 is_stmt 1 view .LVU34
+ 158              		.loc 1 135 19 is_stmt 0 view .LVU35
+ 159 0014 A0F80CC0 		strh	ip, [r0, #12]	@ movhi
+ 136:EEpromConfig/Src/M24C64.c ****     HAL_GPIO_WritePin(Handle->WpGpio, Handle->WpPin, GPIO_PIN_SET);
+ 160              		.loc 1 136 5 is_stmt 1 view .LVU36
+ 161 0018 0122     		movs	r2, #1
+ 162              	.LVL8:
+ 163              		.loc 1 136 5 is_stmt 0 view .LVU37
+ 164 001a 6146     		mov	r1, ip
+ 165              	.LVL9:
+ 166              		.loc 1 136 5 view .LVU38
+ 167 001c 1846     		mov	r0, r3
+ 168              	.LVL10:
+ 169              		.loc 1 136 5 view .LVU39
+ 170 001e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 171              	.LVL11:
+ 137:EEpromConfig/Src/M24C64.c ****     if (HAL_I2C_IsDeviceReady(Handle->HI2c, Handle->Address, 10, 1000) == HAL_OK)
+ 172              		.loc 1 137 5 is_stmt 1 view .LVU40
+ 173              		.loc 1 137 9 is_stmt 0 view .LVU41
+ 174 0022 4FF47A73 		mov	r3, #1000
+ 175 0026 0A22     		movs	r2, #10
+ 176 0028 2179     		ldrb	r1, [r4, #4]	@ zero_extendqisi2
+ 177 002a 2068     		ldr	r0, [r4]
+ 178 002c FFF7FEFF 		bl	HAL_I2C_IsDeviceReady
+ 179              	.LVL12:
+ 180              		.loc 1 137 8 discriminator 1 view .LVU42
+ 181 0030 38B1     		cbz	r0, .L13
+ 125:EEpromConfig/Src/M24C64.c ****   do
+ 182              		.loc 1 125 8 view .LVU43
+ 183 0032 0020     		movs	r0, #0
+ 184 0034 00E0     		b	.L9
+ 185              	.LVL13:
+ 186              	.L10:
+ 125:EEpromConfig/Src/M24C64.c ****   do
+ 187              		.loc 1 125 8 view .LVU44
+ 188 0036 0020     		movs	r0, #0
+ 189              	.LVL14:
+ 190              	.L9:
+ 127:EEpromConfig/Src/M24C64.c ****     if ((Handle == NULL) || (HI2c == NULL) || (WpGpio == NULL))
+ 191              		.loc 1 127 3 is_stmt 1 view .LVU45
+ 138:EEpromConfig/Src/M24C64.c ****     {
+ 139:EEpromConfig/Src/M24C64.c ****       answer = true;
+ 140:EEpromConfig/Src/M24C64.c ****     }
+ 141:EEpromConfig/Src/M24C64.c ****   }
+ 142:EEpromConfig/Src/M24C64.c ****   while (0);
+ 143:EEpromConfig/Src/M24C64.c **** 
+ 144:EEpromConfig/Src/M24C64.c ****   return answer;
+ 192              		.loc 1 144 3 view .LVU46
+ 145:EEpromConfig/Src/M24C64.c **** }
+ 193              		.loc 1 145 1 is_stmt 0 view .LVU47
+ 194 0038 10BD     		pop	{r4, pc}
+ 195              	.LVL15:
+ 196              	.L11:
+ 125:EEpromConfig/Src/M24C64.c ****   do
+ 197              		.loc 1 125 8 view .LVU48
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 7
+
+
+ 198 003a 0020     		movs	r0, #0
+ 199              	.LVL16:
+ 125:EEpromConfig/Src/M24C64.c ****   do
+ 200              		.loc 1 125 8 view .LVU49
+ 201 003c FCE7     		b	.L9
+ 202              	.LVL17:
+ 203              	.L12:
+ 125:EEpromConfig/Src/M24C64.c ****   do
+ 204              		.loc 1 125 8 view .LVU50
+ 205 003e 0020     		movs	r0, #0
+ 206              	.LVL18:
+ 125:EEpromConfig/Src/M24C64.c ****   do
+ 207              		.loc 1 125 8 view .LVU51
+ 208 0040 FAE7     		b	.L9
+ 209              	.LVL19:
+ 210              	.L13:
+ 139:EEpromConfig/Src/M24C64.c ****     }
+ 211              		.loc 1 139 14 view .LVU52
+ 212 0042 0120     		movs	r0, #1
+ 213 0044 F8E7     		b	.L9
+ 214              		.cfi_endproc
+ 215              	.LFE135:
+ 217              		.section	.text.EE24_Read,"ax",%progbits
+ 218              		.align	1
+ 219              		.global	EE24_Read
+ 220              		.syntax unified
+ 221              		.thumb
+ 222              		.thumb_func
+ 224              	EE24_Read:
+ 225              	.LVL20:
+ 226              	.LFB136:
+ 146:EEpromConfig/Src/M24C64.c **** #endif
+ 147:EEpromConfig/Src/M24C64.c **** 
+ 148:EEpromConfig/Src/M24C64.c **** /**************************************************************************************************
+ 149:EEpromConfig/Src/M24C64.c **** 
+ 150:EEpromConfig/Src/M24C64.c **** /**
+ 151:EEpromConfig/Src/M24C64.c ****   * @brief  Read from Memory
+ 152:EEpromConfig/Src/M24C64.c ****   * @note   Read data from memory and copy to an array
+ 153:EEpromConfig/Src/M24C64.c ****   *
+ 154:EEpromConfig/Src/M24C64.c ****   * @param  *Handle: Pointer to EE24_HandleTypeDef structure
+ 155:EEpromConfig/Src/M24C64.c ****   * @param  Address: Start address for read
+ 156:EEpromConfig/Src/M24C64.c ****   * @param  *Data: Pointer to copy data from EEPROM
+ 157:EEpromConfig/Src/M24C64.c ****   * @param  Len: Data length to read
+ 158:EEpromConfig/Src/M24C64.c ****   * @param  Timeout: Timeout of this operation in ms
+ 159:EEpromConfig/Src/M24C64.c ****   *
+ 160:EEpromConfig/Src/M24C64.c ****   * @retval bool: true or false
+ 161:EEpromConfig/Src/M24C64.c ****   */
+ 162:EEpromConfig/Src/M24C64.c **** bool EE24_Read(EE24_HandleTypeDef *Handle, uint32_t Address, uint8_t *Data, size_t Len, uint32_t Ti
+ 163:EEpromConfig/Src/M24C64.c **** {
+ 227              		.loc 1 163 1 is_stmt 1 view -0
+ 228              		.cfi_startproc
+ 229              		@ args = 4, pretend = 0, frame = 0
+ 230              		@ frame_needed = 0, uses_anonymous_args = 0
+ 231              		.loc 1 163 1 is_stmt 0 view .LVU54
+ 232 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 233              		.cfi_def_cfa_offset 20
+ 234              		.cfi_offset 4, -20
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 8
+
+
+ 235              		.cfi_offset 5, -16
+ 236              		.cfi_offset 6, -12
+ 237              		.cfi_offset 7, -8
+ 238              		.cfi_offset 14, -4
+ 239 0002 85B0     		sub	sp, sp, #20
+ 240              		.cfi_def_cfa_offset 40
+ 241 0004 0446     		mov	r4, r0
+ 242 0006 0E46     		mov	r6, r1
+ 243 0008 1746     		mov	r7, r2
+ 244 000a 1D46     		mov	r5, r3
+ 164:EEpromConfig/Src/M24C64.c ****   EE24_Lock(Handle);
+ 245              		.loc 1 164 3 is_stmt 1 view .LVU55
+ 246 000c FFF7FEFF 		bl	EE24_Lock
+ 247              	.LVL21:
+ 165:EEpromConfig/Src/M24C64.c ****   bool answer = false;
+ 248              		.loc 1 165 3 view .LVU56
+ 166:EEpromConfig/Src/M24C64.c ****   do
+ 249              		.loc 1 166 3 view .LVU57
+ 167:EEpromConfig/Src/M24C64.c ****   {
+ 168:EEpromConfig/Src/M24C64.c **** 
+ 169:EEpromConfig/Src/M24C64.c **** #if ((EE24_SIZE == EE24_1KBIT) || (EE24_SIZE == EE24_2KBIT))
+ 170:EEpromConfig/Src/M24C64.c ****     if (HAL_I2C_Mem_Read(Handle->HI2c, Handle->Address, Address, I2C_MEMADD_SIZE_8BIT, Data, Len, T
+ 171:EEpromConfig/Src/M24C64.c **** #elif (EE24_SIZE == EE24_4KBIT)
+ 172:EEpromConfig/Src/M24C64.c ****     if (HAL_I2C_Mem_Read(Handle->HI2c, Handle->Address | ((Address & 0x0100) >> 7), (Address & 0xff
+ 173:EEpromConfig/Src/M24C64.c **** #elif (EE24_SIZE == EE24_8KBIT)
+ 174:EEpromConfig/Src/M24C64.c ****     if (HAL_I2C_Mem_Read(Handle->HI2c, Handle->Address | ((Address & 0x0300) >> 7), (Address & 0xff
+ 175:EEpromConfig/Src/M24C64.c **** #elif (EE24_SIZE == EE24_16KBIT)
+ 176:EEpromConfig/Src/M24C64.c ****     if (HAL_I2C_Mem_Read(Handle->HI2c, Handle->Address | ((Address & 0x0700) >> 7), (Address & 0xff
+ 177:EEpromConfig/Src/M24C64.c **** #else
+ 178:EEpromConfig/Src/M24C64.c ****     if (HAL_I2C_Mem_Read(Handle->HI2c, Handle->Address, Address, I2C_MEMADD_SIZE_16BIT, Data, Len, 
+ 250              		.loc 1 178 5 view .LVU58
+ 251              		.loc 1 178 9 is_stmt 0 view .LVU59
+ 252 0010 0A9B     		ldr	r3, [sp, #40]
+ 253 0012 0293     		str	r3, [sp, #8]
+ 254 0014 ADB2     		uxth	r5, r5
+ 255              	.LVL22:
+ 256              		.loc 1 178 9 view .LVU60
+ 257 0016 0195     		str	r5, [sp, #4]
+ 258 0018 0097     		str	r7, [sp]
+ 259 001a 0223     		movs	r3, #2
+ 260 001c B2B2     		uxth	r2, r6
+ 261 001e 2179     		ldrb	r1, [r4, #4]	@ zero_extendqisi2
+ 262 0020 2068     		ldr	r0, [r4]
+ 263 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 264              	.LVL23:
+ 265              		.loc 1 178 8 discriminator 1 view .LVU61
+ 266 0026 30B1     		cbz	r0, .L17
+ 165:EEpromConfig/Src/M24C64.c ****   do
+ 267              		.loc 1 165 8 view .LVU62
+ 268 0028 0025     		movs	r5, #0
+ 269              	.L16:
+ 270              	.LVL24:
+ 167:EEpromConfig/Src/M24C64.c ****   {
+ 271              		.loc 1 167 3 is_stmt 1 view .LVU63
+ 179:EEpromConfig/Src/M24C64.c **** #endif
+ 180:EEpromConfig/Src/M24C64.c ****     {
+ 181:EEpromConfig/Src/M24C64.c ****       answer = true;
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 9
+
+
+ 182:EEpromConfig/Src/M24C64.c ****     }
+ 183:EEpromConfig/Src/M24C64.c ****   }
+ 184:EEpromConfig/Src/M24C64.c ****   while (0);
+ 185:EEpromConfig/Src/M24C64.c **** 
+ 186:EEpromConfig/Src/M24C64.c ****   EE24_UnLock(Handle);
+ 272              		.loc 1 186 3 view .LVU64
+ 273 002a 2046     		mov	r0, r4
+ 274 002c FFF7FEFF 		bl	EE24_UnLock
+ 275              	.LVL25:
+ 187:EEpromConfig/Src/M24C64.c ****   return answer;
+ 276              		.loc 1 187 3 view .LVU65
+ 188:EEpromConfig/Src/M24C64.c **** }
+ 277              		.loc 1 188 1 is_stmt 0 view .LVU66
+ 278 0030 2846     		mov	r0, r5
+ 279 0032 05B0     		add	sp, sp, #20
+ 280              		.cfi_remember_state
+ 281              		.cfi_def_cfa_offset 20
+ 282              		@ sp needed
+ 283 0034 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 284              	.LVL26:
+ 285              	.L17:
+ 286              		.cfi_restore_state
+ 181:EEpromConfig/Src/M24C64.c ****     }
+ 287              		.loc 1 181 14 view .LVU67
+ 288 0036 0125     		movs	r5, #1
+ 289 0038 F7E7     		b	.L16
+ 290              		.cfi_endproc
+ 291              	.LFE136:
+ 293              		.section	.text.EE24_Write,"ax",%progbits
+ 294              		.align	1
+ 295              		.global	EE24_Write
+ 296              		.syntax unified
+ 297              		.thumb
+ 298              		.thumb_func
+ 300              	EE24_Write:
+ 301              	.LVL27:
+ 302              	.LFB137:
+ 189:EEpromConfig/Src/M24C64.c **** 
+ 190:EEpromConfig/Src/M24C64.c **** /**************************************************************************************************
+ 191:EEpromConfig/Src/M24C64.c **** 
+ 192:EEpromConfig/Src/M24C64.c **** /**
+ 193:EEpromConfig/Src/M24C64.c ****   * @brief  Write to Memory
+ 194:EEpromConfig/Src/M24C64.c ****   * @note   Write an array to memory
+ 195:EEpromConfig/Src/M24C64.c ****   *
+ 196:EEpromConfig/Src/M24C64.c ****   * @param  *Handle: Pointer to EE24_HandleTypeDef structure
+ 197:EEpromConfig/Src/M24C64.c ****   * @param  Address: Start address for write
+ 198:EEpromConfig/Src/M24C64.c ****   * @param  *Data: Pointer to copy data to EEPEOM
+ 199:EEpromConfig/Src/M24C64.c ****   * @param  Len: Data length to write
+ 200:EEpromConfig/Src/M24C64.c ****   * @param  Timeout: Timeout of this operation in ms
+ 201:EEpromConfig/Src/M24C64.c ****   *
+ 202:EEpromConfig/Src/M24C64.c ****   * @retval bool: true or false
+ 203:EEpromConfig/Src/M24C64.c ****   */
+ 204:EEpromConfig/Src/M24C64.c **** bool EE24_Write(EE24_HandleTypeDef *Handle, uint32_t Address, uint8_t *Data, size_t Len, uint32_t T
+ 205:EEpromConfig/Src/M24C64.c **** {
+ 303              		.loc 1 205 1 is_stmt 1 view -0
+ 304              		.cfi_startproc
+ 305              		@ args = 4, pretend = 0, frame = 0
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 10
+
+
+ 306              		@ frame_needed = 0, uses_anonymous_args = 0
+ 307              		.loc 1 205 1 is_stmt 0 view .LVU69
+ 308 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+ 309              		.cfi_def_cfa_offset 32
+ 310              		.cfi_offset 4, -32
+ 311              		.cfi_offset 5, -28
+ 312              		.cfi_offset 6, -24
+ 313              		.cfi_offset 7, -20
+ 314              		.cfi_offset 8, -16
+ 315              		.cfi_offset 9, -12
+ 316              		.cfi_offset 10, -8
+ 317              		.cfi_offset 14, -4
+ 318 0004 84B0     		sub	sp, sp, #16
+ 319              		.cfi_def_cfa_offset 48
+ 320 0006 8046     		mov	r8, r0
+ 321 0008 0E46     		mov	r6, r1
+ 322 000a 1746     		mov	r7, r2
+ 323 000c 1D46     		mov	r5, r3
+ 324 000e DDF83090 		ldr	r9, [sp, #48]
+ 206:EEpromConfig/Src/M24C64.c ****   EE24_Lock(Handle);
+ 325              		.loc 1 206 3 is_stmt 1 view .LVU70
+ 326 0012 FFF7FEFF 		bl	EE24_Lock
+ 327              	.LVL28:
+ 207:EEpromConfig/Src/M24C64.c ****   bool answer = false;
+ 328              		.loc 1 207 3 view .LVU71
+ 208:EEpromConfig/Src/M24C64.c ****   do
+ 329              		.loc 1 208 3 view .LVU72
+ 330              	.LBB2:
+ 209:EEpromConfig/Src/M24C64.c ****   {
+ 210:EEpromConfig/Src/M24C64.c ****     uint16_t w;
+ 331              		.loc 1 210 5 view .LVU73
+ 211:EEpromConfig/Src/M24C64.c ****     uint32_t startTime = HAL_GetTick();
+ 332              		.loc 1 211 5 view .LVU74
+ 333              		.loc 1 211 26 is_stmt 0 view .LVU75
+ 334 0016 FFF7FEFF 		bl	HAL_GetTick
+ 335              	.LVL29:
+ 336 001a 8246     		mov	r10, r0
+ 337              	.LVL30:
+ 212:EEpromConfig/Src/M24C64.c **** #if EE24_USE_WP_PIN == true
+ 213:EEpromConfig/Src/M24C64.c ****     HAL_GPIO_WritePin(Handle->WpGpio, Handle->WpPin, GPIO_PIN_RESET);
+ 338              		.loc 1 213 5 is_stmt 1 view .LVU76
+ 339 001c 0022     		movs	r2, #0
+ 340 001e B8F80C10 		ldrh	r1, [r8, #12]
+ 341 0022 D8F80800 		ldr	r0, [r8, #8]
+ 342              	.LVL31:
+ 343              		.loc 1 213 5 is_stmt 0 view .LVU77
+ 344 0026 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 345              	.LVL32:
+ 346 002a 19E0     		b	.L22
+ 347              	.LVL33:
+ 348              	.L27:
+ 214:EEpromConfig/Src/M24C64.c **** #endif
+ 215:EEpromConfig/Src/M24C64.c ****     while (1)
+ 216:EEpromConfig/Src/M24C64.c ****     {
+ 217:EEpromConfig/Src/M24C64.c ****       w = EE24_PSIZE - (Address  % EE24_PSIZE);
+ 218:EEpromConfig/Src/M24C64.c ****       if (w > Len)
+ 219:EEpromConfig/Src/M24C64.c ****       {
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 11
+
+
+ 220:EEpromConfig/Src/M24C64.c ****         w = Len;
+ 349              		.loc 1 220 9 is_stmt 1 view .LVU78
+ 350              		.loc 1 220 11 is_stmt 0 view .LVU79
+ 351 002c ACB2     		uxth	r4, r5
+ 352              	.LVL34:
+ 353              	.L20:
+ 221:EEpromConfig/Src/M24C64.c ****       }
+ 222:EEpromConfig/Src/M24C64.c **** 
+ 223:EEpromConfig/Src/M24C64.c **** #if ((EE24_SIZE == EE24_1KBIT) || (EE24_SIZE == EE24_2KBIT))
+ 224:EEpromConfig/Src/M24C64.c ****         if (HAL_I2C_Mem_Write(Handle->HI2c, Handle->Address, Address, I2C_MEMADD_SIZE_8BIT, Data, w
+ 225:EEpromConfig/Src/M24C64.c **** #elif (EE24_SIZE == EE24_4KBIT)
+ 226:EEpromConfig/Src/M24C64.c ****         if (HAL_I2C_Mem_Write(Handle->HI2c, Handle->Address | ((Address & 0x0100) >> 7), (Address &
+ 227:EEpromConfig/Src/M24C64.c **** #elif (EE24_SIZE == EE24_8KBIT)
+ 228:EEpromConfig/Src/M24C64.c ****         if (HAL_I2C_Mem_Write(Handle->HI2c, Handle->Address | ((Address & 0x0300) >> 7), (Address &
+ 229:EEpromConfig/Src/M24C64.c **** #elif (EE24_SIZE == EE24_16KBIT)
+ 230:EEpromConfig/Src/M24C64.c ****         if (HAL_I2C_Mem_Write(Handle->HI2c, Handle->Address | ((Address & 0x0700) >> 7), (Address &
+ 231:EEpromConfig/Src/M24C64.c **** #else
+ 232:EEpromConfig/Src/M24C64.c ****         if (HAL_I2C_Mem_Write(Handle->HI2c, Handle->Address, Address, I2C_MEMADD_SIZE_16BIT, Data, 
+ 354              		.loc 1 232 9 is_stmt 1 view .LVU80
+ 355              		.loc 1 232 13 is_stmt 0 view .LVU81
+ 356 002e CDF80890 		str	r9, [sp, #8]
+ 357 0032 0194     		str	r4, [sp, #4]
+ 358 0034 0097     		str	r7, [sp]
+ 359 0036 0223     		movs	r3, #2
+ 360 0038 98F80410 		ldrb	r1, [r8, #4]	@ zero_extendqisi2
+ 361 003c D8F80000 		ldr	r0, [r8]
+ 362 0040 FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 363              	.LVL35:
+ 364              		.loc 1 232 12 discriminator 1 view .LVU82
+ 365 0044 B8B9     		cbnz	r0, .L23
+ 233:EEpromConfig/Src/M24C64.c **** #endif
+ 234:EEpromConfig/Src/M24C64.c ****       {
+ 235:EEpromConfig/Src/M24C64.c ****         EE24_Delay(10);
+ 366              		.loc 1 235 9 is_stmt 1 view .LVU83
+ 367 0046 0A20     		movs	r0, #10
+ 368 0048 FFF7FEFF 		bl	EE24_Delay
+ 369              	.LVL36:
+ 236:EEpromConfig/Src/M24C64.c ****         Len -= w;
+ 370              		.loc 1 236 9 view .LVU84
+ 237:EEpromConfig/Src/M24C64.c ****         Data += w;
+ 371              		.loc 1 237 9 view .LVU85
+ 372              		.loc 1 237 14 is_stmt 0 view .LVU86
+ 373 004c 2744     		add	r7, r7, r4
+ 374              	.LVL37:
+ 238:EEpromConfig/Src/M24C64.c ****         Address += w;
+ 375              		.loc 1 238 9 is_stmt 1 view .LVU87
+ 376              		.loc 1 238 17 is_stmt 0 view .LVU88
+ 377 004e 2644     		add	r6, r6, r4
+ 378              	.LVL38:
+ 239:EEpromConfig/Src/M24C64.c ****         if (Len == 0)
+ 379              		.loc 1 239 9 is_stmt 1 view .LVU89
+ 380              		.loc 1 239 12 is_stmt 0 view .LVU90
+ 381 0050 2D1B     		subs	r5, r5, r4
+ 382              	.LVL39:
+ 383              		.loc 1 239 12 view .LVU91
+ 384 0052 1FD0     		beq	.L24
+ 240:EEpromConfig/Src/M24C64.c ****         {
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 12
+
+
+ 241:EEpromConfig/Src/M24C64.c ****           answer = true;
+ 242:EEpromConfig/Src/M24C64.c ****           break;
+ 243:EEpromConfig/Src/M24C64.c ****         }
+ 244:EEpromConfig/Src/M24C64.c ****         if (HAL_GetTick() - startTime >= Timeout)
+ 385              		.loc 1 244 9 is_stmt 1 view .LVU92
+ 386              		.loc 1 244 13 is_stmt 0 view .LVU93
+ 387 0054 FFF7FEFF 		bl	HAL_GetTick
+ 388              	.LVL40:
+ 389              		.loc 1 244 27 discriminator 1 view .LVU94
+ 390 0058 A0EB0A00 		sub	r0, r0, r10
+ 391              		.loc 1 244 12 discriminator 1 view .LVU95
+ 392 005c 4845     		cmp	r0, r9
+ 393 005e 08D2     		bcs	.L26
+ 394              	.LVL41:
+ 395              	.L22:
+ 215:EEpromConfig/Src/M24C64.c ****     {
+ 396              		.loc 1 215 5 is_stmt 1 view .LVU96
+ 217:EEpromConfig/Src/M24C64.c ****       if (w > Len)
+ 397              		.loc 1 217 7 view .LVU97
+ 217:EEpromConfig/Src/M24C64.c ****       if (w > Len)
+ 398              		.loc 1 217 34 is_stmt 0 view .LVU98
+ 399 0060 B2B2     		uxth	r2, r6
+ 400 0062 06F01F04 		and	r4, r6, #31
+ 217:EEpromConfig/Src/M24C64.c ****       if (w > Len)
+ 401              		.loc 1 217 9 view .LVU99
+ 402 0066 C4F12004 		rsb	r4, r4, #32
+ 403 006a A4B2     		uxth	r4, r4
+ 404              	.LVL42:
+ 218:EEpromConfig/Src/M24C64.c ****       {
+ 405              		.loc 1 218 7 is_stmt 1 view .LVU100
+ 218:EEpromConfig/Src/M24C64.c ****       {
+ 406              		.loc 1 218 10 is_stmt 0 view .LVU101
+ 407 006c AC42     		cmp	r4, r5
+ 408 006e DED9     		bls	.L20
+ 218:EEpromConfig/Src/M24C64.c ****       {
+ 409              		.loc 1 218 10 view .LVU102
+ 410 0070 DCE7     		b	.L27
+ 411              	.L26:
+ 218:EEpromConfig/Src/M24C64.c ****       {
+ 412              		.loc 1 218 10 view .LVU103
+ 413              	.LBE2:
+ 207:EEpromConfig/Src/M24C64.c ****   do
+ 414              		.loc 1 207 8 view .LVU104
+ 415 0072 0024     		movs	r4, #0
+ 416              	.LVL43:
+ 417              	.LBB3:
+ 207:EEpromConfig/Src/M24C64.c ****   do
+ 418              		.loc 1 207 8 view .LVU105
+ 419 0074 00E0     		b	.L21
+ 420              	.LVL44:
+ 421              	.L23:
+ 207:EEpromConfig/Src/M24C64.c ****   do
+ 422              		.loc 1 207 8 view .LVU106
+ 423              	.LBE3:
+ 424 0076 0024     		movs	r4, #0
+ 425              	.LVL45:
+ 426              	.L21:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 13
+
+
+ 209:EEpromConfig/Src/M24C64.c ****     uint16_t w;
+ 427              		.loc 1 209 3 is_stmt 1 view .LVU107
+ 245:EEpromConfig/Src/M24C64.c ****         {
+ 246:EEpromConfig/Src/M24C64.c ****             
+ 247:EEpromConfig/Src/M24C64.c ****           break;
+ 248:EEpromConfig/Src/M24C64.c ****         }
+ 249:EEpromConfig/Src/M24C64.c ****       }
+ 250:EEpromConfig/Src/M24C64.c ****       else
+ 251:EEpromConfig/Src/M24C64.c ****       {
+ 252:EEpromConfig/Src/M24C64.c ****         break;
+ 253:EEpromConfig/Src/M24C64.c ****       }
+ 254:EEpromConfig/Src/M24C64.c ****     }
+ 255:EEpromConfig/Src/M24C64.c ****   }
+ 256:EEpromConfig/Src/M24C64.c ****   while (0);
+ 257:EEpromConfig/Src/M24C64.c **** 
+ 258:EEpromConfig/Src/M24C64.c **** #if EE24_USE_WP_PIN == true
+ 259:EEpromConfig/Src/M24C64.c ****     HAL_GPIO_WritePin(Handle->WpGpio, Handle->WpPin, GPIO_PIN_SET);
+ 428              		.loc 1 259 5 view .LVU108
+ 429 0078 0122     		movs	r2, #1
+ 430 007a B8F80C10 		ldrh	r1, [r8, #12]
+ 431 007e D8F80800 		ldr	r0, [r8, #8]
+ 432 0082 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 433              	.LVL46:
+ 260:EEpromConfig/Src/M24C64.c **** #endif
+ 261:EEpromConfig/Src/M24C64.c ****   EE24_UnLock(Handle);
+ 434              		.loc 1 261 3 view .LVU109
+ 435 0086 4046     		mov	r0, r8
+ 436 0088 FFF7FEFF 		bl	EE24_UnLock
+ 437              	.LVL47:
+ 262:EEpromConfig/Src/M24C64.c ****   return answer;
+ 438              		.loc 1 262 3 view .LVU110
+ 263:EEpromConfig/Src/M24C64.c **** }
+ 439              		.loc 1 263 1 is_stmt 0 view .LVU111
+ 440 008c 2046     		mov	r0, r4
+ 441 008e 04B0     		add	sp, sp, #16
+ 442              		.cfi_remember_state
+ 443              		.cfi_def_cfa_offset 32
+ 444              		@ sp needed
+ 445 0090 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 446              	.LVL48:
+ 447              	.L24:
+ 448              		.cfi_restore_state
+ 449              	.LBB4:
+ 241:EEpromConfig/Src/M24C64.c ****           break;
+ 450              		.loc 1 241 18 view .LVU112
+ 451 0094 0124     		movs	r4, #1
+ 452              	.LVL49:
+ 241:EEpromConfig/Src/M24C64.c ****           break;
+ 453              		.loc 1 241 18 view .LVU113
+ 454 0096 EFE7     		b	.L21
+ 455              	.LBE4:
+ 456              		.cfi_endproc
+ 457              	.LFE137:
+ 459              		.text
+ 460              	.Letext0:
+ 461              		.file 2 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 462              		.file 3 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 14
+
+
+ 463              		.file 4 "Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g431xx.h"
+ 464              		.file 5 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 465              		.file 6 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_def.h"
+ 466              		.file 7 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_gpio.h"
+ 467              		.file 8 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_dma.h"
+ 468              		.file 9 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_i2c.h"
+ 469              		.file 10 "EEpromConfig/Inc/M24C64.h"
+ 470              		.file 11 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h"
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s 			page 15
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 M24C64.c
+C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s:21     .text.EE24_Delay:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s:27     .text.EE24_Delay:00000000 EE24_Delay
+C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s:48     .text.EE24_Lock:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s:54     .text.EE24_Lock:00000000 EE24_Lock
+C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s:94     .text.EE24_UnLock:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s:100    .text.EE24_UnLock:00000000 EE24_UnLock
+C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s:118    .text.EE24_Init:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s:124    .text.EE24_Init:00000000 EE24_Init
+C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s:218    .text.EE24_Read:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s:224    .text.EE24_Read:00000000 EE24_Read
+C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s:294    .text.EE24_Write:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccOpOhj1.s:300    .text.EE24_Write:00000000 EE24_Write
+
+UNDEFINED SYMBOLS
+HAL_Delay
+HAL_GPIO_WritePin
+HAL_I2C_IsDeviceReady
+HAL_I2C_Mem_Read
+HAL_GetTick
+HAL_I2C_Mem_Write

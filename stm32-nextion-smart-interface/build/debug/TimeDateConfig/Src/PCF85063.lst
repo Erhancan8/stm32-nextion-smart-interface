@@ -1,0 +1,1917 @@
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"PCF85063.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "TimeDateConfig/Src/PCF85063.c"
+  20              		.section	.text.decToBcd,"ax",%progbits
+  21              		.align	1
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	decToBcd:
+  27              	.LVL0:
+  28              	.LFB151:
+   1:TimeDateConfig/Src/PCF85063.c **** 
+   2:TimeDateConfig/Src/PCF85063.c **** 
+   3:TimeDateConfig/Src/PCF85063.c **** #include "PCF85063.h"
+   4:TimeDateConfig/Src/PCF85063.c **** 
+   5:TimeDateConfig/Src/PCF85063.c **** static datetime_t st_datetime;
+   6:TimeDateConfig/Src/PCF85063.c **** 
+   7:TimeDateConfig/Src/PCF85063.c **** 
+   8:TimeDateConfig/Src/PCF85063.c **** static uint8_t decToBcd(int val);
+   9:TimeDateConfig/Src/PCF85063.c **** static int bcdToDec(uint8_t val);
+  10:TimeDateConfig/Src/PCF85063.c **** 
+  11:TimeDateConfig/Src/PCF85063.c **** I2C_HandleTypeDef *_pcf850_i2c;
+  12:TimeDateConfig/Src/PCF85063.c **** 
+  13:TimeDateConfig/Src/PCF85063.c **** 
+  14:TimeDateConfig/Src/PCF85063.c **** void PCF85_Init(I2C_HandleTypeDef *_hi2c)
+  15:TimeDateConfig/Src/PCF85063.c **** {
+  16:TimeDateConfig/Src/PCF85063.c **** 	_pcf850_i2c = _hi2c;
+  17:TimeDateConfig/Src/PCF85063.c ****   
+  18:TimeDateConfig/Src/PCF85063.c **** 	// Initiate Normal Mode, RTC Run, NO reset, No correction, , 24hr format, Internal load capacitane
+  19:TimeDateConfig/Src/PCF85063.c **** 
+  20:TimeDateConfig/Src/PCF85063.c **** 	uint8_t PCFINIT_ = 0x49;
+  21:TimeDateConfig/Src/PCF85063.c ****     HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR, REG_CTRL1_ADDR ,1, &PCFINIT_, 1, 1000 );
+  22:TimeDateConfig/Src/PCF85063.c ****   
+  23:TimeDateConfig/Src/PCF85063.c **** }
+  24:TimeDateConfig/Src/PCF85063.c **** 
+  25:TimeDateConfig/Src/PCF85063.c **** 
+  26:TimeDateConfig/Src/PCF85063.c **** void PCF85_Reset(){
+  27:TimeDateConfig/Src/PCF85063.c **** 
+  28:TimeDateConfig/Src/PCF85063.c **** 	uint8_t PCFIRSTS_ = 0x59;
+  29:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR, REG_CTRL1_ADDR ,1, &PCFIRSTS_, 1, 1000 );
+  30:TimeDateConfig/Src/PCF85063.c ****     
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 2
+
+
+  31:TimeDateConfig/Src/PCF85063.c **** }
+  32:TimeDateConfig/Src/PCF85063.c **** 
+  33:TimeDateConfig/Src/PCF85063.c **** 			//SET FONKSİYONLARI
+  34:TimeDateConfig/Src/PCF85063.c **** 
+  35:TimeDateConfig/Src/PCF85063.c **** void PCF85_SetTime(uint8_t hour, uint8_t minute, uint8_t second){
+  36:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[3] = {decToBcd(second),
+  37:TimeDateConfig/Src/PCF85063.c **** 						decToBcd(minute),
+  38:TimeDateConfig/Src/PCF85063.c **** 							decToBcd(hour)};
+  39:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_TIME_ADDR,1, buf, 3, 1000 );
+  40:TimeDateConfig/Src/PCF85063.c **** }
+  41:TimeDateConfig/Src/PCF85063.c **** 
+  42:TimeDateConfig/Src/PCF85063.c **** void PCF85_SetDate(uint8_t weekday, uint8_t day, uint8_t month, uint16_t yr){
+  43:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[4] = {decToBcd(day),
+  44:TimeDateConfig/Src/PCF85063.c **** 			decToBcd(weekday),
+  45:TimeDateConfig/Src/PCF85063.c **** 			decToBcd(month),
+  46:TimeDateConfig/Src/PCF85063.c **** 			decToBcd(yr-YEAR_OFFSET)};
+  47:TimeDateConfig/Src/PCF85063.c **** 
+  48:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_DATE_ADDR,1, buf, 4, 1000 );
+  49:TimeDateConfig/Src/PCF85063.c **** }
+  50:TimeDateConfig/Src/PCF85063.c **** 
+  51:TimeDateConfig/Src/PCF85063.c **** void PCF85_SetSecond(uint8_t second)
+  52:TimeDateConfig/Src/PCF85063.c **** {
+  53:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(second)};
+  54:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_TIME_ADDR,1, buf, 1, 1000 );
+  55:TimeDateConfig/Src/PCF85063.c **** }
+  56:TimeDateConfig/Src/PCF85063.c **** void PCF85_SetMinute(uint8_t minute)
+  57:TimeDateConfig/Src/PCF85063.c **** {
+  58:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(minute)};
+  59:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_MIN_ADDR,1, buf, 1, 1000 );
+  60:TimeDateConfig/Src/PCF85063.c **** }
+  61:TimeDateConfig/Src/PCF85063.c **** 
+  62:TimeDateConfig/Src/PCF85063.c **** void PCF85_SetHour(uint8_t hour)
+  63:TimeDateConfig/Src/PCF85063.c **** {
+  64:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(hour)};
+  65:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_HOUR_ADRR,1, buf, 1, 1000 );
+  66:TimeDateConfig/Src/PCF85063.c **** }
+  67:TimeDateConfig/Src/PCF85063.c **** 
+  68:TimeDateConfig/Src/PCF85063.c **** void PCF85_Setweekday(uint8_t weekday)
+  69:TimeDateConfig/Src/PCF85063.c **** {
+  70:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(weekday)};
+  71:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_WEEKDAY_ADRR,1, buf, 1, 1000 );
+  72:TimeDateConfig/Src/PCF85063.c **** }
+  73:TimeDateConfig/Src/PCF85063.c **** 
+  74:TimeDateConfig/Src/PCF85063.c **** void PCF85_Setday(uint8_t day)
+  75:TimeDateConfig/Src/PCF85063.c **** {
+  76:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(day)};
+  77:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_DAY_ADRR,1, buf, 1, 1000 );
+  78:TimeDateConfig/Src/PCF85063.c **** }
+  79:TimeDateConfig/Src/PCF85063.c **** 
+  80:TimeDateConfig/Src/PCF85063.c **** void PCF85_Setmonth(uint8_t month)
+  81:TimeDateConfig/Src/PCF85063.c **** {
+  82:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(month)};
+  83:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_MONTH_ADRR,1, buf, 1, 1000 );	
+  84:TimeDateConfig/Src/PCF85063.c **** }
+  85:TimeDateConfig/Src/PCF85063.c **** 
+  86:TimeDateConfig/Src/PCF85063.c **** void PCF85_Setyear(uint16_t yr)
+  87:TimeDateConfig/Src/PCF85063.c **** {
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 3
+
+
+  88:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(yr)};
+  89:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_YEAR_ADRR,1, buf, 1, 1000 );	
+  90:TimeDateConfig/Src/PCF85063.c **** }
+  91:TimeDateConfig/Src/PCF85063.c **** 					//GET FONKSİYONLARI
+  92:TimeDateConfig/Src/PCF85063.c **** uint8_t PCF85_GetDateTime(uint8_t *buf){
+  93:TimeDateConfig/Src/PCF85063.c **** 	uint8_t bufss[7] = {0};
+  94:TimeDateConfig/Src/PCF85063.c **** 
+  95:TimeDateConfig/Src/PCF85063.c **** 	if(HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_TIME_ADDR, 1, bufss, 7, 1000 ) == HAL_OK){
+  96:TimeDateConfig/Src/PCF85063.c **** 
+  97:TimeDateConfig/Src/PCF85063.c **** 		buf[0] = bcdToDec(bufss[0] & 0x7F);
+  98:TimeDateConfig/Src/PCF85063.c **** 		buf[1] = bcdToDec(bufss[1] & 0x7F);
+  99:TimeDateConfig/Src/PCF85063.c **** 		buf[2] = bcdToDec(bufss[2] & 0x3F);
+ 100:TimeDateConfig/Src/PCF85063.c **** 		buf[3] = bcdToDec(bufss[3] & 0x3F);
+ 101:TimeDateConfig/Src/PCF85063.c **** 		buf[4] = bcdToDec(bufss[4] & 0x07);
+ 102:TimeDateConfig/Src/PCF85063.c **** 		buf[5] = bcdToDec(bufss[5] & 0x1F);
+ 103:TimeDateConfig/Src/PCF85063.c **** 		buf[6] = bcdToDec(bufss[6]);
+ 104:TimeDateConfig/Src/PCF85063.c **** 
+ 105:TimeDateConfig/Src/PCF85063.c **** 		return 1;
+ 106:TimeDateConfig/Src/PCF85063.c **** 	}
+ 107:TimeDateConfig/Src/PCF85063.c ****   return 0;
+ 108:TimeDateConfig/Src/PCF85063.c **** }
+ 109:TimeDateConfig/Src/PCF85063.c **** uint8_t PCF85_GetSecond(void)
+ 110:TimeDateConfig/Src/PCF85063.c **** {
+ 111:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 112:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_TIME_ADDR, 1, &_retValArr, 1, 1000 );
+ 113:TimeDateConfig/Src/PCF85063.c **** 	return 	bcdToDec(_retValArr & 0x7F);
+ 114:TimeDateConfig/Src/PCF85063.c **** }
+ 115:TimeDateConfig/Src/PCF85063.c **** uint8_t PCF85_GetMinute(void)
+ 116:TimeDateConfig/Src/PCF85063.c **** {
+ 117:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 118:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_MIN_ADDR, 1, &_retValArr, 1, 1000 );
+ 119:TimeDateConfig/Src/PCF85063.c **** 	return 	bcdToDec(_retValArr & 0x7F);
+ 120:TimeDateConfig/Src/PCF85063.c **** }
+ 121:TimeDateConfig/Src/PCF85063.c **** uint8_t PCF85_GetHour(void)
+ 122:TimeDateConfig/Src/PCF85063.c **** {
+ 123:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 124:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_HOUR_ADRR , 1, &_retValArr, 1, 1000 );
+ 125:TimeDateConfig/Src/PCF85063.c **** 	return 	bcdToDec(_retValArr & 0x3F);
+ 126:TimeDateConfig/Src/PCF85063.c **** }
+ 127:TimeDateConfig/Src/PCF85063.c **** uint8_t PCF85_Getweekday(void)
+ 128:TimeDateConfig/Src/PCF85063.c **** {
+ 129:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 130:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_WEEKDAY_ADRR, 1, &_retValArr, 1, 1000 );
+ 131:TimeDateConfig/Src/PCF85063.c **** 	return 	bcdToDec(_retValArr & 0x07);
+ 132:TimeDateConfig/Src/PCF85063.c **** }
+ 133:TimeDateConfig/Src/PCF85063.c **** uint8_t PCF85_Getday(void)
+ 134:TimeDateConfig/Src/PCF85063.c **** {
+ 135:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 136:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_DAY_ADRR, 1, &_retValArr, 1, 1000 );
+ 137:TimeDateConfig/Src/PCF85063.c **** 	return bcdToDec(_retValArr & 0x3F);
+ 138:TimeDateConfig/Src/PCF85063.c **** }
+ 139:TimeDateConfig/Src/PCF85063.c **** uint8_t PCF85_Getmonth(void)
+ 140:TimeDateConfig/Src/PCF85063.c **** {
+ 141:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 142:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_MONTH_ADRR, 1, &_retValArr, 1, 1000 );
+ 143:TimeDateConfig/Src/PCF85063.c **** 	return 	bcdToDec(_retValArr & 0x1F);
+ 144:TimeDateConfig/Src/PCF85063.c **** }
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 4
+
+
+ 145:TimeDateConfig/Src/PCF85063.c **** uint16_t PCF85_Getyear(void)
+ 146:TimeDateConfig/Src/PCF85063.c **** {
+ 147:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 148:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_YEAR_ADRR, 1, &_retValArr, 1, 1000 );
+ 149:TimeDateConfig/Src/PCF85063.c **** 	return 	bcdToDec(_retValArr)+YEAR_OFFSET;
+ 150:TimeDateConfig/Src/PCF85063.c **** }
+ 151:TimeDateConfig/Src/PCF85063.c **** 
+ 152:TimeDateConfig/Src/PCF85063.c **** // Convert normal decimal numbers to binary coded decimal
+ 153:TimeDateConfig/Src/PCF85063.c **** static uint8_t decToBcd(int val){
+  29              		.loc 1 153 33 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+ 154:TimeDateConfig/Src/PCF85063.c ****   return (uint8_t)( (val/10*16) + (val%10) );
+  34              		.loc 1 154 3 view .LVU1
+  35              		.loc 1 154 25 is_stmt 0 view .LVU2
+  36 0000 064A     		ldr	r2, .L2
+  37 0002 82FB0032 		smull	r3, r2, r2, r0
+  38 0006 C317     		asrs	r3, r0, #31
+  39 0008 C3EBA203 		rsb	r3, r3, r2, asr #2
+  40              		.loc 1 154 39 view .LVU3
+  41 000c 03EB8302 		add	r2, r3, r3, lsl #2
+  42 0010 A0EB4200 		sub	r0, r0, r2, lsl #1
+  43              	.LVL1:
+  44              		.loc 1 154 10 view .LVU4
+  45 0014 00EB0310 		add	r0, r0, r3, lsl #4
+ 155:TimeDateConfig/Src/PCF85063.c **** }
+  46              		.loc 1 155 1 view .LVU5
+  47 0018 C0B2     		uxtb	r0, r0
+  48 001a 7047     		bx	lr
+  49              	.L3:
+  50              		.align	2
+  51              	.L2:
+  52 001c 67666666 		.word	1717986919
+  53              		.cfi_endproc
+  54              	.LFE151:
+  56              		.section	.text.bcdToDec,"ax",%progbits
+  57              		.align	1
+  58              		.syntax unified
+  59              		.thumb
+  60              		.thumb_func
+  62              	bcdToDec:
+  63              	.LVL2:
+  64              	.LFB152:
+ 156:TimeDateConfig/Src/PCF85063.c **** // Convert binary coded decimal to normal decimal numbers
+ 157:TimeDateConfig/Src/PCF85063.c **** static int bcdToDec(uint8_t val){
+  65              		.loc 1 157 33 is_stmt 1 view -0
+  66              		.cfi_startproc
+  67              		@ args = 0, pretend = 0, frame = 0
+  68              		@ frame_needed = 0, uses_anonymous_args = 0
+  69              		@ link register save eliminated.
+ 158:TimeDateConfig/Src/PCF85063.c ****   return (int)( (val/16*10) + (val%16) );
+  70              		.loc 1 158 3 view .LVU7
+  71              		.loc 1 158 21 is_stmt 0 view .LVU8
+  72 0000 0309     		lsrs	r3, r0, #4
+  73              		.loc 1 158 24 view .LVU9
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 5
+
+
+  74 0002 03EB8303 		add	r3, r3, r3, lsl #2
+  75              		.loc 1 158 35 view .LVU10
+  76 0006 00F00F00 		and	r0, r0, #15
+  77              	.LVL3:
+ 159:TimeDateConfig/Src/PCF85063.c **** }
+  78              		.loc 1 159 1 view .LVU11
+  79 000a 00EB4300 		add	r0, r0, r3, lsl #1
+  80 000e 7047     		bx	lr
+  81              		.cfi_endproc
+  82              	.LFE152:
+  84              		.section	.text.PCF85_Init,"ax",%progbits
+  85              		.align	1
+  86              		.global	PCF85_Init
+  87              		.syntax unified
+  88              		.thumb
+  89              		.thumb_func
+  91              	PCF85_Init:
+  92              	.LVL4:
+  93              	.LFB132:
+  15:TimeDateConfig/Src/PCF85063.c **** 	_pcf850_i2c = _hi2c;
+  94              		.loc 1 15 1 is_stmt 1 view -0
+  95              		.cfi_startproc
+  96              		@ args = 0, pretend = 0, frame = 8
+  97              		@ frame_needed = 0, uses_anonymous_args = 0
+  15:TimeDateConfig/Src/PCF85063.c **** 	_pcf850_i2c = _hi2c;
+  98              		.loc 1 15 1 is_stmt 0 view .LVU13
+  99 0000 00B5     		push	{lr}
+ 100              		.cfi_def_cfa_offset 4
+ 101              		.cfi_offset 14, -4
+ 102 0002 87B0     		sub	sp, sp, #28
+ 103              		.cfi_def_cfa_offset 32
+  16:TimeDateConfig/Src/PCF85063.c ****   
+ 104              		.loc 1 16 2 is_stmt 1 view .LVU14
+  16:TimeDateConfig/Src/PCF85063.c ****   
+ 105              		.loc 1 16 14 is_stmt 0 view .LVU15
+ 106 0004 094B     		ldr	r3, .L7
+ 107 0006 1860     		str	r0, [r3]
+  20:TimeDateConfig/Src/PCF85063.c ****     HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR, REG_CTRL1_ADDR ,1, &PCFINIT_, 1, 1000 );
+ 108              		.loc 1 20 2 is_stmt 1 view .LVU16
+  20:TimeDateConfig/Src/PCF85063.c ****     HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR, REG_CTRL1_ADDR ,1, &PCFINIT_, 1, 1000 );
+ 109              		.loc 1 20 10 is_stmt 0 view .LVU17
+ 110 0008 4923     		movs	r3, #73
+ 111 000a 8DF81730 		strb	r3, [sp, #23]
+  21:TimeDateConfig/Src/PCF85063.c ****   
+ 112              		.loc 1 21 5 is_stmt 1 view .LVU18
+ 113 000e 4FF47A73 		mov	r3, #1000
+ 114 0012 0293     		str	r3, [sp, #8]
+ 115 0014 0123     		movs	r3, #1
+ 116 0016 0193     		str	r3, [sp, #4]
+ 117 0018 0DF11702 		add	r2, sp, #23
+ 118 001c 0092     		str	r2, [sp]
+ 119 001e 0022     		movs	r2, #0
+ 120 0020 A221     		movs	r1, #162
+ 121 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 122              	.LVL5:
+  23:TimeDateConfig/Src/PCF85063.c **** 
+ 123              		.loc 1 23 1 is_stmt 0 view .LVU19
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 6
+
+
+ 124 0026 07B0     		add	sp, sp, #28
+ 125              		.cfi_def_cfa_offset 4
+ 126              		@ sp needed
+ 127 0028 5DF804FB 		ldr	pc, [sp], #4
+ 128              	.L8:
+ 129              		.align	2
+ 130              	.L7:
+ 131 002c 00000000 		.word	_pcf850_i2c
+ 132              		.cfi_endproc
+ 133              	.LFE132:
+ 135              		.section	.text.PCF85_Reset,"ax",%progbits
+ 136              		.align	1
+ 137              		.global	PCF85_Reset
+ 138              		.syntax unified
+ 139              		.thumb
+ 140              		.thumb_func
+ 142              	PCF85_Reset:
+ 143              	.LFB133:
+  26:TimeDateConfig/Src/PCF85063.c **** 
+ 144              		.loc 1 26 19 is_stmt 1 view -0
+ 145              		.cfi_startproc
+ 146              		@ args = 0, pretend = 0, frame = 8
+ 147              		@ frame_needed = 0, uses_anonymous_args = 0
+ 148 0000 00B5     		push	{lr}
+ 149              		.cfi_def_cfa_offset 4
+ 150              		.cfi_offset 14, -4
+ 151 0002 87B0     		sub	sp, sp, #28
+ 152              		.cfi_def_cfa_offset 32
+  28:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR, REG_CTRL1_ADDR ,1, &PCFIRSTS_, 1, 1000 );
+ 153              		.loc 1 28 2 view .LVU21
+  28:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR, REG_CTRL1_ADDR ,1, &PCFIRSTS_, 1, 1000 );
+ 154              		.loc 1 28 10 is_stmt 0 view .LVU22
+ 155 0004 5923     		movs	r3, #89
+ 156 0006 8DF81730 		strb	r3, [sp, #23]
+  29:TimeDateConfig/Src/PCF85063.c ****     
+ 157              		.loc 1 29 2 is_stmt 1 view .LVU23
+ 158 000a 4FF47A73 		mov	r3, #1000
+ 159 000e 0293     		str	r3, [sp, #8]
+ 160 0010 0123     		movs	r3, #1
+ 161 0012 0193     		str	r3, [sp, #4]
+ 162 0014 0DF11702 		add	r2, sp, #23
+ 163 0018 0092     		str	r2, [sp]
+ 164 001a 0022     		movs	r2, #0
+ 165 001c A221     		movs	r1, #162
+ 166 001e 0348     		ldr	r0, .L11
+ 167 0020 0068     		ldr	r0, [r0]
+ 168 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 169              	.LVL6:
+  31:TimeDateConfig/Src/PCF85063.c **** 
+ 170              		.loc 1 31 1 is_stmt 0 view .LVU24
+ 171 0026 07B0     		add	sp, sp, #28
+ 172              		.cfi_def_cfa_offset 4
+ 173              		@ sp needed
+ 174 0028 5DF804FB 		ldr	pc, [sp], #4
+ 175              	.L12:
+ 176              		.align	2
+ 177              	.L11:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 7
+
+
+ 178 002c 00000000 		.word	_pcf850_i2c
+ 179              		.cfi_endproc
+ 180              	.LFE133:
+ 182              		.section	.text.PCF85_SetTime,"ax",%progbits
+ 183              		.align	1
+ 184              		.global	PCF85_SetTime
+ 185              		.syntax unified
+ 186              		.thumb
+ 187              		.thumb_func
+ 189              	PCF85_SetTime:
+ 190              	.LVL7:
+ 191              	.LFB134:
+  35:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[3] = {decToBcd(second),
+ 192              		.loc 1 35 65 is_stmt 1 view -0
+ 193              		.cfi_startproc
+ 194              		@ args = 0, pretend = 0, frame = 8
+ 195              		@ frame_needed = 0, uses_anonymous_args = 0
+  35:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[3] = {decToBcd(second),
+ 196              		.loc 1 35 65 is_stmt 0 view .LVU26
+ 197 0000 30B5     		push	{r4, r5, lr}
+ 198              		.cfi_def_cfa_offset 12
+ 199              		.cfi_offset 4, -12
+ 200              		.cfi_offset 5, -8
+ 201              		.cfi_offset 14, -4
+ 202 0002 87B0     		sub	sp, sp, #28
+ 203              		.cfi_def_cfa_offset 40
+ 204 0004 0446     		mov	r4, r0
+ 205 0006 0D46     		mov	r5, r1
+  36:TimeDateConfig/Src/PCF85063.c **** 						decToBcd(minute),
+ 206              		.loc 1 36 2 is_stmt 1 view .LVU27
+  36:TimeDateConfig/Src/PCF85063.c **** 						decToBcd(minute),
+ 207              		.loc 1 36 20 is_stmt 0 view .LVU28
+ 208 0008 1046     		mov	r0, r2
+ 209              	.LVL8:
+  36:TimeDateConfig/Src/PCF85063.c **** 						decToBcd(minute),
+ 210              		.loc 1 36 20 view .LVU29
+ 211 000a FFF7FEFF 		bl	decToBcd
+ 212              	.LVL9:
+  36:TimeDateConfig/Src/PCF85063.c **** 						decToBcd(minute),
+ 213              		.loc 1 36 10 discriminator 1 view .LVU30
+ 214 000e 8DF81400 		strb	r0, [sp, #20]
+  37:TimeDateConfig/Src/PCF85063.c **** 							decToBcd(hour)};
+ 215              		.loc 1 37 7 view .LVU31
+ 216 0012 2846     		mov	r0, r5
+ 217 0014 FFF7FEFF 		bl	decToBcd
+ 218              	.LVL10:
+  36:TimeDateConfig/Src/PCF85063.c **** 						decToBcd(minute),
+ 219              		.loc 1 36 10 view .LVU32
+ 220 0018 8DF81500 		strb	r0, [sp, #21]
+  38:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_TIME_ADDR,1, buf, 3, 1000 );
+ 221              		.loc 1 38 8 view .LVU33
+ 222 001c 2046     		mov	r0, r4
+ 223 001e FFF7FEFF 		bl	decToBcd
+ 224              	.LVL11:
+  36:TimeDateConfig/Src/PCF85063.c **** 						decToBcd(minute),
+ 225              		.loc 1 36 10 view .LVU34
+ 226 0022 8DF81600 		strb	r0, [sp, #22]
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 8
+
+
+  39:TimeDateConfig/Src/PCF85063.c **** }
+ 227              		.loc 1 39 2 is_stmt 1 view .LVU35
+ 228 0026 4FF47A73 		mov	r3, #1000
+ 229 002a 0293     		str	r3, [sp, #8]
+ 230 002c 0323     		movs	r3, #3
+ 231 002e 0193     		str	r3, [sp, #4]
+ 232 0030 05AB     		add	r3, sp, #20
+ 233 0032 0093     		str	r3, [sp]
+ 234 0034 0123     		movs	r3, #1
+ 235 0036 0422     		movs	r2, #4
+ 236 0038 A221     		movs	r1, #162
+ 237 003a 0348     		ldr	r0, .L15
+ 238 003c 0068     		ldr	r0, [r0]
+ 239 003e FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 240              	.LVL12:
+  40:TimeDateConfig/Src/PCF85063.c **** 
+ 241              		.loc 1 40 1 is_stmt 0 view .LVU36
+ 242 0042 07B0     		add	sp, sp, #28
+ 243              		.cfi_def_cfa_offset 12
+ 244              		@ sp needed
+ 245 0044 30BD     		pop	{r4, r5, pc}
+ 246              	.LVL13:
+ 247              	.L16:
+  40:TimeDateConfig/Src/PCF85063.c **** 
+ 248              		.loc 1 40 1 view .LVU37
+ 249 0046 00BF     		.align	2
+ 250              	.L15:
+ 251 0048 00000000 		.word	_pcf850_i2c
+ 252              		.cfi_endproc
+ 253              	.LFE134:
+ 255              		.section	.text.PCF85_SetDate,"ax",%progbits
+ 256              		.align	1
+ 257              		.global	PCF85_SetDate
+ 258              		.syntax unified
+ 259              		.thumb
+ 260              		.thumb_func
+ 262              	PCF85_SetDate:
+ 263              	.LVL14:
+ 264              	.LFB135:
+  42:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[4] = {decToBcd(day),
+ 265              		.loc 1 42 77 is_stmt 1 view -0
+ 266              		.cfi_startproc
+ 267              		@ args = 0, pretend = 0, frame = 8
+ 268              		@ frame_needed = 0, uses_anonymous_args = 0
+  42:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[4] = {decToBcd(day),
+ 269              		.loc 1 42 77 is_stmt 0 view .LVU39
+ 270 0000 70B5     		push	{r4, r5, r6, lr}
+ 271              		.cfi_def_cfa_offset 16
+ 272              		.cfi_offset 4, -16
+ 273              		.cfi_offset 5, -12
+ 274              		.cfi_offset 6, -8
+ 275              		.cfi_offset 14, -4
+ 276 0002 86B0     		sub	sp, sp, #24
+ 277              		.cfi_def_cfa_offset 40
+ 278 0004 0646     		mov	r6, r0
+ 279 0006 1546     		mov	r5, r2
+ 280 0008 1C46     		mov	r4, r3
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 9
+
+
+  43:TimeDateConfig/Src/PCF85063.c **** 			decToBcd(weekday),
+ 281              		.loc 1 43 2 is_stmt 1 view .LVU40
+  43:TimeDateConfig/Src/PCF85063.c **** 			decToBcd(weekday),
+ 282              		.loc 1 43 20 is_stmt 0 view .LVU41
+ 283 000a 0846     		mov	r0, r1
+ 284              	.LVL15:
+  43:TimeDateConfig/Src/PCF85063.c **** 			decToBcd(weekday),
+ 285              		.loc 1 43 20 view .LVU42
+ 286 000c FFF7FEFF 		bl	decToBcd
+ 287              	.LVL16:
+  43:TimeDateConfig/Src/PCF85063.c **** 			decToBcd(weekday),
+ 288              		.loc 1 43 10 discriminator 1 view .LVU43
+ 289 0010 8DF81400 		strb	r0, [sp, #20]
+  44:TimeDateConfig/Src/PCF85063.c **** 			decToBcd(month),
+ 290              		.loc 1 44 4 view .LVU44
+ 291 0014 3046     		mov	r0, r6
+ 292 0016 FFF7FEFF 		bl	decToBcd
+ 293              	.LVL17:
+  43:TimeDateConfig/Src/PCF85063.c **** 			decToBcd(weekday),
+ 294              		.loc 1 43 10 view .LVU45
+ 295 001a 8DF81500 		strb	r0, [sp, #21]
+  45:TimeDateConfig/Src/PCF85063.c **** 			decToBcd(yr-YEAR_OFFSET)};
+ 296              		.loc 1 45 4 view .LVU46
+ 297 001e 2846     		mov	r0, r5
+ 298 0020 FFF7FEFF 		bl	decToBcd
+ 299              	.LVL18:
+  43:TimeDateConfig/Src/PCF85063.c **** 			decToBcd(weekday),
+ 300              		.loc 1 43 10 view .LVU47
+ 301 0024 8DF81600 		strb	r0, [sp, #22]
+  46:TimeDateConfig/Src/PCF85063.c **** 
+ 302              		.loc 1 46 4 view .LVU48
+ 303 0028 A4F2B270 		subw	r0, r4, #1970
+ 304 002c FFF7FEFF 		bl	decToBcd
+ 305              	.LVL19:
+  43:TimeDateConfig/Src/PCF85063.c **** 			decToBcd(weekday),
+ 306              		.loc 1 43 10 view .LVU49
+ 307 0030 8DF81700 		strb	r0, [sp, #23]
+  48:TimeDateConfig/Src/PCF85063.c **** }
+ 308              		.loc 1 48 2 is_stmt 1 view .LVU50
+ 309 0034 4FF47A73 		mov	r3, #1000
+ 310 0038 0293     		str	r3, [sp, #8]
+ 311 003a 0423     		movs	r3, #4
+ 312 003c 0193     		str	r3, [sp, #4]
+ 313 003e 05AB     		add	r3, sp, #20
+ 314 0040 0093     		str	r3, [sp]
+ 315 0042 0123     		movs	r3, #1
+ 316 0044 0722     		movs	r2, #7
+ 317 0046 A221     		movs	r1, #162
+ 318 0048 0248     		ldr	r0, .L19
+ 319 004a 0068     		ldr	r0, [r0]
+ 320 004c FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 321              	.LVL20:
+  49:TimeDateConfig/Src/PCF85063.c **** 
+ 322              		.loc 1 49 1 is_stmt 0 view .LVU51
+ 323 0050 06B0     		add	sp, sp, #24
+ 324              		.cfi_def_cfa_offset 16
+ 325              		@ sp needed
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 10
+
+
+ 326 0052 70BD     		pop	{r4, r5, r6, pc}
+ 327              	.LVL21:
+ 328              	.L20:
+  49:TimeDateConfig/Src/PCF85063.c **** 
+ 329              		.loc 1 49 1 view .LVU52
+ 330              		.align	2
+ 331              	.L19:
+ 332 0054 00000000 		.word	_pcf850_i2c
+ 333              		.cfi_endproc
+ 334              	.LFE135:
+ 336              		.section	.text.PCF85_SetSecond,"ax",%progbits
+ 337              		.align	1
+ 338              		.global	PCF85_SetSecond
+ 339              		.syntax unified
+ 340              		.thumb
+ 341              		.thumb_func
+ 343              	PCF85_SetSecond:
+ 344              	.LVL22:
+ 345              	.LFB136:
+  52:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(second)};
+ 346              		.loc 1 52 1 is_stmt 1 view -0
+ 347              		.cfi_startproc
+ 348              		@ args = 0, pretend = 0, frame = 8
+ 349              		@ frame_needed = 0, uses_anonymous_args = 0
+  52:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(second)};
+ 350              		.loc 1 52 1 is_stmt 0 view .LVU54
+ 351 0000 00B5     		push	{lr}
+ 352              		.cfi_def_cfa_offset 4
+ 353              		.cfi_offset 14, -4
+ 354 0002 87B0     		sub	sp, sp, #28
+ 355              		.cfi_def_cfa_offset 32
+  53:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_TIME_ADDR,1, buf, 1, 1000 );
+ 356              		.loc 1 53 2 is_stmt 1 view .LVU55
+  53:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_TIME_ADDR,1, buf, 1, 1000 );
+ 357              		.loc 1 53 20 is_stmt 0 view .LVU56
+ 358 0004 FFF7FEFF 		bl	decToBcd
+ 359              	.LVL23:
+  53:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_TIME_ADDR,1, buf, 1, 1000 );
+ 360              		.loc 1 53 10 discriminator 1 view .LVU57
+ 361 0008 8DF81400 		strb	r0, [sp, #20]
+  54:TimeDateConfig/Src/PCF85063.c **** }
+ 362              		.loc 1 54 2 is_stmt 1 view .LVU58
+ 363 000c 4FF47A73 		mov	r3, #1000
+ 364 0010 0293     		str	r3, [sp, #8]
+ 365 0012 0123     		movs	r3, #1
+ 366 0014 0193     		str	r3, [sp, #4]
+ 367 0016 05AA     		add	r2, sp, #20
+ 368 0018 0092     		str	r2, [sp]
+ 369 001a 0422     		movs	r2, #4
+ 370 001c A221     		movs	r1, #162
+ 371 001e 0348     		ldr	r0, .L23
+ 372 0020 0068     		ldr	r0, [r0]
+ 373 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 374              	.LVL24:
+  55:TimeDateConfig/Src/PCF85063.c **** void PCF85_SetMinute(uint8_t minute)
+ 375              		.loc 1 55 1 is_stmt 0 view .LVU59
+ 376 0026 07B0     		add	sp, sp, #28
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 11
+
+
+ 377              		.cfi_def_cfa_offset 4
+ 378              		@ sp needed
+ 379 0028 5DF804FB 		ldr	pc, [sp], #4
+ 380              	.L24:
+ 381              		.align	2
+ 382              	.L23:
+ 383 002c 00000000 		.word	_pcf850_i2c
+ 384              		.cfi_endproc
+ 385              	.LFE136:
+ 387              		.section	.text.PCF85_SetMinute,"ax",%progbits
+ 388              		.align	1
+ 389              		.global	PCF85_SetMinute
+ 390              		.syntax unified
+ 391              		.thumb
+ 392              		.thumb_func
+ 394              	PCF85_SetMinute:
+ 395              	.LVL25:
+ 396              	.LFB137:
+  57:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(minute)};
+ 397              		.loc 1 57 1 is_stmt 1 view -0
+ 398              		.cfi_startproc
+ 399              		@ args = 0, pretend = 0, frame = 8
+ 400              		@ frame_needed = 0, uses_anonymous_args = 0
+  57:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(minute)};
+ 401              		.loc 1 57 1 is_stmt 0 view .LVU61
+ 402 0000 00B5     		push	{lr}
+ 403              		.cfi_def_cfa_offset 4
+ 404              		.cfi_offset 14, -4
+ 405 0002 87B0     		sub	sp, sp, #28
+ 406              		.cfi_def_cfa_offset 32
+  58:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_MIN_ADDR,1, buf, 1, 1000 );
+ 407              		.loc 1 58 2 is_stmt 1 view .LVU62
+  58:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_MIN_ADDR,1, buf, 1, 1000 );
+ 408              		.loc 1 58 20 is_stmt 0 view .LVU63
+ 409 0004 FFF7FEFF 		bl	decToBcd
+ 410              	.LVL26:
+  58:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_MIN_ADDR,1, buf, 1, 1000 );
+ 411              		.loc 1 58 10 discriminator 1 view .LVU64
+ 412 0008 8DF81400 		strb	r0, [sp, #20]
+  59:TimeDateConfig/Src/PCF85063.c **** }
+ 413              		.loc 1 59 2 is_stmt 1 view .LVU65
+ 414 000c 4FF47A73 		mov	r3, #1000
+ 415 0010 0293     		str	r3, [sp, #8]
+ 416 0012 0123     		movs	r3, #1
+ 417 0014 0193     		str	r3, [sp, #4]
+ 418 0016 05AA     		add	r2, sp, #20
+ 419 0018 0092     		str	r2, [sp]
+ 420 001a 0522     		movs	r2, #5
+ 421 001c A221     		movs	r1, #162
+ 422 001e 0348     		ldr	r0, .L27
+ 423 0020 0068     		ldr	r0, [r0]
+ 424 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 425              	.LVL27:
+  60:TimeDateConfig/Src/PCF85063.c **** 
+ 426              		.loc 1 60 1 is_stmt 0 view .LVU66
+ 427 0026 07B0     		add	sp, sp, #28
+ 428              		.cfi_def_cfa_offset 4
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 12
+
+
+ 429              		@ sp needed
+ 430 0028 5DF804FB 		ldr	pc, [sp], #4
+ 431              	.L28:
+ 432              		.align	2
+ 433              	.L27:
+ 434 002c 00000000 		.word	_pcf850_i2c
+ 435              		.cfi_endproc
+ 436              	.LFE137:
+ 438              		.section	.text.PCF85_SetHour,"ax",%progbits
+ 439              		.align	1
+ 440              		.global	PCF85_SetHour
+ 441              		.syntax unified
+ 442              		.thumb
+ 443              		.thumb_func
+ 445              	PCF85_SetHour:
+ 446              	.LVL28:
+ 447              	.LFB138:
+  63:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(hour)};
+ 448              		.loc 1 63 1 is_stmt 1 view -0
+ 449              		.cfi_startproc
+ 450              		@ args = 0, pretend = 0, frame = 8
+ 451              		@ frame_needed = 0, uses_anonymous_args = 0
+  63:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(hour)};
+ 452              		.loc 1 63 1 is_stmt 0 view .LVU68
+ 453 0000 00B5     		push	{lr}
+ 454              		.cfi_def_cfa_offset 4
+ 455              		.cfi_offset 14, -4
+ 456 0002 87B0     		sub	sp, sp, #28
+ 457              		.cfi_def_cfa_offset 32
+  64:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_HOUR_ADRR,1, buf, 1, 1000 );
+ 458              		.loc 1 64 2 is_stmt 1 view .LVU69
+  64:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_HOUR_ADRR,1, buf, 1, 1000 );
+ 459              		.loc 1 64 20 is_stmt 0 view .LVU70
+ 460 0004 FFF7FEFF 		bl	decToBcd
+ 461              	.LVL29:
+  64:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_HOUR_ADRR,1, buf, 1, 1000 );
+ 462              		.loc 1 64 10 discriminator 1 view .LVU71
+ 463 0008 8DF81400 		strb	r0, [sp, #20]
+  65:TimeDateConfig/Src/PCF85063.c **** }
+ 464              		.loc 1 65 2 is_stmt 1 view .LVU72
+ 465 000c 4FF47A73 		mov	r3, #1000
+ 466 0010 0293     		str	r3, [sp, #8]
+ 467 0012 0123     		movs	r3, #1
+ 468 0014 0193     		str	r3, [sp, #4]
+ 469 0016 05AA     		add	r2, sp, #20
+ 470 0018 0092     		str	r2, [sp]
+ 471 001a 0622     		movs	r2, #6
+ 472 001c A221     		movs	r1, #162
+ 473 001e 0348     		ldr	r0, .L31
+ 474 0020 0068     		ldr	r0, [r0]
+ 475 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 476              	.LVL30:
+  66:TimeDateConfig/Src/PCF85063.c **** 
+ 477              		.loc 1 66 1 is_stmt 0 view .LVU73
+ 478 0026 07B0     		add	sp, sp, #28
+ 479              		.cfi_def_cfa_offset 4
+ 480              		@ sp needed
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 13
+
+
+ 481 0028 5DF804FB 		ldr	pc, [sp], #4
+ 482              	.L32:
+ 483              		.align	2
+ 484              	.L31:
+ 485 002c 00000000 		.word	_pcf850_i2c
+ 486              		.cfi_endproc
+ 487              	.LFE138:
+ 489              		.section	.text.PCF85_Setweekday,"ax",%progbits
+ 490              		.align	1
+ 491              		.global	PCF85_Setweekday
+ 492              		.syntax unified
+ 493              		.thumb
+ 494              		.thumb_func
+ 496              	PCF85_Setweekday:
+ 497              	.LVL31:
+ 498              	.LFB139:
+  69:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(weekday)};
+ 499              		.loc 1 69 1 is_stmt 1 view -0
+ 500              		.cfi_startproc
+ 501              		@ args = 0, pretend = 0, frame = 8
+ 502              		@ frame_needed = 0, uses_anonymous_args = 0
+  69:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(weekday)};
+ 503              		.loc 1 69 1 is_stmt 0 view .LVU75
+ 504 0000 00B5     		push	{lr}
+ 505              		.cfi_def_cfa_offset 4
+ 506              		.cfi_offset 14, -4
+ 507 0002 87B0     		sub	sp, sp, #28
+ 508              		.cfi_def_cfa_offset 32
+  70:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_WEEKDAY_ADRR,1, buf, 1, 1000 );
+ 509              		.loc 1 70 2 is_stmt 1 view .LVU76
+  70:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_WEEKDAY_ADRR,1, buf, 1, 1000 );
+ 510              		.loc 1 70 20 is_stmt 0 view .LVU77
+ 511 0004 FFF7FEFF 		bl	decToBcd
+ 512              	.LVL32:
+  70:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_WEEKDAY_ADRR,1, buf, 1, 1000 );
+ 513              		.loc 1 70 10 discriminator 1 view .LVU78
+ 514 0008 8DF81400 		strb	r0, [sp, #20]
+  71:TimeDateConfig/Src/PCF85063.c **** }
+ 515              		.loc 1 71 2 is_stmt 1 view .LVU79
+ 516 000c 4FF47A73 		mov	r3, #1000
+ 517 0010 0293     		str	r3, [sp, #8]
+ 518 0012 0123     		movs	r3, #1
+ 519 0014 0193     		str	r3, [sp, #4]
+ 520 0016 05AA     		add	r2, sp, #20
+ 521 0018 0092     		str	r2, [sp]
+ 522 001a 0822     		movs	r2, #8
+ 523 001c A221     		movs	r1, #162
+ 524 001e 0348     		ldr	r0, .L35
+ 525 0020 0068     		ldr	r0, [r0]
+ 526 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 527              	.LVL33:
+  72:TimeDateConfig/Src/PCF85063.c **** 
+ 528              		.loc 1 72 1 is_stmt 0 view .LVU80
+ 529 0026 07B0     		add	sp, sp, #28
+ 530              		.cfi_def_cfa_offset 4
+ 531              		@ sp needed
+ 532 0028 5DF804FB 		ldr	pc, [sp], #4
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 14
+
+
+ 533              	.L36:
+ 534              		.align	2
+ 535              	.L35:
+ 536 002c 00000000 		.word	_pcf850_i2c
+ 537              		.cfi_endproc
+ 538              	.LFE139:
+ 540              		.section	.text.PCF85_Setday,"ax",%progbits
+ 541              		.align	1
+ 542              		.global	PCF85_Setday
+ 543              		.syntax unified
+ 544              		.thumb
+ 545              		.thumb_func
+ 547              	PCF85_Setday:
+ 548              	.LVL34:
+ 549              	.LFB140:
+  75:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(day)};
+ 550              		.loc 1 75 1 is_stmt 1 view -0
+ 551              		.cfi_startproc
+ 552              		@ args = 0, pretend = 0, frame = 8
+ 553              		@ frame_needed = 0, uses_anonymous_args = 0
+  75:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(day)};
+ 554              		.loc 1 75 1 is_stmt 0 view .LVU82
+ 555 0000 00B5     		push	{lr}
+ 556              		.cfi_def_cfa_offset 4
+ 557              		.cfi_offset 14, -4
+ 558 0002 87B0     		sub	sp, sp, #28
+ 559              		.cfi_def_cfa_offset 32
+  76:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_DAY_ADRR,1, buf, 1, 1000 );
+ 560              		.loc 1 76 2 is_stmt 1 view .LVU83
+  76:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_DAY_ADRR,1, buf, 1, 1000 );
+ 561              		.loc 1 76 20 is_stmt 0 view .LVU84
+ 562 0004 FFF7FEFF 		bl	decToBcd
+ 563              	.LVL35:
+  76:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_DAY_ADRR,1, buf, 1, 1000 );
+ 564              		.loc 1 76 10 discriminator 1 view .LVU85
+ 565 0008 8DF81400 		strb	r0, [sp, #20]
+  77:TimeDateConfig/Src/PCF85063.c **** }
+ 566              		.loc 1 77 2 is_stmt 1 view .LVU86
+ 567 000c 4FF47A73 		mov	r3, #1000
+ 568 0010 0293     		str	r3, [sp, #8]
+ 569 0012 0123     		movs	r3, #1
+ 570 0014 0193     		str	r3, [sp, #4]
+ 571 0016 05AA     		add	r2, sp, #20
+ 572 0018 0092     		str	r2, [sp]
+ 573 001a 0722     		movs	r2, #7
+ 574 001c A221     		movs	r1, #162
+ 575 001e 0348     		ldr	r0, .L39
+ 576 0020 0068     		ldr	r0, [r0]
+ 577 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 578              	.LVL36:
+  78:TimeDateConfig/Src/PCF85063.c **** 
+ 579              		.loc 1 78 1 is_stmt 0 view .LVU87
+ 580 0026 07B0     		add	sp, sp, #28
+ 581              		.cfi_def_cfa_offset 4
+ 582              		@ sp needed
+ 583 0028 5DF804FB 		ldr	pc, [sp], #4
+ 584              	.L40:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 15
+
+
+ 585              		.align	2
+ 586              	.L39:
+ 587 002c 00000000 		.word	_pcf850_i2c
+ 588              		.cfi_endproc
+ 589              	.LFE140:
+ 591              		.section	.text.PCF85_Setmonth,"ax",%progbits
+ 592              		.align	1
+ 593              		.global	PCF85_Setmonth
+ 594              		.syntax unified
+ 595              		.thumb
+ 596              		.thumb_func
+ 598              	PCF85_Setmonth:
+ 599              	.LVL37:
+ 600              	.LFB141:
+  81:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(month)};
+ 601              		.loc 1 81 1 is_stmt 1 view -0
+ 602              		.cfi_startproc
+ 603              		@ args = 0, pretend = 0, frame = 8
+ 604              		@ frame_needed = 0, uses_anonymous_args = 0
+  81:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(month)};
+ 605              		.loc 1 81 1 is_stmt 0 view .LVU89
+ 606 0000 00B5     		push	{lr}
+ 607              		.cfi_def_cfa_offset 4
+ 608              		.cfi_offset 14, -4
+ 609 0002 87B0     		sub	sp, sp, #28
+ 610              		.cfi_def_cfa_offset 32
+  82:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_MONTH_ADRR,1, buf, 1, 1000 );	
+ 611              		.loc 1 82 2 is_stmt 1 view .LVU90
+  82:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_MONTH_ADRR,1, buf, 1, 1000 );	
+ 612              		.loc 1 82 20 is_stmt 0 view .LVU91
+ 613 0004 FFF7FEFF 		bl	decToBcd
+ 614              	.LVL38:
+  82:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_MONTH_ADRR,1, buf, 1, 1000 );	
+ 615              		.loc 1 82 10 discriminator 1 view .LVU92
+ 616 0008 8DF81400 		strb	r0, [sp, #20]
+  83:TimeDateConfig/Src/PCF85063.c **** }
+ 617              		.loc 1 83 2 is_stmt 1 view .LVU93
+ 618 000c 4FF47A73 		mov	r3, #1000
+ 619 0010 0293     		str	r3, [sp, #8]
+ 620 0012 0123     		movs	r3, #1
+ 621 0014 0193     		str	r3, [sp, #4]
+ 622 0016 05AA     		add	r2, sp, #20
+ 623 0018 0092     		str	r2, [sp]
+ 624 001a 0922     		movs	r2, #9
+ 625 001c A221     		movs	r1, #162
+ 626 001e 0348     		ldr	r0, .L43
+ 627 0020 0068     		ldr	r0, [r0]
+ 628 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 629              	.LVL39:
+  84:TimeDateConfig/Src/PCF85063.c **** 
+ 630              		.loc 1 84 1 is_stmt 0 view .LVU94
+ 631 0026 07B0     		add	sp, sp, #28
+ 632              		.cfi_def_cfa_offset 4
+ 633              		@ sp needed
+ 634 0028 5DF804FB 		ldr	pc, [sp], #4
+ 635              	.L44:
+ 636              		.align	2
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 16
+
+
+ 637              	.L43:
+ 638 002c 00000000 		.word	_pcf850_i2c
+ 639              		.cfi_endproc
+ 640              	.LFE141:
+ 642              		.section	.text.PCF85_Setyear,"ax",%progbits
+ 643              		.align	1
+ 644              		.global	PCF85_Setyear
+ 645              		.syntax unified
+ 646              		.thumb
+ 647              		.thumb_func
+ 649              	PCF85_Setyear:
+ 650              	.LVL40:
+ 651              	.LFB142:
+  87:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(yr)};
+ 652              		.loc 1 87 1 is_stmt 1 view -0
+ 653              		.cfi_startproc
+ 654              		@ args = 0, pretend = 0, frame = 8
+ 655              		@ frame_needed = 0, uses_anonymous_args = 0
+  87:TimeDateConfig/Src/PCF85063.c **** 	uint8_t buf[1] = {decToBcd(yr)};
+ 656              		.loc 1 87 1 is_stmt 0 view .LVU96
+ 657 0000 00B5     		push	{lr}
+ 658              		.cfi_def_cfa_offset 4
+ 659              		.cfi_offset 14, -4
+ 660 0002 87B0     		sub	sp, sp, #28
+ 661              		.cfi_def_cfa_offset 32
+  88:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_YEAR_ADRR,1, buf, 1, 1000 );	
+ 662              		.loc 1 88 2 is_stmt 1 view .LVU97
+  88:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_YEAR_ADRR,1, buf, 1, 1000 );	
+ 663              		.loc 1 88 20 is_stmt 0 view .LVU98
+ 664 0004 FFF7FEFF 		bl	decToBcd
+ 665              	.LVL41:
+  88:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Write(_pcf850_i2c, I2C_ADDR,REG_YEAR_ADRR,1, buf, 1, 1000 );	
+ 666              		.loc 1 88 10 discriminator 1 view .LVU99
+ 667 0008 8DF81400 		strb	r0, [sp, #20]
+  89:TimeDateConfig/Src/PCF85063.c **** }
+ 668              		.loc 1 89 2 is_stmt 1 view .LVU100
+ 669 000c 4FF47A73 		mov	r3, #1000
+ 670 0010 0293     		str	r3, [sp, #8]
+ 671 0012 0123     		movs	r3, #1
+ 672 0014 0193     		str	r3, [sp, #4]
+ 673 0016 05AA     		add	r2, sp, #20
+ 674 0018 0092     		str	r2, [sp]
+ 675 001a 0A22     		movs	r2, #10
+ 676 001c A221     		movs	r1, #162
+ 677 001e 0348     		ldr	r0, .L47
+ 678 0020 0068     		ldr	r0, [r0]
+ 679 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 680              	.LVL42:
+  90:TimeDateConfig/Src/PCF85063.c **** 					//GET FONKSİYONLARI
+ 681              		.loc 1 90 1 is_stmt 0 view .LVU101
+ 682 0026 07B0     		add	sp, sp, #28
+ 683              		.cfi_def_cfa_offset 4
+ 684              		@ sp needed
+ 685 0028 5DF804FB 		ldr	pc, [sp], #4
+ 686              	.L48:
+ 687              		.align	2
+ 688              	.L47:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 17
+
+
+ 689 002c 00000000 		.word	_pcf850_i2c
+ 690              		.cfi_endproc
+ 691              	.LFE142:
+ 693              		.section	.text.PCF85_GetDateTime,"ax",%progbits
+ 694              		.align	1
+ 695              		.global	PCF85_GetDateTime
+ 696              		.syntax unified
+ 697              		.thumb
+ 698              		.thumb_func
+ 700              	PCF85_GetDateTime:
+ 701              	.LVL43:
+ 702              	.LFB143:
+  92:TimeDateConfig/Src/PCF85063.c **** 	uint8_t bufss[7] = {0};
+ 703              		.loc 1 92 40 is_stmt 1 view -0
+ 704              		.cfi_startproc
+ 705              		@ args = 0, pretend = 0, frame = 8
+ 706              		@ frame_needed = 0, uses_anonymous_args = 0
+  92:TimeDateConfig/Src/PCF85063.c **** 	uint8_t bufss[7] = {0};
+ 707              		.loc 1 92 40 is_stmt 0 view .LVU103
+ 708 0000 10B5     		push	{r4, lr}
+ 709              		.cfi_def_cfa_offset 8
+ 710              		.cfi_offset 4, -8
+ 711              		.cfi_offset 14, -4
+ 712 0002 86B0     		sub	sp, sp, #24
+ 713              		.cfi_def_cfa_offset 32
+ 714 0004 0446     		mov	r4, r0
+  93:TimeDateConfig/Src/PCF85063.c **** 
+ 715              		.loc 1 93 2 is_stmt 1 view .LVU104
+  93:TimeDateConfig/Src/PCF85063.c **** 
+ 716              		.loc 1 93 10 is_stmt 0 view .LVU105
+ 717 0006 0023     		movs	r3, #0
+ 718 0008 0493     		str	r3, [sp, #16]
+ 719 000a CDF81330 		str	r3, [sp, #19]	@ unaligned
+  95:TimeDateConfig/Src/PCF85063.c **** 
+ 720              		.loc 1 95 2 is_stmt 1 view .LVU106
+  95:TimeDateConfig/Src/PCF85063.c **** 
+ 721              		.loc 1 95 5 is_stmt 0 view .LVU107
+ 722 000e 4FF47A73 		mov	r3, #1000
+ 723 0012 0293     		str	r3, [sp, #8]
+ 724 0014 0723     		movs	r3, #7
+ 725 0016 0193     		str	r3, [sp, #4]
+ 726 0018 04AB     		add	r3, sp, #16
+ 727 001a 0093     		str	r3, [sp]
+ 728 001c 0123     		movs	r3, #1
+ 729 001e 0422     		movs	r2, #4
+ 730 0020 A221     		movs	r1, #162
+ 731 0022 1C48     		ldr	r0, .L54
+ 732              	.LVL44:
+  95:TimeDateConfig/Src/PCF85063.c **** 
+ 733              		.loc 1 95 5 view .LVU108
+ 734 0024 0068     		ldr	r0, [r0]
+ 735 0026 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 736              	.LVL45:
+  95:TimeDateConfig/Src/PCF85063.c **** 
+ 737              		.loc 1 95 4 discriminator 1 view .LVU109
+ 738 002a 10B1     		cbz	r0, .L53
+ 107:TimeDateConfig/Src/PCF85063.c **** }
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 18
+
+
+ 739              		.loc 1 107 10 view .LVU110
+ 740 002c 0020     		movs	r0, #0
+ 741              	.L50:
+ 108:TimeDateConfig/Src/PCF85063.c **** uint8_t PCF85_GetSecond(void)
+ 742              		.loc 1 108 1 view .LVU111
+ 743 002e 06B0     		add	sp, sp, #24
+ 744              		.cfi_remember_state
+ 745              		.cfi_def_cfa_offset 8
+ 746              		@ sp needed
+ 747 0030 10BD     		pop	{r4, pc}
+ 748              	.LVL46:
+ 749              	.L53:
+ 750              		.cfi_restore_state
+  97:TimeDateConfig/Src/PCF85063.c **** 		buf[1] = bcdToDec(bufss[1] & 0x7F);
+ 751              		.loc 1 97 3 is_stmt 1 view .LVU112
+  97:TimeDateConfig/Src/PCF85063.c **** 		buf[1] = bcdToDec(bufss[1] & 0x7F);
+ 752              		.loc 1 97 26 is_stmt 0 view .LVU113
+ 753 0032 9DF81000 		ldrb	r0, [sp, #16]	@ zero_extendqisi2
+  97:TimeDateConfig/Src/PCF85063.c **** 		buf[1] = bcdToDec(bufss[1] & 0x7F);
+ 754              		.loc 1 97 12 view .LVU114
+ 755 0036 00F07F00 		and	r0, r0, #127
+ 756 003a FFF7FEFF 		bl	bcdToDec
+ 757              	.LVL47:
+  97:TimeDateConfig/Src/PCF85063.c **** 		buf[1] = bcdToDec(bufss[1] & 0x7F);
+ 758              		.loc 1 97 10 discriminator 1 view .LVU115
+ 759 003e 2070     		strb	r0, [r4]
+  98:TimeDateConfig/Src/PCF85063.c **** 		buf[2] = bcdToDec(bufss[2] & 0x3F);
+ 760              		.loc 1 98 3 is_stmt 1 view .LVU116
+  98:TimeDateConfig/Src/PCF85063.c **** 		buf[2] = bcdToDec(bufss[2] & 0x3F);
+ 761              		.loc 1 98 26 is_stmt 0 view .LVU117
+ 762 0040 9DF81100 		ldrb	r0, [sp, #17]	@ zero_extendqisi2
+  98:TimeDateConfig/Src/PCF85063.c **** 		buf[2] = bcdToDec(bufss[2] & 0x3F);
+ 763              		.loc 1 98 12 view .LVU118
+ 764 0044 00F07F00 		and	r0, r0, #127
+ 765 0048 FFF7FEFF 		bl	bcdToDec
+ 766              	.LVL48:
+  98:TimeDateConfig/Src/PCF85063.c **** 		buf[2] = bcdToDec(bufss[2] & 0x3F);
+ 767              		.loc 1 98 10 discriminator 1 view .LVU119
+ 768 004c 6070     		strb	r0, [r4, #1]
+  99:TimeDateConfig/Src/PCF85063.c **** 		buf[3] = bcdToDec(bufss[3] & 0x3F);
+ 769              		.loc 1 99 3 is_stmt 1 view .LVU120
+  99:TimeDateConfig/Src/PCF85063.c **** 		buf[3] = bcdToDec(bufss[3] & 0x3F);
+ 770              		.loc 1 99 26 is_stmt 0 view .LVU121
+ 771 004e 9DF81200 		ldrb	r0, [sp, #18]	@ zero_extendqisi2
+  99:TimeDateConfig/Src/PCF85063.c **** 		buf[3] = bcdToDec(bufss[3] & 0x3F);
+ 772              		.loc 1 99 12 view .LVU122
+ 773 0052 00F03F00 		and	r0, r0, #63
+ 774 0056 FFF7FEFF 		bl	bcdToDec
+ 775              	.LVL49:
+  99:TimeDateConfig/Src/PCF85063.c **** 		buf[3] = bcdToDec(bufss[3] & 0x3F);
+ 776              		.loc 1 99 10 discriminator 1 view .LVU123
+ 777 005a A070     		strb	r0, [r4, #2]
+ 100:TimeDateConfig/Src/PCF85063.c **** 		buf[4] = bcdToDec(bufss[4] & 0x07);
+ 778              		.loc 1 100 3 is_stmt 1 view .LVU124
+ 100:TimeDateConfig/Src/PCF85063.c **** 		buf[4] = bcdToDec(bufss[4] & 0x07);
+ 779              		.loc 1 100 26 is_stmt 0 view .LVU125
+ 780 005c 9DF81300 		ldrb	r0, [sp, #19]	@ zero_extendqisi2
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 19
+
+
+ 100:TimeDateConfig/Src/PCF85063.c **** 		buf[4] = bcdToDec(bufss[4] & 0x07);
+ 781              		.loc 1 100 12 view .LVU126
+ 782 0060 00F03F00 		and	r0, r0, #63
+ 783 0064 FFF7FEFF 		bl	bcdToDec
+ 784              	.LVL50:
+ 100:TimeDateConfig/Src/PCF85063.c **** 		buf[4] = bcdToDec(bufss[4] & 0x07);
+ 785              		.loc 1 100 10 discriminator 1 view .LVU127
+ 786 0068 E070     		strb	r0, [r4, #3]
+ 101:TimeDateConfig/Src/PCF85063.c **** 		buf[5] = bcdToDec(bufss[5] & 0x1F);
+ 787              		.loc 1 101 3 is_stmt 1 view .LVU128
+ 101:TimeDateConfig/Src/PCF85063.c **** 		buf[5] = bcdToDec(bufss[5] & 0x1F);
+ 788              		.loc 1 101 26 is_stmt 0 view .LVU129
+ 789 006a 9DF81400 		ldrb	r0, [sp, #20]	@ zero_extendqisi2
+ 101:TimeDateConfig/Src/PCF85063.c **** 		buf[5] = bcdToDec(bufss[5] & 0x1F);
+ 790              		.loc 1 101 12 view .LVU130
+ 791 006e 00F00700 		and	r0, r0, #7
+ 792 0072 FFF7FEFF 		bl	bcdToDec
+ 793              	.LVL51:
+ 101:TimeDateConfig/Src/PCF85063.c **** 		buf[5] = bcdToDec(bufss[5] & 0x1F);
+ 794              		.loc 1 101 10 discriminator 1 view .LVU131
+ 795 0076 2071     		strb	r0, [r4, #4]
+ 102:TimeDateConfig/Src/PCF85063.c **** 		buf[6] = bcdToDec(bufss[6]);
+ 796              		.loc 1 102 3 is_stmt 1 view .LVU132
+ 102:TimeDateConfig/Src/PCF85063.c **** 		buf[6] = bcdToDec(bufss[6]);
+ 797              		.loc 1 102 26 is_stmt 0 view .LVU133
+ 798 0078 9DF81500 		ldrb	r0, [sp, #21]	@ zero_extendqisi2
+ 102:TimeDateConfig/Src/PCF85063.c **** 		buf[6] = bcdToDec(bufss[6]);
+ 799              		.loc 1 102 12 view .LVU134
+ 800 007c 00F01F00 		and	r0, r0, #31
+ 801 0080 FFF7FEFF 		bl	bcdToDec
+ 802              	.LVL52:
+ 102:TimeDateConfig/Src/PCF85063.c **** 		buf[6] = bcdToDec(bufss[6]);
+ 803              		.loc 1 102 10 discriminator 1 view .LVU135
+ 804 0084 6071     		strb	r0, [r4, #5]
+ 103:TimeDateConfig/Src/PCF85063.c **** 
+ 805              		.loc 1 103 3 is_stmt 1 view .LVU136
+ 103:TimeDateConfig/Src/PCF85063.c **** 
+ 806              		.loc 1 103 12 is_stmt 0 view .LVU137
+ 807 0086 9DF81600 		ldrb	r0, [sp, #22]	@ zero_extendqisi2
+ 808 008a FFF7FEFF 		bl	bcdToDec
+ 809              	.LVL53:
+ 103:TimeDateConfig/Src/PCF85063.c **** 
+ 810              		.loc 1 103 10 discriminator 1 view .LVU138
+ 811 008e A071     		strb	r0, [r4, #6]
+ 105:TimeDateConfig/Src/PCF85063.c **** 	}
+ 812              		.loc 1 105 3 is_stmt 1 view .LVU139
+ 105:TimeDateConfig/Src/PCF85063.c **** 	}
+ 813              		.loc 1 105 10 is_stmt 0 view .LVU140
+ 814 0090 0120     		movs	r0, #1
+ 815 0092 CCE7     		b	.L50
+ 816              	.L55:
+ 817              		.align	2
+ 818              	.L54:
+ 819 0094 00000000 		.word	_pcf850_i2c
+ 820              		.cfi_endproc
+ 821              	.LFE143:
+ 823              		.section	.text.PCF85_GetSecond,"ax",%progbits
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 20
+
+
+ 824              		.align	1
+ 825              		.global	PCF85_GetSecond
+ 826              		.syntax unified
+ 827              		.thumb
+ 828              		.thumb_func
+ 830              	PCF85_GetSecond:
+ 831              	.LFB144:
+ 110:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 832              		.loc 1 110 1 is_stmt 1 view -0
+ 833              		.cfi_startproc
+ 834              		@ args = 0, pretend = 0, frame = 8
+ 835              		@ frame_needed = 0, uses_anonymous_args = 0
+ 836 0000 00B5     		push	{lr}
+ 837              		.cfi_def_cfa_offset 4
+ 838              		.cfi_offset 14, -4
+ 839 0002 87B0     		sub	sp, sp, #28
+ 840              		.cfi_def_cfa_offset 32
+ 111:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_TIME_ADDR, 1, &_retValArr, 1, 1000 );
+ 841              		.loc 1 111 2 view .LVU142
+ 111:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_TIME_ADDR, 1, &_retValArr, 1, 1000 );
+ 842              		.loc 1 111 10 is_stmt 0 view .LVU143
+ 843 0004 0023     		movs	r3, #0
+ 844 0006 8DF81730 		strb	r3, [sp, #23]
+ 112:TimeDateConfig/Src/PCF85063.c **** 	return 	bcdToDec(_retValArr & 0x7F);
+ 845              		.loc 1 112 2 is_stmt 1 view .LVU144
+ 846 000a 4FF47A73 		mov	r3, #1000
+ 847 000e 0293     		str	r3, [sp, #8]
+ 848 0010 0123     		movs	r3, #1
+ 849 0012 0193     		str	r3, [sp, #4]
+ 850 0014 0DF11702 		add	r2, sp, #23
+ 851 0018 0092     		str	r2, [sp]
+ 852 001a 0422     		movs	r2, #4
+ 853 001c A221     		movs	r1, #162
+ 854 001e 0748     		ldr	r0, .L58
+ 855 0020 0068     		ldr	r0, [r0]
+ 856 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 857              	.LVL54:
+ 113:TimeDateConfig/Src/PCF85063.c **** }
+ 858              		.loc 1 113 2 view .LVU145
+ 113:TimeDateConfig/Src/PCF85063.c **** }
+ 859              		.loc 1 113 10 is_stmt 0 view .LVU146
+ 860 0026 9DF81700 		ldrb	r0, [sp, #23]	@ zero_extendqisi2
+ 861 002a 00F07F00 		and	r0, r0, #127
+ 862 002e FFF7FEFF 		bl	bcdToDec
+ 863              	.LVL55:
+ 114:TimeDateConfig/Src/PCF85063.c **** uint8_t PCF85_GetMinute(void)
+ 864              		.loc 1 114 1 view .LVU147
+ 865 0032 C0B2     		uxtb	r0, r0
+ 866 0034 07B0     		add	sp, sp, #28
+ 867              		.cfi_def_cfa_offset 4
+ 868              		@ sp needed
+ 869 0036 5DF804FB 		ldr	pc, [sp], #4
+ 870              	.L59:
+ 871 003a 00BF     		.align	2
+ 872              	.L58:
+ 873 003c 00000000 		.word	_pcf850_i2c
+ 874              		.cfi_endproc
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 21
+
+
+ 875              	.LFE144:
+ 877              		.section	.text.PCF85_GetMinute,"ax",%progbits
+ 878              		.align	1
+ 879              		.global	PCF85_GetMinute
+ 880              		.syntax unified
+ 881              		.thumb
+ 882              		.thumb_func
+ 884              	PCF85_GetMinute:
+ 885              	.LFB145:
+ 116:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 886              		.loc 1 116 1 is_stmt 1 view -0
+ 887              		.cfi_startproc
+ 888              		@ args = 0, pretend = 0, frame = 8
+ 889              		@ frame_needed = 0, uses_anonymous_args = 0
+ 890 0000 00B5     		push	{lr}
+ 891              		.cfi_def_cfa_offset 4
+ 892              		.cfi_offset 14, -4
+ 893 0002 87B0     		sub	sp, sp, #28
+ 894              		.cfi_def_cfa_offset 32
+ 117:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_MIN_ADDR, 1, &_retValArr, 1, 1000 );
+ 895              		.loc 1 117 2 view .LVU149
+ 117:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_MIN_ADDR, 1, &_retValArr, 1, 1000 );
+ 896              		.loc 1 117 10 is_stmt 0 view .LVU150
+ 897 0004 0023     		movs	r3, #0
+ 898 0006 8DF81730 		strb	r3, [sp, #23]
+ 118:TimeDateConfig/Src/PCF85063.c **** 	return 	bcdToDec(_retValArr & 0x7F);
+ 899              		.loc 1 118 2 is_stmt 1 view .LVU151
+ 900 000a 4FF47A73 		mov	r3, #1000
+ 901 000e 0293     		str	r3, [sp, #8]
+ 902 0010 0123     		movs	r3, #1
+ 903 0012 0193     		str	r3, [sp, #4]
+ 904 0014 0DF11702 		add	r2, sp, #23
+ 905 0018 0092     		str	r2, [sp]
+ 906 001a 0522     		movs	r2, #5
+ 907 001c A221     		movs	r1, #162
+ 908 001e 0748     		ldr	r0, .L62
+ 909 0020 0068     		ldr	r0, [r0]
+ 910 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 911              	.LVL56:
+ 119:TimeDateConfig/Src/PCF85063.c **** }
+ 912              		.loc 1 119 2 view .LVU152
+ 119:TimeDateConfig/Src/PCF85063.c **** }
+ 913              		.loc 1 119 10 is_stmt 0 view .LVU153
+ 914 0026 9DF81700 		ldrb	r0, [sp, #23]	@ zero_extendqisi2
+ 915 002a 00F07F00 		and	r0, r0, #127
+ 916 002e FFF7FEFF 		bl	bcdToDec
+ 917              	.LVL57:
+ 120:TimeDateConfig/Src/PCF85063.c **** uint8_t PCF85_GetHour(void)
+ 918              		.loc 1 120 1 view .LVU154
+ 919 0032 C0B2     		uxtb	r0, r0
+ 920 0034 07B0     		add	sp, sp, #28
+ 921              		.cfi_def_cfa_offset 4
+ 922              		@ sp needed
+ 923 0036 5DF804FB 		ldr	pc, [sp], #4
+ 924              	.L63:
+ 925 003a 00BF     		.align	2
+ 926              	.L62:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 22
+
+
+ 927 003c 00000000 		.word	_pcf850_i2c
+ 928              		.cfi_endproc
+ 929              	.LFE145:
+ 931              		.section	.text.PCF85_GetHour,"ax",%progbits
+ 932              		.align	1
+ 933              		.global	PCF85_GetHour
+ 934              		.syntax unified
+ 935              		.thumb
+ 936              		.thumb_func
+ 938              	PCF85_GetHour:
+ 939              	.LFB146:
+ 122:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 940              		.loc 1 122 1 is_stmt 1 view -0
+ 941              		.cfi_startproc
+ 942              		@ args = 0, pretend = 0, frame = 8
+ 943              		@ frame_needed = 0, uses_anonymous_args = 0
+ 944 0000 00B5     		push	{lr}
+ 945              		.cfi_def_cfa_offset 4
+ 946              		.cfi_offset 14, -4
+ 947 0002 87B0     		sub	sp, sp, #28
+ 948              		.cfi_def_cfa_offset 32
+ 123:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_HOUR_ADRR , 1, &_retValArr, 1, 1000 );
+ 949              		.loc 1 123 2 view .LVU156
+ 123:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_HOUR_ADRR , 1, &_retValArr, 1, 1000 );
+ 950              		.loc 1 123 10 is_stmt 0 view .LVU157
+ 951 0004 0023     		movs	r3, #0
+ 952 0006 8DF81730 		strb	r3, [sp, #23]
+ 124:TimeDateConfig/Src/PCF85063.c **** 	return 	bcdToDec(_retValArr & 0x3F);
+ 953              		.loc 1 124 2 is_stmt 1 view .LVU158
+ 954 000a 4FF47A73 		mov	r3, #1000
+ 955 000e 0293     		str	r3, [sp, #8]
+ 956 0010 0123     		movs	r3, #1
+ 957 0012 0193     		str	r3, [sp, #4]
+ 958 0014 0DF11702 		add	r2, sp, #23
+ 959 0018 0092     		str	r2, [sp]
+ 960 001a 0622     		movs	r2, #6
+ 961 001c A221     		movs	r1, #162
+ 962 001e 0748     		ldr	r0, .L66
+ 963 0020 0068     		ldr	r0, [r0]
+ 964 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 965              	.LVL58:
+ 125:TimeDateConfig/Src/PCF85063.c **** }
+ 966              		.loc 1 125 2 view .LVU159
+ 125:TimeDateConfig/Src/PCF85063.c **** }
+ 967              		.loc 1 125 10 is_stmt 0 view .LVU160
+ 968 0026 9DF81700 		ldrb	r0, [sp, #23]	@ zero_extendqisi2
+ 969 002a 00F03F00 		and	r0, r0, #63
+ 970 002e FFF7FEFF 		bl	bcdToDec
+ 971              	.LVL59:
+ 126:TimeDateConfig/Src/PCF85063.c **** uint8_t PCF85_Getweekday(void)
+ 972              		.loc 1 126 1 view .LVU161
+ 973 0032 C0B2     		uxtb	r0, r0
+ 974 0034 07B0     		add	sp, sp, #28
+ 975              		.cfi_def_cfa_offset 4
+ 976              		@ sp needed
+ 977 0036 5DF804FB 		ldr	pc, [sp], #4
+ 978              	.L67:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 23
+
+
+ 979 003a 00BF     		.align	2
+ 980              	.L66:
+ 981 003c 00000000 		.word	_pcf850_i2c
+ 982              		.cfi_endproc
+ 983              	.LFE146:
+ 985              		.section	.text.PCF85_Getweekday,"ax",%progbits
+ 986              		.align	1
+ 987              		.global	PCF85_Getweekday
+ 988              		.syntax unified
+ 989              		.thumb
+ 990              		.thumb_func
+ 992              	PCF85_Getweekday:
+ 993              	.LFB147:
+ 128:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 994              		.loc 1 128 1 is_stmt 1 view -0
+ 995              		.cfi_startproc
+ 996              		@ args = 0, pretend = 0, frame = 8
+ 997              		@ frame_needed = 0, uses_anonymous_args = 0
+ 998 0000 00B5     		push	{lr}
+ 999              		.cfi_def_cfa_offset 4
+ 1000              		.cfi_offset 14, -4
+ 1001 0002 87B0     		sub	sp, sp, #28
+ 1002              		.cfi_def_cfa_offset 32
+ 129:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_WEEKDAY_ADRR, 1, &_retValArr, 1, 1000 );
+ 1003              		.loc 1 129 2 view .LVU163
+ 129:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_WEEKDAY_ADRR, 1, &_retValArr, 1, 1000 );
+ 1004              		.loc 1 129 10 is_stmt 0 view .LVU164
+ 1005 0004 0023     		movs	r3, #0
+ 1006 0006 8DF81730 		strb	r3, [sp, #23]
+ 130:TimeDateConfig/Src/PCF85063.c **** 	return 	bcdToDec(_retValArr & 0x07);
+ 1007              		.loc 1 130 2 is_stmt 1 view .LVU165
+ 1008 000a 4FF47A73 		mov	r3, #1000
+ 1009 000e 0293     		str	r3, [sp, #8]
+ 1010 0010 0123     		movs	r3, #1
+ 1011 0012 0193     		str	r3, [sp, #4]
+ 1012 0014 0DF11702 		add	r2, sp, #23
+ 1013 0018 0092     		str	r2, [sp]
+ 1014 001a 0822     		movs	r2, #8
+ 1015 001c A221     		movs	r1, #162
+ 1016 001e 0748     		ldr	r0, .L70
+ 1017 0020 0068     		ldr	r0, [r0]
+ 1018 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 1019              	.LVL60:
+ 131:TimeDateConfig/Src/PCF85063.c **** }
+ 1020              		.loc 1 131 2 view .LVU166
+ 131:TimeDateConfig/Src/PCF85063.c **** }
+ 1021              		.loc 1 131 10 is_stmt 0 view .LVU167
+ 1022 0026 9DF81700 		ldrb	r0, [sp, #23]	@ zero_extendqisi2
+ 1023 002a 00F00700 		and	r0, r0, #7
+ 1024 002e FFF7FEFF 		bl	bcdToDec
+ 1025              	.LVL61:
+ 132:TimeDateConfig/Src/PCF85063.c **** uint8_t PCF85_Getday(void)
+ 1026              		.loc 1 132 1 view .LVU168
+ 1027 0032 C0B2     		uxtb	r0, r0
+ 1028 0034 07B0     		add	sp, sp, #28
+ 1029              		.cfi_def_cfa_offset 4
+ 1030              		@ sp needed
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 24
+
+
+ 1031 0036 5DF804FB 		ldr	pc, [sp], #4
+ 1032              	.L71:
+ 1033 003a 00BF     		.align	2
+ 1034              	.L70:
+ 1035 003c 00000000 		.word	_pcf850_i2c
+ 1036              		.cfi_endproc
+ 1037              	.LFE147:
+ 1039              		.section	.text.PCF85_Getday,"ax",%progbits
+ 1040              		.align	1
+ 1041              		.global	PCF85_Getday
+ 1042              		.syntax unified
+ 1043              		.thumb
+ 1044              		.thumb_func
+ 1046              	PCF85_Getday:
+ 1047              	.LFB148:
+ 134:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 1048              		.loc 1 134 1 is_stmt 1 view -0
+ 1049              		.cfi_startproc
+ 1050              		@ args = 0, pretend = 0, frame = 8
+ 1051              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1052 0000 00B5     		push	{lr}
+ 1053              		.cfi_def_cfa_offset 4
+ 1054              		.cfi_offset 14, -4
+ 1055 0002 87B0     		sub	sp, sp, #28
+ 1056              		.cfi_def_cfa_offset 32
+ 135:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_DAY_ADRR, 1, &_retValArr, 1, 1000 );
+ 1057              		.loc 1 135 2 view .LVU170
+ 135:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_DAY_ADRR, 1, &_retValArr, 1, 1000 );
+ 1058              		.loc 1 135 10 is_stmt 0 view .LVU171
+ 1059 0004 0023     		movs	r3, #0
+ 1060 0006 8DF81730 		strb	r3, [sp, #23]
+ 136:TimeDateConfig/Src/PCF85063.c **** 	return bcdToDec(_retValArr & 0x3F);
+ 1061              		.loc 1 136 2 is_stmt 1 view .LVU172
+ 1062 000a 4FF47A73 		mov	r3, #1000
+ 1063 000e 0293     		str	r3, [sp, #8]
+ 1064 0010 0123     		movs	r3, #1
+ 1065 0012 0193     		str	r3, [sp, #4]
+ 1066 0014 0DF11702 		add	r2, sp, #23
+ 1067 0018 0092     		str	r2, [sp]
+ 1068 001a 0722     		movs	r2, #7
+ 1069 001c A221     		movs	r1, #162
+ 1070 001e 0748     		ldr	r0, .L74
+ 1071 0020 0068     		ldr	r0, [r0]
+ 1072 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 1073              	.LVL62:
+ 137:TimeDateConfig/Src/PCF85063.c **** }
+ 1074              		.loc 1 137 2 view .LVU173
+ 137:TimeDateConfig/Src/PCF85063.c **** }
+ 1075              		.loc 1 137 9 is_stmt 0 view .LVU174
+ 1076 0026 9DF81700 		ldrb	r0, [sp, #23]	@ zero_extendqisi2
+ 1077 002a 00F03F00 		and	r0, r0, #63
+ 1078 002e FFF7FEFF 		bl	bcdToDec
+ 1079              	.LVL63:
+ 138:TimeDateConfig/Src/PCF85063.c **** uint8_t PCF85_Getmonth(void)
+ 1080              		.loc 1 138 1 view .LVU175
+ 1081 0032 C0B2     		uxtb	r0, r0
+ 1082 0034 07B0     		add	sp, sp, #28
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 25
+
+
+ 1083              		.cfi_def_cfa_offset 4
+ 1084              		@ sp needed
+ 1085 0036 5DF804FB 		ldr	pc, [sp], #4
+ 1086              	.L75:
+ 1087 003a 00BF     		.align	2
+ 1088              	.L74:
+ 1089 003c 00000000 		.word	_pcf850_i2c
+ 1090              		.cfi_endproc
+ 1091              	.LFE148:
+ 1093              		.section	.text.PCF85_Getmonth,"ax",%progbits
+ 1094              		.align	1
+ 1095              		.global	PCF85_Getmonth
+ 1096              		.syntax unified
+ 1097              		.thumb
+ 1098              		.thumb_func
+ 1100              	PCF85_Getmonth:
+ 1101              	.LFB149:
+ 140:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 1102              		.loc 1 140 1 is_stmt 1 view -0
+ 1103              		.cfi_startproc
+ 1104              		@ args = 0, pretend = 0, frame = 8
+ 1105              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1106 0000 00B5     		push	{lr}
+ 1107              		.cfi_def_cfa_offset 4
+ 1108              		.cfi_offset 14, -4
+ 1109 0002 87B0     		sub	sp, sp, #28
+ 1110              		.cfi_def_cfa_offset 32
+ 141:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_MONTH_ADRR, 1, &_retValArr, 1, 1000 );
+ 1111              		.loc 1 141 2 view .LVU177
+ 141:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_MONTH_ADRR, 1, &_retValArr, 1, 1000 );
+ 1112              		.loc 1 141 10 is_stmt 0 view .LVU178
+ 1113 0004 0023     		movs	r3, #0
+ 1114 0006 8DF81730 		strb	r3, [sp, #23]
+ 142:TimeDateConfig/Src/PCF85063.c **** 	return 	bcdToDec(_retValArr & 0x1F);
+ 1115              		.loc 1 142 2 is_stmt 1 view .LVU179
+ 1116 000a 4FF47A73 		mov	r3, #1000
+ 1117 000e 0293     		str	r3, [sp, #8]
+ 1118 0010 0123     		movs	r3, #1
+ 1119 0012 0193     		str	r3, [sp, #4]
+ 1120 0014 0DF11702 		add	r2, sp, #23
+ 1121 0018 0092     		str	r2, [sp]
+ 1122 001a 0922     		movs	r2, #9
+ 1123 001c A221     		movs	r1, #162
+ 1124 001e 0748     		ldr	r0, .L78
+ 1125 0020 0068     		ldr	r0, [r0]
+ 1126 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 1127              	.LVL64:
+ 143:TimeDateConfig/Src/PCF85063.c **** }
+ 1128              		.loc 1 143 2 view .LVU180
+ 143:TimeDateConfig/Src/PCF85063.c **** }
+ 1129              		.loc 1 143 10 is_stmt 0 view .LVU181
+ 1130 0026 9DF81700 		ldrb	r0, [sp, #23]	@ zero_extendqisi2
+ 1131 002a 00F01F00 		and	r0, r0, #31
+ 1132 002e FFF7FEFF 		bl	bcdToDec
+ 1133              	.LVL65:
+ 144:TimeDateConfig/Src/PCF85063.c **** uint16_t PCF85_Getyear(void)
+ 1134              		.loc 1 144 1 view .LVU182
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 26
+
+
+ 1135 0032 C0B2     		uxtb	r0, r0
+ 1136 0034 07B0     		add	sp, sp, #28
+ 1137              		.cfi_def_cfa_offset 4
+ 1138              		@ sp needed
+ 1139 0036 5DF804FB 		ldr	pc, [sp], #4
+ 1140              	.L79:
+ 1141 003a 00BF     		.align	2
+ 1142              	.L78:
+ 1143 003c 00000000 		.word	_pcf850_i2c
+ 1144              		.cfi_endproc
+ 1145              	.LFE149:
+ 1147              		.section	.text.PCF85_Getyear,"ax",%progbits
+ 1148              		.align	1
+ 1149              		.global	PCF85_Getyear
+ 1150              		.syntax unified
+ 1151              		.thumb
+ 1152              		.thumb_func
+ 1154              	PCF85_Getyear:
+ 1155              	.LFB150:
+ 146:TimeDateConfig/Src/PCF85063.c **** 	uint8_t _retValArr = 0;
+ 1156              		.loc 1 146 1 is_stmt 1 view -0
+ 1157              		.cfi_startproc
+ 1158              		@ args = 0, pretend = 0, frame = 8
+ 1159              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1160 0000 00B5     		push	{lr}
+ 1161              		.cfi_def_cfa_offset 4
+ 1162              		.cfi_offset 14, -4
+ 1163 0002 87B0     		sub	sp, sp, #28
+ 1164              		.cfi_def_cfa_offset 32
+ 147:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_YEAR_ADRR, 1, &_retValArr, 1, 1000 );
+ 1165              		.loc 1 147 2 view .LVU184
+ 147:TimeDateConfig/Src/PCF85063.c **** 	HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_YEAR_ADRR, 1, &_retValArr, 1, 1000 );
+ 1166              		.loc 1 147 10 is_stmt 0 view .LVU185
+ 1167 0004 0023     		movs	r3, #0
+ 1168 0006 8DF81730 		strb	r3, [sp, #23]
+ 148:TimeDateConfig/Src/PCF85063.c **** 	return 	bcdToDec(_retValArr)+YEAR_OFFSET;
+ 1169              		.loc 1 148 2 is_stmt 1 view .LVU186
+ 1170 000a 4FF47A73 		mov	r3, #1000
+ 1171 000e 0293     		str	r3, [sp, #8]
+ 1172 0010 0123     		movs	r3, #1
+ 1173 0012 0193     		str	r3, [sp, #4]
+ 1174 0014 0DF11702 		add	r2, sp, #23
+ 1175 0018 0092     		str	r2, [sp]
+ 1176 001a 0A22     		movs	r2, #10
+ 1177 001c A221     		movs	r1, #162
+ 1178 001e 0748     		ldr	r0, .L82
+ 1179 0020 0068     		ldr	r0, [r0]
+ 1180 0022 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 1181              	.LVL66:
+ 149:TimeDateConfig/Src/PCF85063.c **** }
+ 1182              		.loc 1 149 2 view .LVU187
+ 149:TimeDateConfig/Src/PCF85063.c **** }
+ 1183              		.loc 1 149 10 is_stmt 0 view .LVU188
+ 1184 0026 9DF81700 		ldrb	r0, [sp, #23]	@ zero_extendqisi2
+ 1185 002a FFF7FEFF 		bl	bcdToDec
+ 1186              	.LVL67:
+ 149:TimeDateConfig/Src/PCF85063.c **** }
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 27
+
+
+ 1187              		.loc 1 149 30 discriminator 1 view .LVU189
+ 1188 002e 00F2B270 		addw	r0, r0, #1970
+ 150:TimeDateConfig/Src/PCF85063.c **** 
+ 1189              		.loc 1 150 1 view .LVU190
+ 1190 0032 80B2     		uxth	r0, r0
+ 1191 0034 07B0     		add	sp, sp, #28
+ 1192              		.cfi_def_cfa_offset 4
+ 1193              		@ sp needed
+ 1194 0036 5DF804FB 		ldr	pc, [sp], #4
+ 1195              	.L83:
+ 1196 003a 00BF     		.align	2
+ 1197              	.L82:
+ 1198 003c 00000000 		.word	_pcf850_i2c
+ 1199              		.cfi_endproc
+ 1200              	.LFE150:
+ 1202              		.section	.text.PCF85_task,"ax",%progbits
+ 1203              		.align	1
+ 1204              		.global	PCF85_task
+ 1205              		.syntax unified
+ 1206              		.thumb
+ 1207              		.thumb_func
+ 1209              	PCF85_task:
+ 1210              	.LFB153:
+ 160:TimeDateConfig/Src/PCF85063.c **** 
+ 161:TimeDateConfig/Src/PCF85063.c **** 
+ 162:TimeDateConfig/Src/PCF85063.c **** void PCF85_task(void) {
+ 1211              		.loc 1 162 23 is_stmt 1 view -0
+ 1212              		.cfi_startproc
+ 1213              		@ args = 0, pretend = 0, frame = 8
+ 1214              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1215 0000 10B5     		push	{r4, lr}
+ 1216              		.cfi_def_cfa_offset 8
+ 1217              		.cfi_offset 4, -8
+ 1218              		.cfi_offset 14, -4
+ 1219 0002 86B0     		sub	sp, sp, #24
+ 1220              		.cfi_def_cfa_offset 32
+ 163:TimeDateConfig/Src/PCF85063.c **** 	uint8_t bufss[7] = {0};
+ 1221              		.loc 1 163 2 view .LVU192
+ 1222              		.loc 1 163 10 is_stmt 0 view .LVU193
+ 1223 0004 0023     		movs	r3, #0
+ 1224 0006 0493     		str	r3, [sp, #16]
+ 1225 0008 CDF81330 		str	r3, [sp, #19]	@ unaligned
+ 164:TimeDateConfig/Src/PCF85063.c **** 	if(HAL_I2C_Mem_Read(_pcf850_i2c, I2C_ADDR, REG_TIME_ADDR, 1, bufss, 7, 1000 ) == HAL_OK){
+ 1226              		.loc 1 164 2 is_stmt 1 view .LVU194
+ 1227              		.loc 1 164 5 is_stmt 0 view .LVU195
+ 1228 000c 4FF47A73 		mov	r3, #1000
+ 1229 0010 0293     		str	r3, [sp, #8]
+ 1230 0012 0723     		movs	r3, #7
+ 1231 0014 0193     		str	r3, [sp, #4]
+ 1232 0016 04AB     		add	r3, sp, #16
+ 1233 0018 0093     		str	r3, [sp]
+ 1234 001a 0123     		movs	r3, #1
+ 1235 001c 0422     		movs	r2, #4
+ 1236 001e A221     		movs	r1, #162
+ 1237 0020 1C48     		ldr	r0, .L87
+ 1238 0022 0068     		ldr	r0, [r0]
+ 1239 0024 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 28
+
+
+ 1240              	.LVL68:
+ 1241              		.loc 1 164 4 discriminator 1 view .LVU196
+ 1242 0028 88BB     		cbnz	r0, .L84
+ 165:TimeDateConfig/Src/PCF85063.c **** 
+ 166:TimeDateConfig/Src/PCF85063.c **** 		st_datetime.st_time.second = bcdToDec(bufss[0] & 0x7F);
+ 1243              		.loc 1 166 3 is_stmt 1 view .LVU197
+ 1244              		.loc 1 166 46 is_stmt 0 view .LVU198
+ 1245 002a 9DF81000 		ldrb	r0, [sp, #16]	@ zero_extendqisi2
+ 1246              		.loc 1 166 32 view .LVU199
+ 1247 002e 00F07F00 		and	r0, r0, #127
+ 1248 0032 FFF7FEFF 		bl	bcdToDec
+ 1249              	.LVL69:
+ 1250              		.loc 1 166 30 discriminator 1 view .LVU200
+ 1251 0036 184C     		ldr	r4, .L87+4
+ 1252 0038 6070     		strb	r0, [r4, #1]
+ 167:TimeDateConfig/Src/PCF85063.c **** 		st_datetime.st_time.minute = bcdToDec(bufss[1] & 0x7F);
+ 1253              		.loc 1 167 3 is_stmt 1 view .LVU201
+ 1254              		.loc 1 167 46 is_stmt 0 view .LVU202
+ 1255 003a 9DF81100 		ldrb	r0, [sp, #17]	@ zero_extendqisi2
+ 1256              		.loc 1 167 32 view .LVU203
+ 1257 003e 00F07F00 		and	r0, r0, #127
+ 1258 0042 FFF7FEFF 		bl	bcdToDec
+ 1259              	.LVL70:
+ 1260              		.loc 1 167 30 discriminator 1 view .LVU204
+ 1261 0046 A070     		strb	r0, [r4, #2]
+ 168:TimeDateConfig/Src/PCF85063.c **** 		st_datetime.st_time.hour = bcdToDec(bufss[2] & 0x3F);
+ 1262              		.loc 1 168 3 is_stmt 1 view .LVU205
+ 1263              		.loc 1 168 44 is_stmt 0 view .LVU206
+ 1264 0048 9DF81200 		ldrb	r0, [sp, #18]	@ zero_extendqisi2
+ 1265              		.loc 1 168 30 view .LVU207
+ 1266 004c 00F03F00 		and	r0, r0, #63
+ 1267 0050 FFF7FEFF 		bl	bcdToDec
+ 1268              	.LVL71:
+ 1269              		.loc 1 168 28 discriminator 1 view .LVU208
+ 1270 0054 E070     		strb	r0, [r4, #3]
+ 169:TimeDateConfig/Src/PCF85063.c **** 		st_datetime.st_date.day = bcdToDec(bufss[3] & 0x3F);
+ 1271              		.loc 1 169 3 is_stmt 1 view .LVU209
+ 1272              		.loc 1 169 43 is_stmt 0 view .LVU210
+ 1273 0056 9DF81300 		ldrb	r0, [sp, #19]	@ zero_extendqisi2
+ 1274              		.loc 1 169 29 view .LVU211
+ 1275 005a 00F03F00 		and	r0, r0, #63
+ 1276 005e FFF7FEFF 		bl	bcdToDec
+ 1277              	.LVL72:
+ 1278              		.loc 1 169 27 discriminator 1 view .LVU212
+ 1279 0062 2071     		strb	r0, [r4, #4]
+ 170:TimeDateConfig/Src/PCF85063.c **** 		st_datetime.weekday = bcdToDec(bufss[4] & 0x07);
+ 1280              		.loc 1 170 3 is_stmt 1 view .LVU213
+ 1281              		.loc 1 170 39 is_stmt 0 view .LVU214
+ 1282 0064 9DF81400 		ldrb	r0, [sp, #20]	@ zero_extendqisi2
+ 1283              		.loc 1 170 25 view .LVU215
+ 1284 0068 00F00700 		and	r0, r0, #7
+ 1285 006c FFF7FEFF 		bl	bcdToDec
+ 1286              	.LVL73:
+ 1287              		.loc 1 170 23 discriminator 1 view .LVU216
+ 1288 0070 2070     		strb	r0, [r4]
+ 171:TimeDateConfig/Src/PCF85063.c **** 		st_datetime.st_date.month = bcdToDec(bufss[5] & 0x1F);
+ 1289              		.loc 1 171 3 is_stmt 1 view .LVU217
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 29
+
+
+ 1290              		.loc 1 171 45 is_stmt 0 view .LVU218
+ 1291 0072 9DF81500 		ldrb	r0, [sp, #21]	@ zero_extendqisi2
+ 1292              		.loc 1 171 31 view .LVU219
+ 1293 0076 00F01F00 		and	r0, r0, #31
+ 1294 007a FFF7FEFF 		bl	bcdToDec
+ 1295              	.LVL74:
+ 1296              		.loc 1 171 29 discriminator 1 view .LVU220
+ 1297 007e 6071     		strb	r0, [r4, #5]
+ 172:TimeDateConfig/Src/PCF85063.c **** 		st_datetime.st_date.yr = bcdToDec(bufss[6])+YEAR_OFFSET;
+ 1298              		.loc 1 172 3 is_stmt 1 view .LVU221
+ 1299              		.loc 1 172 28 is_stmt 0 view .LVU222
+ 1300 0080 9DF81600 		ldrb	r0, [sp, #22]	@ zero_extendqisi2
+ 1301 0084 FFF7FEFF 		bl	bcdToDec
+ 1302              	.LVL75:
+ 1303              		.loc 1 172 46 discriminator 1 view .LVU223
+ 1304 0088 00F2B270 		addw	r0, r0, #1970
+ 1305              		.loc 1 172 26 discriminator 1 view .LVU224
+ 1306 008c E080     		strh	r0, [r4, #6]	@ movhi
+ 1307              	.L84:
+ 173:TimeDateConfig/Src/PCF85063.c **** 				
+ 174:TimeDateConfig/Src/PCF85063.c **** 	}
+ 175:TimeDateConfig/Src/PCF85063.c **** }
+ 1308              		.loc 1 175 1 view .LVU225
+ 1309 008e 06B0     		add	sp, sp, #24
+ 1310              		.cfi_def_cfa_offset 8
+ 1311              		@ sp needed
+ 1312 0090 10BD     		pop	{r4, pc}
+ 1313              	.L88:
+ 1314 0092 00BF     		.align	2
+ 1315              	.L87:
+ 1316 0094 00000000 		.word	_pcf850_i2c
+ 1317 0098 00000000 		.word	st_datetime
+ 1318              		.cfi_endproc
+ 1319              	.LFE153:
+ 1321              		.section	.text.get_time,"ax",%progbits
+ 1322              		.align	1
+ 1323              		.global	get_time
+ 1324              		.syntax unified
+ 1325              		.thumb
+ 1326              		.thumb_func
+ 1328              	get_time:
+ 1329              	.LFB154:
+ 176:TimeDateConfig/Src/PCF85063.c **** 
+ 177:TimeDateConfig/Src/PCF85063.c **** time_t get_time(void)
+ 178:TimeDateConfig/Src/PCF85063.c **** {
+ 1330              		.loc 1 178 1 is_stmt 1 view -0
+ 1331              		.cfi_startproc
+ 1332              		@ args = 0, pretend = 0, frame = 8
+ 1333              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1334              		@ link register save eliminated.
+ 1335 0000 82B0     		sub	sp, sp, #8
+ 1336              		.cfi_def_cfa_offset 8
+ 179:TimeDateConfig/Src/PCF85063.c **** 	return st_datetime.st_time;
+ 1337              		.loc 1 179 2 view .LVU227
+ 1338              		.loc 1 179 20 is_stmt 0 view .LVU228
+ 1339 0002 0B4B     		ldr	r3, .L91
+ 1340 0004 B3F80120 		ldrh	r2, [r3, #1]	@ unaligned
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 30
+
+
+ 1341 0008 DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 1342 000a 1946     		mov	r1, r3
+ 1343 000c ADF80420 		strh	r2, [sp, #4]	@ unaligned
+ 1344 0010 8DF80630 		strb	r3, [sp, #6]
+ 1345              		.loc 1 179 20 discriminator 1 view .LVU229
+ 1346 0014 0020     		movs	r0, #0
+ 1347 0016 9DF80430 		ldrb	r3, [sp, #4]	@ zero_extendqisi2
+ 1348 001a 63F30700 		bfi	r0, r3, #0, #8
+ 1349 001e 9DF80530 		ldrb	r3, [sp, #5]	@ zero_extendqisi2
+ 1350 0022 63F30F20 		bfi	r0, r3, #8, #8
+ 1351 0026 CBB2     		uxtb	r3, r1
+ 1352 0028 63F31740 		bfi	r0, r3, #16, #8
+ 180:TimeDateConfig/Src/PCF85063.c **** }
+ 1353              		.loc 1 180 1 view .LVU230
+ 1354 002c 02B0     		add	sp, sp, #8
+ 1355              		.cfi_def_cfa_offset 0
+ 1356              		@ sp needed
+ 1357 002e 7047     		bx	lr
+ 1358              	.L92:
+ 1359              		.align	2
+ 1360              	.L91:
+ 1361 0030 00000000 		.word	st_datetime
+ 1362              		.cfi_endproc
+ 1363              	.LFE154:
+ 1365              		.section	.text.get_date,"ax",%progbits
+ 1366              		.align	1
+ 1367              		.global	get_date
+ 1368              		.syntax unified
+ 1369              		.thumb
+ 1370              		.thumb_func
+ 1372              	get_date:
+ 1373              	.LFB155:
+ 181:TimeDateConfig/Src/PCF85063.c **** date_t get_date(void)
+ 182:TimeDateConfig/Src/PCF85063.c **** {
+ 1374              		.loc 1 182 1 is_stmt 1 view -0
+ 1375              		.cfi_startproc
+ 1376              		@ args = 0, pretend = 0, frame = 8
+ 1377              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1378              		@ link register save eliminated.
+ 1379 0000 82B0     		sub	sp, sp, #8
+ 1380              		.cfi_def_cfa_offset 8
+ 183:TimeDateConfig/Src/PCF85063.c **** 	return st_datetime.st_date;
+ 1381              		.loc 1 183 2 view .LVU232
+ 1382              		.loc 1 183 20 is_stmt 0 view .LVU233
+ 1383 0002 074B     		ldr	r3, .L95
+ 1384 0004 5B68     		ldr	r3, [r3, #4]
+ 1385 0006 0193     		str	r3, [sp, #4]
+ 1386              		.loc 1 183 20 discriminator 1 view .LVU234
+ 1387 0008 0020     		movs	r0, #0
+ 1388 000a BDF80430 		ldrh	r3, [sp, #4]
+ 1389 000e 63F30F00 		bfi	r0, r3, #0, #16
+ 1390 0012 BDF80630 		ldrh	r3, [sp, #6]
+ 1391 0016 63F31F40 		bfi	r0, r3, #16, #16
+ 184:TimeDateConfig/Src/PCF85063.c **** }
+ 1392              		.loc 1 184 1 view .LVU235
+ 1393 001a 02B0     		add	sp, sp, #8
+ 1394              		.cfi_def_cfa_offset 0
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 31
+
+
+ 1395              		@ sp needed
+ 1396 001c 7047     		bx	lr
+ 1397              	.L96:
+ 1398 001e 00BF     		.align	2
+ 1399              	.L95:
+ 1400 0020 00000000 		.word	st_datetime
+ 1401              		.cfi_endproc
+ 1402              	.LFE155:
+ 1404              		.global	_pcf850_i2c
+ 1405              		.section	.bss._pcf850_i2c,"aw",%nobits
+ 1406              		.align	2
+ 1409              	_pcf850_i2c:
+ 1410 0000 00000000 		.space	4
+ 1411              		.section	.bss.st_datetime,"aw",%nobits
+ 1412              		.align	2
+ 1415              	st_datetime:
+ 1416 0000 00000000 		.space	8
+ 1416      00000000 
+ 1417              		.text
+ 1418              	.Letext0:
+ 1419              		.file 2 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 1420              		.file 3 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 1421              		.file 4 "Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g431xx.h"
+ 1422              		.file 5 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_def.h"
+ 1423              		.file 6 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_dma.h"
+ 1424              		.file 7 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_i2c.h"
+ 1425              		.file 8 "TimeDateConfig/Inc/PCF85063.h"
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 32
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 PCF85063.c
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:21     .text.decToBcd:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:26     .text.decToBcd:00000000 decToBcd
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:52     .text.decToBcd:0000001c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:57     .text.bcdToDec:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:62     .text.bcdToDec:00000000 bcdToDec
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:85     .text.PCF85_Init:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:91     .text.PCF85_Init:00000000 PCF85_Init
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:131    .text.PCF85_Init:0000002c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1409   .bss._pcf850_i2c:00000000 _pcf850_i2c
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:136    .text.PCF85_Reset:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:142    .text.PCF85_Reset:00000000 PCF85_Reset
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:178    .text.PCF85_Reset:0000002c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:183    .text.PCF85_SetTime:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:189    .text.PCF85_SetTime:00000000 PCF85_SetTime
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:251    .text.PCF85_SetTime:00000048 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:256    .text.PCF85_SetDate:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:262    .text.PCF85_SetDate:00000000 PCF85_SetDate
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:332    .text.PCF85_SetDate:00000054 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:337    .text.PCF85_SetSecond:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:343    .text.PCF85_SetSecond:00000000 PCF85_SetSecond
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:383    .text.PCF85_SetSecond:0000002c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:388    .text.PCF85_SetMinute:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:394    .text.PCF85_SetMinute:00000000 PCF85_SetMinute
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:434    .text.PCF85_SetMinute:0000002c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:439    .text.PCF85_SetHour:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:445    .text.PCF85_SetHour:00000000 PCF85_SetHour
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:485    .text.PCF85_SetHour:0000002c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:490    .text.PCF85_Setweekday:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:496    .text.PCF85_Setweekday:00000000 PCF85_Setweekday
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:536    .text.PCF85_Setweekday:0000002c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:541    .text.PCF85_Setday:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:547    .text.PCF85_Setday:00000000 PCF85_Setday
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:587    .text.PCF85_Setday:0000002c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:592    .text.PCF85_Setmonth:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:598    .text.PCF85_Setmonth:00000000 PCF85_Setmonth
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:638    .text.PCF85_Setmonth:0000002c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:643    .text.PCF85_Setyear:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:649    .text.PCF85_Setyear:00000000 PCF85_Setyear
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:689    .text.PCF85_Setyear:0000002c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:694    .text.PCF85_GetDateTime:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:700    .text.PCF85_GetDateTime:00000000 PCF85_GetDateTime
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:819    .text.PCF85_GetDateTime:00000094 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:824    .text.PCF85_GetSecond:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:830    .text.PCF85_GetSecond:00000000 PCF85_GetSecond
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:873    .text.PCF85_GetSecond:0000003c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:878    .text.PCF85_GetMinute:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:884    .text.PCF85_GetMinute:00000000 PCF85_GetMinute
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:927    .text.PCF85_GetMinute:0000003c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:932    .text.PCF85_GetHour:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:938    .text.PCF85_GetHour:00000000 PCF85_GetHour
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:981    .text.PCF85_GetHour:0000003c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:986    .text.PCF85_Getweekday:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:992    .text.PCF85_Getweekday:00000000 PCF85_Getweekday
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1035   .text.PCF85_Getweekday:0000003c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1040   .text.PCF85_Getday:00000000 $t
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s 			page 33
+
+
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1046   .text.PCF85_Getday:00000000 PCF85_Getday
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1089   .text.PCF85_Getday:0000003c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1094   .text.PCF85_Getmonth:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1100   .text.PCF85_Getmonth:00000000 PCF85_Getmonth
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1143   .text.PCF85_Getmonth:0000003c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1148   .text.PCF85_Getyear:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1154   .text.PCF85_Getyear:00000000 PCF85_Getyear
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1198   .text.PCF85_Getyear:0000003c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1203   .text.PCF85_task:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1209   .text.PCF85_task:00000000 PCF85_task
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1316   .text.PCF85_task:00000094 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1415   .bss.st_datetime:00000000 st_datetime
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1322   .text.get_time:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1328   .text.get_time:00000000 get_time
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1361   .text.get_time:00000030 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1366   .text.get_date:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1372   .text.get_date:00000000 get_date
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1400   .text.get_date:00000020 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1406   .bss._pcf850_i2c:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccrJVgUa.s:1412   .bss.st_datetime:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_I2C_Mem_Write
+HAL_I2C_Mem_Read

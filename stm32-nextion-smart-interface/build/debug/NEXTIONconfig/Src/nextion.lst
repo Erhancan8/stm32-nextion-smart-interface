@@ -1,0 +1,407 @@
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"nextion.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "NEXTIONconfig/Src/nextion.c"
+  20              		.section	.rodata.NEXTION_SendCode.str1.4,"aMS",%progbits,1
+  21              		.align	2
+  22              	.LC0:
+  23 0000 257300   		.ascii	"%s\000"
+  24              		.section	.text.NEXTION_SendCode,"ax",%progbits
+  25              		.align	1
+  26              		.global	NEXTION_SendCode
+  27              		.syntax unified
+  28              		.thumb
+  29              		.thumb_func
+  31              	NEXTION_SendCode:
+  32              	.LVL0:
+  33              	.LFB135:
+   1:NEXTIONconfig/Src/nextion.c **** #include "nextion.h"
+   2:NEXTIONconfig/Src/nextion.c **** 
+   3:NEXTIONconfig/Src/nextion.c **** 
+   4:NEXTIONconfig/Src/nextion.c **** static uint8_t Cmd_End[3] = {0xff, 0xff, 0xff};
+   5:NEXTIONconfig/Src/nextion.c **** 
+   6:NEXTIONconfig/Src/nextion.c **** 
+   7:NEXTIONconfig/Src/nextion.c **** 
+   8:NEXTIONconfig/Src/nextion.c **** void NEXTION_SendCode(char* string)
+   9:NEXTIONconfig/Src/nextion.c **** {
+  34              		.loc 1 9 1 view -0
+  35              		.cfi_startproc
+  36              		@ args = 0, pretend = 0, frame = 56
+  37              		@ frame_needed = 0, uses_anonymous_args = 0
+  38              		.loc 1 9 1 is_stmt 0 view .LVU1
+  39 0000 10B5     		push	{r4, lr}
+  40              		.cfi_def_cfa_offset 8
+  41              		.cfi_offset 4, -8
+  42              		.cfi_offset 14, -4
+  43 0002 8EB0     		sub	sp, sp, #56
+  44              		.cfi_def_cfa_offset 64
+  45 0004 0246     		mov	r2, r0
+  10:NEXTIONconfig/Src/nextion.c ****     char buf[50];
+  46              		.loc 1 10 5 is_stmt 1 view .LVU2
+  11:NEXTIONconfig/Src/nextion.c ****     int len = sprintf(buf, "%s", string);
+  47              		.loc 1 11 5 view .LVU3
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s 			page 2
+
+
+  48              		.loc 1 11 15 is_stmt 0 view .LVU4
+  49 0006 0B49     		ldr	r1, .L3
+  50 0008 01A8     		add	r0, sp, #4
+  51              	.LVL1:
+  52              		.loc 1 11 15 view .LVU5
+  53 000a FFF7FEFF 		bl	sprintf
+  54              	.LVL2:
+  55              		.loc 1 11 15 view .LVU6
+  56 000e 0446     		mov	r4, r0
+  57              	.LVL3:
+  12:NEXTIONconfig/Src/nextion.c ****     HAL_UART_Transmit(get_pointer_huart1(), (uint8_t*) buf, len, 1000);
+  58              		.loc 1 12 5 is_stmt 1 view .LVU7
+  59 0010 FFF7FEFF 		bl	get_pointer_huart1
+  60              	.LVL4:
+  61              		.loc 1 12 5 is_stmt 0 discriminator 1 view .LVU8
+  62 0014 4FF47A73 		mov	r3, #1000
+  63 0018 A2B2     		uxth	r2, r4
+  64 001a 01A9     		add	r1, sp, #4
+  65 001c FFF7FEFF 		bl	HAL_UART_Transmit
+  66              	.LVL5:
+  13:NEXTIONconfig/Src/nextion.c ****     HAL_UART_Transmit(get_pointer_huart1(), Cmd_End, 3, 1000);
+  67              		.loc 1 13 5 is_stmt 1 view .LVU9
+  68 0020 FFF7FEFF 		bl	get_pointer_huart1
+  69              	.LVL6:
+  70              		.loc 1 13 5 is_stmt 0 discriminator 1 view .LVU10
+  71 0024 4FF47A73 		mov	r3, #1000
+  72 0028 0322     		movs	r2, #3
+  73 002a 0349     		ldr	r1, .L3+4
+  74 002c FFF7FEFF 		bl	HAL_UART_Transmit
+  75              	.LVL7:
+  14:NEXTIONconfig/Src/nextion.c **** }
+  76              		.loc 1 14 1 view .LVU11
+  77 0030 0EB0     		add	sp, sp, #56
+  78              		.cfi_def_cfa_offset 8
+  79              		@ sp needed
+  80 0032 10BD     		pop	{r4, pc}
+  81              	.LVL8:
+  82              	.L4:
+  83              		.loc 1 14 1 view .LVU12
+  84              		.align	2
+  85              	.L3:
+  86 0034 00000000 		.word	.LC0
+  87 0038 00000000 		.word	Cmd_End
+  88              		.cfi_endproc
+  89              	.LFE135:
+  91              		.section	.rodata.NEXTION_SendString.str1.4,"aMS",%progbits,1
+  92              		.align	2
+  93              	.LC1:
+  94 0000 25732E74 		.ascii	"%s.txt=\"%s\"\000"
+  94      78743D22 
+  94      25732200 
+  95              		.section	.text.NEXTION_SendString,"ax",%progbits
+  96              		.align	1
+  97              		.global	NEXTION_SendString
+  98              		.syntax unified
+  99              		.thumb
+ 100              		.thumb_func
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s 			page 3
+
+
+ 102              	NEXTION_SendString:
+ 103              	.LVL9:
+ 104              	.LFB136:
+  15:NEXTIONconfig/Src/nextion.c **** 
+  16:NEXTIONconfig/Src/nextion.c **** void NEXTION_SendString(char* ID, char* string)
+  17:NEXTIONconfig/Src/nextion.c **** {
+ 105              		.loc 1 17 1 is_stmt 1 view -0
+ 106              		.cfi_startproc
+ 107              		@ args = 0, pretend = 0, frame = 56
+ 108              		@ frame_needed = 0, uses_anonymous_args = 0
+ 109              		.loc 1 17 1 is_stmt 0 view .LVU14
+ 110 0000 10B5     		push	{r4, lr}
+ 111              		.cfi_def_cfa_offset 8
+ 112              		.cfi_offset 4, -8
+ 113              		.cfi_offset 14, -4
+ 114 0002 8EB0     		sub	sp, sp, #56
+ 115              		.cfi_def_cfa_offset 64
+ 116 0004 0246     		mov	r2, r0
+ 117 0006 0B46     		mov	r3, r1
+  18:NEXTIONconfig/Src/nextion.c ****     char buf[50];
+ 118              		.loc 1 18 5 is_stmt 1 view .LVU15
+  19:NEXTIONconfig/Src/nextion.c ****     int len = sprintf(buf, "%s.txt=\"%s\"",ID, string);
+ 119              		.loc 1 19 5 view .LVU16
+ 120              		.loc 1 19 15 is_stmt 0 view .LVU17
+ 121 0008 0B49     		ldr	r1, .L7
+ 122              	.LVL10:
+ 123              		.loc 1 19 15 view .LVU18
+ 124 000a 01A8     		add	r0, sp, #4
+ 125              	.LVL11:
+ 126              		.loc 1 19 15 view .LVU19
+ 127 000c FFF7FEFF 		bl	sprintf
+ 128              	.LVL12:
+ 129              		.loc 1 19 15 view .LVU20
+ 130 0010 0446     		mov	r4, r0
+ 131              	.LVL13:
+  20:NEXTIONconfig/Src/nextion.c ****     HAL_UART_Transmit(get_pointer_huart1(), (uint8_t*) buf, len, 1000);
+ 132              		.loc 1 20 5 is_stmt 1 view .LVU21
+ 133 0012 FFF7FEFF 		bl	get_pointer_huart1
+ 134              	.LVL14:
+ 135              		.loc 1 20 5 is_stmt 0 discriminator 1 view .LVU22
+ 136 0016 4FF47A73 		mov	r3, #1000
+ 137 001a A2B2     		uxth	r2, r4
+ 138 001c 01A9     		add	r1, sp, #4
+ 139 001e FFF7FEFF 		bl	HAL_UART_Transmit
+ 140              	.LVL15:
+  21:NEXTIONconfig/Src/nextion.c ****     HAL_UART_Transmit(get_pointer_huart1(), Cmd_End, 3, 1000);
+ 141              		.loc 1 21 5 is_stmt 1 view .LVU23
+ 142 0022 FFF7FEFF 		bl	get_pointer_huart1
+ 143              	.LVL16:
+ 144              		.loc 1 21 5 is_stmt 0 discriminator 1 view .LVU24
+ 145 0026 4FF47A73 		mov	r3, #1000
+ 146 002a 0322     		movs	r2, #3
+ 147 002c 0349     		ldr	r1, .L7+4
+ 148 002e FFF7FEFF 		bl	HAL_UART_Transmit
+ 149              	.LVL17:
+  22:NEXTIONconfig/Src/nextion.c **** }
+ 150              		.loc 1 22 1 view .LVU25
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s 			page 4
+
+
+ 151 0032 0EB0     		add	sp, sp, #56
+ 152              		.cfi_def_cfa_offset 8
+ 153              		@ sp needed
+ 154 0034 10BD     		pop	{r4, pc}
+ 155              	.LVL18:
+ 156              	.L8:
+ 157              		.loc 1 22 1 view .LVU26
+ 158 0036 00BF     		.align	2
+ 159              	.L7:
+ 160 0038 00000000 		.word	.LC1
+ 161 003c 00000000 		.word	Cmd_End
+ 162              		.cfi_endproc
+ 163              	.LFE136:
+ 165              		.section	.rodata.NEXTION_SendValue.str1.4,"aMS",%progbits,1
+ 166              		.align	2
+ 167              	.LC2:
+ 168 0000 25732E76 		.ascii	"%s.val=%s\000"
+ 168      616C3D25 
+ 168      7300
+ 169              		.section	.text.NEXTION_SendValue,"ax",%progbits
+ 170              		.align	1
+ 171              		.global	NEXTION_SendValue
+ 172              		.syntax unified
+ 173              		.thumb
+ 174              		.thumb_func
+ 176              	NEXTION_SendValue:
+ 177              	.LVL19:
+ 178              	.LFB137:
+  23:NEXTIONconfig/Src/nextion.c **** 
+  24:NEXTIONconfig/Src/nextion.c **** void NEXTION_SendValue(char* ID, char* string)
+  25:NEXTIONconfig/Src/nextion.c **** {
+ 179              		.loc 1 25 1 is_stmt 1 view -0
+ 180              		.cfi_startproc
+ 181              		@ args = 0, pretend = 0, frame = 56
+ 182              		@ frame_needed = 0, uses_anonymous_args = 0
+ 183              		.loc 1 25 1 is_stmt 0 view .LVU28
+ 184 0000 10B5     		push	{r4, lr}
+ 185              		.cfi_def_cfa_offset 8
+ 186              		.cfi_offset 4, -8
+ 187              		.cfi_offset 14, -4
+ 188 0002 8EB0     		sub	sp, sp, #56
+ 189              		.cfi_def_cfa_offset 64
+ 190 0004 0246     		mov	r2, r0
+ 191 0006 0B46     		mov	r3, r1
+  26:NEXTIONconfig/Src/nextion.c ****     char buf[50];
+ 192              		.loc 1 26 5 is_stmt 1 view .LVU29
+  27:NEXTIONconfig/Src/nextion.c ****     int len = sprintf(buf, "%s.val=%s",ID, string);
+ 193              		.loc 1 27 5 view .LVU30
+ 194              		.loc 1 27 15 is_stmt 0 view .LVU31
+ 195 0008 0B49     		ldr	r1, .L11
+ 196              	.LVL20:
+ 197              		.loc 1 27 15 view .LVU32
+ 198 000a 01A8     		add	r0, sp, #4
+ 199              	.LVL21:
+ 200              		.loc 1 27 15 view .LVU33
+ 201 000c FFF7FEFF 		bl	sprintf
+ 202              	.LVL22:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s 			page 5
+
+
+ 203              		.loc 1 27 15 view .LVU34
+ 204 0010 0446     		mov	r4, r0
+ 205              	.LVL23:
+  28:NEXTIONconfig/Src/nextion.c ****     HAL_UART_Transmit(get_pointer_huart1(), (uint8_t*) buf, len, 1000);
+ 206              		.loc 1 28 5 is_stmt 1 view .LVU35
+ 207 0012 FFF7FEFF 		bl	get_pointer_huart1
+ 208              	.LVL24:
+ 209              		.loc 1 28 5 is_stmt 0 discriminator 1 view .LVU36
+ 210 0016 4FF47A73 		mov	r3, #1000
+ 211 001a A2B2     		uxth	r2, r4
+ 212 001c 01A9     		add	r1, sp, #4
+ 213 001e FFF7FEFF 		bl	HAL_UART_Transmit
+ 214              	.LVL25:
+  29:NEXTIONconfig/Src/nextion.c ****     HAL_UART_Transmit(get_pointer_huart1(), Cmd_End, 3, 1000);
+ 215              		.loc 1 29 5 is_stmt 1 view .LVU37
+ 216 0022 FFF7FEFF 		bl	get_pointer_huart1
+ 217              	.LVL26:
+ 218              		.loc 1 29 5 is_stmt 0 discriminator 1 view .LVU38
+ 219 0026 4FF47A73 		mov	r3, #1000
+ 220 002a 0322     		movs	r2, #3
+ 221 002c 0349     		ldr	r1, .L11+4
+ 222 002e FFF7FEFF 		bl	HAL_UART_Transmit
+ 223              	.LVL27:
+  30:NEXTIONconfig/Src/nextion.c **** }
+ 224              		.loc 1 30 1 view .LVU39
+ 225 0032 0EB0     		add	sp, sp, #56
+ 226              		.cfi_def_cfa_offset 8
+ 227              		@ sp needed
+ 228 0034 10BD     		pop	{r4, pc}
+ 229              	.LVL28:
+ 230              	.L12:
+ 231              		.loc 1 30 1 view .LVU40
+ 232 0036 00BF     		.align	2
+ 233              	.L11:
+ 234 0038 00000000 		.word	.LC2
+ 235 003c 00000000 		.word	Cmd_End
+ 236              		.cfi_endproc
+ 237              	.LFE137:
+ 239              		.section	.rodata.NEXTION_SendPage.str1.4,"aMS",%progbits,1
+ 240              		.align	2
+ 241              	.LC3:
+ 242 0000 70616765 		.ascii	"page %s\000"
+ 242      20257300 
+ 243              		.section	.text.NEXTION_SendPage,"ax",%progbits
+ 244              		.align	1
+ 245              		.global	NEXTION_SendPage
+ 246              		.syntax unified
+ 247              		.thumb
+ 248              		.thumb_func
+ 250              	NEXTION_SendPage:
+ 251              	.LVL29:
+ 252              	.LFB138:
+  31:NEXTIONconfig/Src/nextion.c **** 
+  32:NEXTIONconfig/Src/nextion.c **** void NEXTION_SendPage(char* page_number)
+  33:NEXTIONconfig/Src/nextion.c **** {
+ 253              		.loc 1 33 1 is_stmt 1 view -0
+ 254              		.cfi_startproc
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s 			page 6
+
+
+ 255              		@ args = 0, pretend = 0, frame = 56
+ 256              		@ frame_needed = 0, uses_anonymous_args = 0
+ 257              		.loc 1 33 1 is_stmt 0 view .LVU42
+ 258 0000 10B5     		push	{r4, lr}
+ 259              		.cfi_def_cfa_offset 8
+ 260              		.cfi_offset 4, -8
+ 261              		.cfi_offset 14, -4
+ 262 0002 8EB0     		sub	sp, sp, #56
+ 263              		.cfi_def_cfa_offset 64
+ 264 0004 0246     		mov	r2, r0
+  34:NEXTIONconfig/Src/nextion.c ****     char buf[50];
+ 265              		.loc 1 34 5 is_stmt 1 view .LVU43
+  35:NEXTIONconfig/Src/nextion.c ****     int len = sprintf(buf, "page %s",page_number);
+ 266              		.loc 1 35 5 view .LVU44
+ 267              		.loc 1 35 15 is_stmt 0 view .LVU45
+ 268 0006 0B49     		ldr	r1, .L15
+ 269 0008 01A8     		add	r0, sp, #4
+ 270              	.LVL30:
+ 271              		.loc 1 35 15 view .LVU46
+ 272 000a FFF7FEFF 		bl	sprintf
+ 273              	.LVL31:
+ 274              		.loc 1 35 15 view .LVU47
+ 275 000e 0446     		mov	r4, r0
+ 276              	.LVL32:
+  36:NEXTIONconfig/Src/nextion.c ****     HAL_UART_Transmit(get_pointer_huart1(), (uint8_t*) buf, len, 1000);
+ 277              		.loc 1 36 5 is_stmt 1 view .LVU48
+ 278 0010 FFF7FEFF 		bl	get_pointer_huart1
+ 279              	.LVL33:
+ 280              		.loc 1 36 5 is_stmt 0 discriminator 1 view .LVU49
+ 281 0014 4FF47A73 		mov	r3, #1000
+ 282 0018 A2B2     		uxth	r2, r4
+ 283 001a 01A9     		add	r1, sp, #4
+ 284 001c FFF7FEFF 		bl	HAL_UART_Transmit
+ 285              	.LVL34:
+  37:NEXTIONconfig/Src/nextion.c ****     HAL_UART_Transmit(get_pointer_huart1(), Cmd_End, 3, 1000);
+ 286              		.loc 1 37 5 is_stmt 1 view .LVU50
+ 287 0020 FFF7FEFF 		bl	get_pointer_huart1
+ 288              	.LVL35:
+ 289              		.loc 1 37 5 is_stmt 0 discriminator 1 view .LVU51
+ 290 0024 4FF47A73 		mov	r3, #1000
+ 291 0028 0322     		movs	r2, #3
+ 292 002a 0349     		ldr	r1, .L15+4
+ 293 002c FFF7FEFF 		bl	HAL_UART_Transmit
+ 294              	.LVL36:
+  38:NEXTIONconfig/Src/nextion.c **** }
+ 295              		.loc 1 38 1 view .LVU52
+ 296 0030 0EB0     		add	sp, sp, #56
+ 297              		.cfi_def_cfa_offset 8
+ 298              		@ sp needed
+ 299 0032 10BD     		pop	{r4, pc}
+ 300              	.LVL37:
+ 301              	.L16:
+ 302              		.loc 1 38 1 view .LVU53
+ 303              		.align	2
+ 304              	.L15:
+ 305 0034 00000000 		.word	.LC3
+ 306 0038 00000000 		.word	Cmd_End
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s 			page 7
+
+
+ 307              		.cfi_endproc
+ 308              	.LFE138:
+ 310              		.section	.data.Cmd_End,"aw"
+ 311              		.align	2
+ 314              	Cmd_End:
+ 315 0000 FFFFFF   		.ascii	"\377\377\377"
+ 316              		.text
+ 317              	.Letext0:
+ 318              		.file 2 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 319              		.file 3 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 320              		.file 4 "Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g431xx.h"
+ 321              		.file 5 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_def.h"
+ 322              		.file 6 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_dma.h"
+ 323              		.file 7 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h"
+ 324              		.file 8 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 325              		.file 9 "Core/Inc/main.h"
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s 			page 8
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 nextion.c
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:21     .rodata.NEXTION_SendCode.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:25     .text.NEXTION_SendCode:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:31     .text.NEXTION_SendCode:00000000 NEXTION_SendCode
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:86     .text.NEXTION_SendCode:00000034 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:314    .data.Cmd_End:00000000 Cmd_End
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:92     .rodata.NEXTION_SendString.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:96     .text.NEXTION_SendString:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:102    .text.NEXTION_SendString:00000000 NEXTION_SendString
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:160    .text.NEXTION_SendString:00000038 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:166    .rodata.NEXTION_SendValue.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:170    .text.NEXTION_SendValue:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:176    .text.NEXTION_SendValue:00000000 NEXTION_SendValue
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:234    .text.NEXTION_SendValue:00000038 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:240    .rodata.NEXTION_SendPage.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:244    .text.NEXTION_SendPage:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:250    .text.NEXTION_SendPage:00000000 NEXTION_SendPage
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:305    .text.NEXTION_SendPage:00000034 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccAoEql3.s:311    .data.Cmd_End:00000000 $d
+
+UNDEFINED SYMBOLS
+sprintf
+get_pointer_huart1
+HAL_UART_Transmit

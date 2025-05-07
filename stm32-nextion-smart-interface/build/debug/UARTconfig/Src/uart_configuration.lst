@@ -1,0 +1,506 @@
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"uart_configuration.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "UARTconfig/Src/uart_configuration.c"
+  20              		.section	.text.UartDmaInit,"ax",%progbits
+  21              		.align	1
+  22              		.global	UartDmaInit
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	UartDmaInit:
+  28              	.LFB135:
+   1:UARTconfig/Src/uart_configuration.c **** #include "uart_configuration.h"
+   2:UARTconfig/Src/uart_configuration.c **** #include "process.h"
+   3:UARTconfig/Src/uart_configuration.c **** 
+   4:UARTconfig/Src/uart_configuration.c **** static NEXTION_PackageTypeDef st_nextion_package;
+   5:UARTconfig/Src/uart_configuration.c **** extern UART_HandleTypeDef   huart3;
+   6:UARTconfig/Src/uart_configuration.c **** extern DMA_HandleTypeDef    hdma_usart3_rx;
+   7:UARTconfig/Src/uart_configuration.c **** 
+   8:UARTconfig/Src/uart_configuration.c **** extern DMA_HandleTypeDef    hdma_usart1_rx;
+   9:UARTconfig/Src/uart_configuration.c **** extern UART_HandleTypeDef   huart1;
+  10:UARTconfig/Src/uart_configuration.c **** 
+  11:UARTconfig/Src/uart_configuration.c **** static uint8_t RxBuf[RXBUF_SIZE];
+  12:UARTconfig/Src/uart_configuration.c **** uint8_t rxbuffer_uart1 [7];
+  13:UARTconfig/Src/uart_configuration.c **** 
+  14:UARTconfig/Src/uart_configuration.c ****  uint16_t oldPos = 0;
+  15:UARTconfig/Src/uart_configuration.c ****  uint16_t newPos = 0;
+  16:UARTconfig/Src/uart_configuration.c **** 
+  17:UARTconfig/Src/uart_configuration.c **** uint8_t MainBuf[MainBuf_SIZE];
+  18:UARTconfig/Src/uart_configuration.c **** 
+  19:UARTconfig/Src/uart_configuration.c **** volatile int uart_dma_flag  = 0;
+  20:UARTconfig/Src/uart_configuration.c **** volatile int NEXTION_DMA_FLAG = 0;
+  21:UARTconfig/Src/uart_configuration.c **** int update_st_nextion_package_flag = 0;
+  22:UARTconfig/Src/uart_configuration.c **** 
+  23:UARTconfig/Src/uart_configuration.c **** 
+  24:UARTconfig/Src/uart_configuration.c **** void UartDmaInit(void)
+  25:UARTconfig/Src/uart_configuration.c **** {
+  29              		.loc 1 25 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33 0000 08B5     		push	{r3, lr}
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s 			page 2
+
+
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 3, -8
+  36              		.cfi_offset 14, -4
+  26:UARTconfig/Src/uart_configuration.c ****     HAL_UARTEx_ReceiveToIdle_DMA(&huart3, RxBuf, RXBUF_SIZE);
+  37              		.loc 1 26 5 view .LVU1
+  38 0002 0A22     		movs	r2, #10
+  39 0004 0A49     		ldr	r1, .L3
+  40 0006 0B48     		ldr	r0, .L3+4
+  41 0008 FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_DMA
+  42              	.LVL0:
+  27:UARTconfig/Src/uart_configuration.c ****   __HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+  43              		.loc 1 27 3 view .LVU2
+  44 000c 0A4B     		ldr	r3, .L3+8
+  45 000e 1A68     		ldr	r2, [r3]
+  46 0010 1368     		ldr	r3, [r2]
+  47 0012 23F00403 		bic	r3, r3, #4
+  48 0016 1360     		str	r3, [r2]
+  28:UARTconfig/Src/uart_configuration.c **** 
+  29:UARTconfig/Src/uart_configuration.c ****     HAL_UARTEx_ReceiveToIdle_DMA(&huart1, (uint8_t *) rxbuffer_uart1, RXBUF_SIZE);
+  49              		.loc 1 29 5 view .LVU3
+  50 0018 0A22     		movs	r2, #10
+  51 001a 0849     		ldr	r1, .L3+12
+  52 001c 0848     		ldr	r0, .L3+16
+  53 001e FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_DMA
+  54              	.LVL1:
+  30:UARTconfig/Src/uart_configuration.c ****   __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
+  55              		.loc 1 30 3 view .LVU4
+  56 0022 084B     		ldr	r3, .L3+20
+  57 0024 1A68     		ldr	r2, [r3]
+  58 0026 1368     		ldr	r3, [r2]
+  59 0028 23F00403 		bic	r3, r3, #4
+  60 002c 1360     		str	r3, [r2]
+  31:UARTconfig/Src/uart_configuration.c **** }
+  61              		.loc 1 31 1 is_stmt 0 view .LVU5
+  62 002e 08BD     		pop	{r3, pc}
+  63              	.L4:
+  64              		.align	2
+  65              	.L3:
+  66 0030 00000000 		.word	RxBuf
+  67 0034 00000000 		.word	huart3
+  68 0038 00000000 		.word	hdma_usart3_rx
+  69 003c 00000000 		.word	rxbuffer_uart1
+  70 0040 00000000 		.word	huart1
+  71 0044 00000000 		.word	hdma_usart1_rx
+  72              		.cfi_endproc
+  73              	.LFE135:
+  75              		.section	.text.HAL_UARTEx_RxEventCallback,"ax",%progbits
+  76              		.align	1
+  77              		.global	HAL_UARTEx_RxEventCallback
+  78              		.syntax unified
+  79              		.thumb
+  80              		.thumb_func
+  82              	HAL_UARTEx_RxEventCallback:
+  83              	.LVL2:
+  84              	.LFB136:
+  32:UARTconfig/Src/uart_configuration.c **** 
+  33:UARTconfig/Src/uart_configuration.c **** void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s 			page 3
+
+
+  34:UARTconfig/Src/uart_configuration.c **** {
+  85              		.loc 1 34 1 is_stmt 1 view -0
+  86              		.cfi_startproc
+  87              		@ args = 0, pretend = 0, frame = 0
+  88              		@ frame_needed = 0, uses_anonymous_args = 0
+  89              		.loc 1 34 1 is_stmt 0 view .LVU7
+  90 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+  91              		.cfi_def_cfa_offset 24
+  92              		.cfi_offset 4, -24
+  93              		.cfi_offset 5, -20
+  94              		.cfi_offset 6, -16
+  95              		.cfi_offset 7, -12
+  96              		.cfi_offset 8, -8
+  97              		.cfi_offset 14, -4
+  98 0004 0446     		mov	r4, r0
+  99 0006 0D46     		mov	r5, r1
+  35:UARTconfig/Src/uart_configuration.c ****   if (huart->Instance == USART3)
+ 100              		.loc 1 35 3 is_stmt 1 view .LVU8
+ 101              		.loc 1 35 12 is_stmt 0 view .LVU9
+ 102 0008 0068     		ldr	r0, [r0]
+ 103              	.LVL3:
+ 104              		.loc 1 35 6 view .LVU10
+ 105 000a 244B     		ldr	r3, .L13
+ 106 000c 9842     		cmp	r0, r3
+ 107 000e 05D0     		beq	.L11
+ 108              	.LVL4:
+ 109              	.L6:
+  36:UARTconfig/Src/uart_configuration.c ****   {
+  37:UARTconfig/Src/uart_configuration.c ****     uart_dma_flag = DMA_FLAG_ENABLE;
+  38:UARTconfig/Src/uart_configuration.c ****     oldPos = newPos;
+  39:UARTconfig/Src/uart_configuration.c **** 
+  40:UARTconfig/Src/uart_configuration.c ****     memcpy ((uint8_t *)MainBuf+oldPos, RxBuf, Size);
+  41:UARTconfig/Src/uart_configuration.c ****       
+  42:UARTconfig/Src/uart_configuration.c **** 
+  43:UARTconfig/Src/uart_configuration.c ****     newPos = Size+oldPos;
+  44:UARTconfig/Src/uart_configuration.c **** 
+  45:UARTconfig/Src/uart_configuration.c ****     HAL_UARTEx_ReceiveToIdle_DMA(&huart3, (uint8_t *) RxBuf, RXBUF_SIZE);
+  46:UARTconfig/Src/uart_configuration.c ****     __HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+  47:UARTconfig/Src/uart_configuration.c **** 
+  48:UARTconfig/Src/uart_configuration.c ****     
+  49:UARTconfig/Src/uart_configuration.c ****   }
+  50:UARTconfig/Src/uart_configuration.c **** 
+  51:UARTconfig/Src/uart_configuration.c ****   if(huart->Instance == USART1)
+ 110              		.loc 1 51 3 is_stmt 1 view .LVU11
+ 111              		.loc 1 51 11 is_stmt 0 view .LVU12
+ 112 0010 2068     		ldr	r0, [r4]
+ 113              		.loc 1 51 5 view .LVU13
+ 114 0012 234B     		ldr	r3, .L13+4
+ 115 0014 9842     		cmp	r0, r3
+ 116 0016 21D0     		beq	.L12
+ 117              	.L5:
+  52:UARTconfig/Src/uart_configuration.c ****   {
+  53:UARTconfig/Src/uart_configuration.c ****     // serial_message(" [[%d",rxbuffer_uart1[0]);
+  54:UARTconfig/Src/uart_configuration.c ****     // serial_message(" %d",rxbuffer_uart1[1]);
+  55:UARTconfig/Src/uart_configuration.c ****     // serial_message(" %d",rxbuffer_uart1[2]);
+  56:UARTconfig/Src/uart_configuration.c ****     // serial_message(" %d",rxbuffer_uart1[3]);
+  57:UARTconfig/Src/uart_configuration.c ****     // serial_message(" %d",rxbuffer_uart1[4]);
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s 			page 4
+
+
+  58:UARTconfig/Src/uart_configuration.c ****     // serial_message(" %d",rxbuffer_uart1[5]);
+  59:UARTconfig/Src/uart_configuration.c ****     // serial_message(" %d-----]\n",rxbuffer_uart1[6]);
+  60:UARTconfig/Src/uart_configuration.c ****     
+  61:UARTconfig/Src/uart_configuration.c ****     // if(NEXTION_DMA_FLAG == DMA_FLAG_DISABLE)
+  62:UARTconfig/Src/uart_configuration.c ****     // {
+  63:UARTconfig/Src/uart_configuration.c **** 
+  64:UARTconfig/Src/uart_configuration.c ****     NEXTION_DMA_FLAG = DMA_FLAG_ENABLE;
+  65:UARTconfig/Src/uart_configuration.c ****     //update_st_nextion_package_flag = 1;
+  66:UARTconfig/Src/uart_configuration.c ****   
+  67:UARTconfig/Src/uart_configuration.c ****      memcpy(&st_nextion_package, rxbuffer_uart1, sizeof rxbuffer_uart1);
+  68:UARTconfig/Src/uart_configuration.c **** 
+  69:UARTconfig/Src/uart_configuration.c **** 
+  70:UARTconfig/Src/uart_configuration.c **** 
+  71:UARTconfig/Src/uart_configuration.c ****   		for(int i=Size ; i<10; i++)
+  72:UARTconfig/Src/uart_configuration.c ****       {
+  73:UARTconfig/Src/uart_configuration.c **** 			  rxbuffer_uart1[i] = 0;
+  74:UARTconfig/Src/uart_configuration.c **** 		  }
+  75:UARTconfig/Src/uart_configuration.c **** 
+  76:UARTconfig/Src/uart_configuration.c ****     // }
+  77:UARTconfig/Src/uart_configuration.c ****       HAL_UARTEx_ReceiveToIdle_DMA(&huart1, (uint8_t *) rxbuffer_uart1, RXBUF_SIZE);
+  78:UARTconfig/Src/uart_configuration.c ****       __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
+  79:UARTconfig/Src/uart_configuration.c **** 
+  80:UARTconfig/Src/uart_configuration.c ****       
+  81:UARTconfig/Src/uart_configuration.c ****   }
+  82:UARTconfig/Src/uart_configuration.c **** }
+ 118              		.loc 1 82 1 view .LVU14
+ 119 0018 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 120              	.LVL5:
+ 121              	.L11:
+  37:UARTconfig/Src/uart_configuration.c ****     oldPos = newPos;
+ 122              		.loc 1 37 5 is_stmt 1 view .LVU15
+  37:UARTconfig/Src/uart_configuration.c ****     oldPos = newPos;
+ 123              		.loc 1 37 19 is_stmt 0 view .LVU16
+ 124 001c 214B     		ldr	r3, .L13+8
+ 125 001e 0122     		movs	r2, #1
+ 126 0020 1A60     		str	r2, [r3]
+  38:UARTconfig/Src/uart_configuration.c **** 
+ 127              		.loc 1 38 5 is_stmt 1 view .LVU17
+  38:UARTconfig/Src/uart_configuration.c **** 
+ 128              		.loc 1 38 12 is_stmt 0 view .LVU18
+ 129 0022 214F     		ldr	r7, .L13+12
+ 130 0024 3B88     		ldrh	r3, [r7]
+ 131 0026 DFF8A880 		ldr	r8, .L13+52
+ 132 002a A8F80030 		strh	r3, [r8]	@ movhi
+  40:UARTconfig/Src/uart_configuration.c ****       
+ 133              		.loc 1 40 5 is_stmt 1 view .LVU19
+ 134 002e 1F4E     		ldr	r6, .L13+16
+ 135 0030 0A46     		mov	r2, r1
+ 136 0032 3146     		mov	r1, r6
+ 137              	.LVL6:
+  40:UARTconfig/Src/uart_configuration.c ****       
+ 138              		.loc 1 40 5 is_stmt 0 view .LVU20
+ 139 0034 1E48     		ldr	r0, .L13+20
+ 140 0036 1844     		add	r0, r0, r3
+ 141 0038 FFF7FEFF 		bl	memcpy
+ 142              	.LVL7:
+  43:UARTconfig/Src/uart_configuration.c **** 
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s 			page 5
+
+
+ 143              		.loc 1 43 5 is_stmt 1 view .LVU21
+  43:UARTconfig/Src/uart_configuration.c **** 
+ 144              		.loc 1 43 18 is_stmt 0 view .LVU22
+ 145 003c B8F80030 		ldrh	r3, [r8]
+ 146 0040 2B44     		add	r3, r3, r5
+  43:UARTconfig/Src/uart_configuration.c **** 
+ 147              		.loc 1 43 12 view .LVU23
+ 148 0042 3B80     		strh	r3, [r7]	@ movhi
+  45:UARTconfig/Src/uart_configuration.c ****     __HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+ 149              		.loc 1 45 5 is_stmt 1 view .LVU24
+ 150 0044 0A22     		movs	r2, #10
+ 151 0046 3146     		mov	r1, r6
+ 152 0048 1A48     		ldr	r0, .L13+24
+ 153 004a FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_DMA
+ 154              	.LVL8:
+  46:UARTconfig/Src/uart_configuration.c **** 
+ 155              		.loc 1 46 5 view .LVU25
+ 156 004e 1A4B     		ldr	r3, .L13+28
+ 157 0050 1A68     		ldr	r2, [r3]
+ 158 0052 1368     		ldr	r3, [r2]
+ 159 0054 23F00403 		bic	r3, r3, #4
+ 160 0058 1360     		str	r3, [r2]
+ 161 005a D9E7     		b	.L6
+ 162              	.L12:
+  64:UARTconfig/Src/uart_configuration.c ****     //update_st_nextion_package_flag = 1;
+ 163              		.loc 1 64 5 view .LVU26
+  64:UARTconfig/Src/uart_configuration.c ****     //update_st_nextion_package_flag = 1;
+ 164              		.loc 1 64 22 is_stmt 0 view .LVU27
+ 165 005c 174B     		ldr	r3, .L13+32
+ 166 005e 0122     		movs	r2, #1
+ 167 0060 1A60     		str	r2, [r3]
+  67:UARTconfig/Src/uart_configuration.c **** 
+ 168              		.loc 1 67 6 is_stmt 1 view .LVU28
+ 169 0062 174B     		ldr	r3, .L13+36
+ 170 0064 174A     		ldr	r2, .L13+40
+ 171 0066 92E80300 		ldm	r2, {r0, r1}
+ 172 006a 1860     		str	r0, [r3]
+ 173 006c 9980     		strh	r1, [r3, #4]	@ movhi
+ 174 006e 090C     		lsrs	r1, r1, #16
+ 175 0070 9971     		strb	r1, [r3, #6]
+  71:UARTconfig/Src/uart_configuration.c ****       {
+ 176              		.loc 1 71 5 view .LVU29
+ 177              	.LBB2:
+  71:UARTconfig/Src/uart_configuration.c ****       {
+ 178              		.loc 1 71 9 view .LVU30
+  71:UARTconfig/Src/uart_configuration.c ****       {
+ 179              		.loc 1 71 13 is_stmt 0 view .LVU31
+ 180 0072 2946     		mov	r1, r5
+ 181              	.LVL9:
+  71:UARTconfig/Src/uart_configuration.c ****       {
+ 182              		.loc 1 71 5 view .LVU32
+ 183 0074 03E0     		b	.L8
+ 184              	.L9:
+  73:UARTconfig/Src/uart_configuration.c **** 		  }
+ 185              		.loc 1 73 6 is_stmt 1 view .LVU33
+  73:UARTconfig/Src/uart_configuration.c **** 		  }
+ 186              		.loc 1 73 24 is_stmt 0 view .LVU34
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s 			page 6
+
+
+ 187 0076 134B     		ldr	r3, .L13+40
+ 188 0078 0022     		movs	r2, #0
+ 189 007a 5A54     		strb	r2, [r3, r1]
+  71:UARTconfig/Src/uart_configuration.c ****       {
+ 190              		.loc 1 71 29 is_stmt 1 discriminator 3 view .LVU35
+ 191 007c 0131     		adds	r1, r1, #1
+ 192              	.LVL10:
+ 193              	.L8:
+  71:UARTconfig/Src/uart_configuration.c ****       {
+ 194              		.loc 1 71 23 discriminator 1 view .LVU36
+ 195 007e 0929     		cmp	r1, #9
+ 196 0080 F9DD     		ble	.L9
+ 197              	.LBE2:
+  77:UARTconfig/Src/uart_configuration.c ****       __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
+ 198              		.loc 1 77 7 view .LVU37
+ 199 0082 0A22     		movs	r2, #10
+ 200 0084 0F49     		ldr	r1, .L13+40
+ 201              	.LVL11:
+  77:UARTconfig/Src/uart_configuration.c ****       __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
+ 202              		.loc 1 77 7 is_stmt 0 view .LVU38
+ 203 0086 1048     		ldr	r0, .L13+44
+ 204 0088 FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_DMA
+ 205              	.LVL12:
+  78:UARTconfig/Src/uart_configuration.c **** 
+ 206              		.loc 1 78 7 is_stmt 1 view .LVU39
+ 207 008c 0F4B     		ldr	r3, .L13+48
+ 208 008e 1A68     		ldr	r2, [r3]
+ 209 0090 1368     		ldr	r3, [r2]
+ 210 0092 23F00403 		bic	r3, r3, #4
+ 211 0096 1360     		str	r3, [r2]
+ 212              		.loc 1 82 1 is_stmt 0 view .LVU40
+ 213 0098 BEE7     		b	.L5
+ 214              	.L14:
+ 215 009a 00BF     		.align	2
+ 216              	.L13:
+ 217 009c 00480040 		.word	1073760256
+ 218 00a0 00380140 		.word	1073821696
+ 219 00a4 00000000 		.word	uart_dma_flag
+ 220 00a8 00000000 		.word	newPos
+ 221 00ac 00000000 		.word	RxBuf
+ 222 00b0 00000000 		.word	MainBuf
+ 223 00b4 00000000 		.word	huart3
+ 224 00b8 00000000 		.word	hdma_usart3_rx
+ 225 00bc 00000000 		.word	NEXTION_DMA_FLAG
+ 226 00c0 00000000 		.word	st_nextion_package
+ 227 00c4 00000000 		.word	rxbuffer_uart1
+ 228 00c8 00000000 		.word	huart1
+ 229 00cc 00000000 		.word	hdma_usart1_rx
+ 230 00d0 00000000 		.word	oldPos
+ 231              		.cfi_endproc
+ 232              	.LFE136:
+ 234              		.section	.text.get_st_nextion_package,"ax",%progbits
+ 235              		.align	1
+ 236              		.global	get_st_nextion_package
+ 237              		.syntax unified
+ 238              		.thumb
+ 239              		.thumb_func
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s 			page 7
+
+
+ 241              	get_st_nextion_package:
+ 242              	.LVL13:
+ 243              	.LFB137:
+  83:UARTconfig/Src/uart_configuration.c **** 
+  84:UARTconfig/Src/uart_configuration.c **** NEXTION_PackageTypeDef get_st_nextion_package(void)
+  85:UARTconfig/Src/uart_configuration.c **** {
+ 244              		.loc 1 85 1 is_stmt 1 view -0
+ 245              		.cfi_startproc
+ 246              		@ args = 0, pretend = 0, frame = 0
+ 247              		@ frame_needed = 0, uses_anonymous_args = 0
+ 248              		@ link register save eliminated.
+ 249              		.loc 1 85 1 is_stmt 0 view .LVU42
+ 250 0000 0346     		mov	r3, r0
+  86:UARTconfig/Src/uart_configuration.c ****   return st_nextion_package;
+ 251              		.loc 1 86 3 is_stmt 1 view .LVU43
+ 252              		.loc 1 86 10 is_stmt 0 view .LVU44
+ 253 0002 044A     		ldr	r2, .L16
+ 254 0004 1068     		ldr	r0, [r2]
+ 255              	.LVL14:
+ 256              		.loc 1 86 10 view .LVU45
+ 257 0006 1860     		str	r0, [r3]	@ unaligned
+ 258 0008 9188     		ldrh	r1, [r2, #4]	@ unaligned
+ 259 000a 9279     		ldrb	r2, [r2, #6]	@ zero_extendqisi2
+ 260 000c 9980     		strh	r1, [r3, #4]	@ unaligned
+ 261 000e 9A71     		strb	r2, [r3, #6]
+  87:UARTconfig/Src/uart_configuration.c **** }...
+ 262              		.loc 1 87 1 view .LVU46
+ 263 0010 1846     		mov	r0, r3
+ 264 0012 7047     		bx	lr
+ 265              	.L17:
+ 266              		.align	2
+ 267              	.L16:
+ 268 0014 00000000 		.word	st_nextion_package
+ 269              		.cfi_endproc
+ 270              	.LFE137:
+ 272              		.global	update_st_nextion_package_flag
+ 273              		.section	.bss.update_st_nextion_package_flag,"aw",%nobits
+ 274              		.align	2
+ 277              	update_st_nextion_package_flag:
+ 278 0000 00000000 		.space	4
+ 279              		.global	NEXTION_DMA_FLAG
+ 280              		.section	.bss.NEXTION_DMA_FLAG,"aw",%nobits
+ 281              		.align	2
+ 284              	NEXTION_DMA_FLAG:
+ 285 0000 00000000 		.space	4
+ 286              		.global	uart_dma_flag
+ 287              		.section	.bss.uart_dma_flag,"aw",%nobits
+ 288              		.align	2
+ 291              	uart_dma_flag:
+ 292 0000 00000000 		.space	4
+ 293              		.global	MainBuf
+ 294              		.section	.bss.MainBuf,"aw",%nobits
+ 295              		.align	2
+ 298              	MainBuf:
+ 299 0000 00000000 		.space	128
+ 299      00000000 
+ 299      00000000 
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s 			page 8
+
+
+ 299      00000000 
+ 299      00000000 
+ 300              		.global	newPos
+ 301              		.section	.bss.newPos,"aw",%nobits
+ 302              		.align	1
+ 305              	newPos:
+ 306 0000 0000     		.space	2
+ 307              		.global	oldPos
+ 308              		.section	.bss.oldPos,"aw",%nobits
+ 309              		.align	1
+ 312              	oldPos:
+ 313 0000 0000     		.space	2
+ 314              		.global	rxbuffer_uart1
+ 315              		.section	.bss.rxbuffer_uart1,"aw",%nobits
+ 316              		.align	2
+ 319              	rxbuffer_uart1:
+ 320 0000 00000000 		.space	7
+ 320      000000
+ 321              		.section	.bss.RxBuf,"aw",%nobits
+ 322              		.align	2
+ 325              	RxBuf:
+ 326 0000 00000000 		.space	10
+ 326      00000000 
+ 326      0000
+ 327              		.section	.bss.st_nextion_package,"aw",%nobits
+ 328              		.align	2
+ 331              	st_nextion_package:
+ 332 0000 00000000 		.space	7
+ 332      000000
+ 333              		.text
+ 334              	.Letext0:
+ 335              		.file 2 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 336              		.file 3 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 337              		.file 4 "Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g431xx.h"
+ 338              		.file 5 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 339              		.file 6 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_def.h"
+ 340              		.file 7 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_dma.h"
+ 341              		.file 8 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h"
+ 342              		.file 9 "NEXTIONconfig/Inc/nextion.h"
+ 343              		.file 10 "UARTconfig/Inc/uart_configuration.h"
+ 344              		.file 11 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev
+ 345              		.file 12 "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h"
+ 346              		.file 13 "<built-in>"
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s 			page 9
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 uart_configuration.c
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:21     .text.UartDmaInit:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:27     .text.UartDmaInit:00000000 UartDmaInit
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:66     .text.UartDmaInit:00000030 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:325    .bss.RxBuf:00000000 RxBuf
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:319    .bss.rxbuffer_uart1:00000000 rxbuffer_uart1
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:76     .text.HAL_UARTEx_RxEventCallback:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:82     .text.HAL_UARTEx_RxEventCallback:00000000 HAL_UARTEx_RxEventCallback
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:217    .text.HAL_UARTEx_RxEventCallback:0000009c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:291    .bss.uart_dma_flag:00000000 uart_dma_flag
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:305    .bss.newPos:00000000 newPos
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:298    .bss.MainBuf:00000000 MainBuf
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:284    .bss.NEXTION_DMA_FLAG:00000000 NEXTION_DMA_FLAG
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:331    .bss.st_nextion_package:00000000 st_nextion_package
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:312    .bss.oldPos:00000000 oldPos
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:235    .text.get_st_nextion_package:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:241    .text.get_st_nextion_package:00000000 get_st_nextion_package
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:268    .text.get_st_nextion_package:00000014 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:277    .bss.update_st_nextion_package_flag:00000000 update_st_nextion_package_flag
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:274    .bss.update_st_nextion_package_flag:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:281    .bss.NEXTION_DMA_FLAG:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:288    .bss.uart_dma_flag:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:295    .bss.MainBuf:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:302    .bss.newPos:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:309    .bss.oldPos:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:316    .bss.rxbuffer_uart1:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:322    .bss.RxBuf:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccfhlQ1d.s:328    .bss.st_nextion_package:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_UARTEx_ReceiveToIdle_DMA
+huart3
+hdma_usart3_rx
+huart1
+hdma_usart1_rx
+memcpy

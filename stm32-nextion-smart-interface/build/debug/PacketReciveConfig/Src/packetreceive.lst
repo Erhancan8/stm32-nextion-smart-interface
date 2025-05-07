@@ -1,0 +1,852 @@
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"packetreceive.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "PacketReciveConfig/Src/packetreceive.c"
+  20              		.section	.text.getStartByte,"ax",%progbits
+  21              		.align	1
+  22              		.global	getStartByte
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	getStartByte:
+  28              	.LVL0:
+  29              	.LFB136:
+   1:PacketReciveConfig/Src/packetreceive.c **** #include "packetreceive.h"
+   2:PacketReciveConfig/Src/packetreceive.c **** 
+   3:PacketReciveConfig/Src/packetreceive.c **** static packet_data packetData;
+   4:PacketReciveConfig/Src/packetreceive.c **** static packet_steps_t packet_steps;
+   5:PacketReciveConfig/Src/packetreceive.c **** 
+   6:PacketReciveConfig/Src/packetreceive.c **** func_ptr function_ptr[] = { 
+   7:PacketReciveConfig/Src/packetreceive.c ****     NULL,
+   8:PacketReciveConfig/Src/packetreceive.c ****     getStartByte,
+   9:PacketReciveConfig/Src/packetreceive.c ****     getLenght,
+  10:PacketReciveConfig/Src/packetreceive.c ****     getPayloud,
+  11:PacketReciveConfig/Src/packetreceive.c ****     getCrc,
+  12:PacketReciveConfig/Src/packetreceive.c ****     getStopByte
+  13:PacketReciveConfig/Src/packetreceive.c **** 
+  14:PacketReciveConfig/Src/packetreceive.c **** };
+  15:PacketReciveConfig/Src/packetreceive.c **** 
+  16:PacketReciveConfig/Src/packetreceive.c **** 
+  17:PacketReciveConfig/Src/packetreceive.c **** int isPacketValid(uint8_t* data, uint8_t lenght)
+  18:PacketReciveConfig/Src/packetreceive.c **** {
+  19:PacketReciveConfig/Src/packetreceive.c ****     if(data[0] != START_STOP_BYTE)
+  20:PacketReciveConfig/Src/packetreceive.c ****     {
+  21:PacketReciveConfig/Src/packetreceive.c ****         serial_message("wrong start byte. start byte should be 0x7E");
+  22:PacketReciveConfig/Src/packetreceive.c ****         return 1;
+  23:PacketReciveConfig/Src/packetreceive.c ****     }
+  24:PacketReciveConfig/Src/packetreceive.c ****     if( memchr(data+1,START_STOP_BYTE,lenght) == NULL)
+  25:PacketReciveConfig/Src/packetreceive.c ****     {
+  26:PacketReciveConfig/Src/packetreceive.c ****         serial_message("wrong stop byte. stop byte should be 0x7E");
+  27:PacketReciveConfig/Src/packetreceive.c ****         return 1;
+  28:PacketReciveConfig/Src/packetreceive.c **** 
+  29:PacketReciveConfig/Src/packetreceive.c ****     }
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 2
+
+
+  30:PacketReciveConfig/Src/packetreceive.c ****     
+  31:PacketReciveConfig/Src/packetreceive.c ****     if(data[data[1] + 5] != START_STOP_BYTE)
+  32:PacketReciveConfig/Src/packetreceive.c ****     {
+  33:PacketReciveConfig/Src/packetreceive.c ****         serial_message("wrong lenght. lenght should be %d",data[1]+6);
+  34:PacketReciveConfig/Src/packetreceive.c ****          return 1;
+  35:PacketReciveConfig/Src/packetreceive.c ****     }
+  36:PacketReciveConfig/Src/packetreceive.c ****     return 0;
+  37:PacketReciveConfig/Src/packetreceive.c **** }
+  38:PacketReciveConfig/Src/packetreceive.c **** 
+  39:PacketReciveConfig/Src/packetreceive.c **** packet_data getStartByte(uint8_t* data)
+  40:PacketReciveConfig/Src/packetreceive.c **** {
+  30              		.loc 1 40 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 40 1 is_stmt 0 view .LVU1
+  35 0000 10B5     		push	{r4, lr}
+  36              		.cfi_def_cfa_offset 8
+  37              		.cfi_offset 4, -8
+  38              		.cfi_offset 14, -4
+  39 0002 0446     		mov	r4, r0
+  41:PacketReciveConfig/Src/packetreceive.c ****     packetData.Start_byte = data[0];
+  40              		.loc 1 41 5 is_stmt 1 view .LVU2
+  41              		.loc 1 41 33 is_stmt 0 view .LVU3
+  42 0004 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+  43              		.loc 1 41 27 view .LVU4
+  44 0006 0449     		ldr	r1, .L3
+  45              	.LVL1:
+  46              		.loc 1 41 27 view .LVU5
+  47 0008 0B70     		strb	r3, [r1]
+  42:PacketReciveConfig/Src/packetreceive.c ****     return packetData;
+  48              		.loc 1 42 5 is_stmt 1 view .LVU6
+  49              		.loc 1 42 12 is_stmt 0 view .LVU7
+  50 000a 40F20512 		movw	r2, #261
+  51 000e FFF7FEFF 		bl	memcpy
+  52              	.LVL2:
+  43:PacketReciveConfig/Src/packetreceive.c **** }
+  53              		.loc 1 43 1 view .LVU8
+  54 0012 2046     		mov	r0, r4
+  55 0014 10BD     		pop	{r4, pc}
+  56              	.LVL3:
+  57              	.L4:
+  58              		.loc 1 43 1 view .LVU9
+  59 0016 00BF     		.align	2
+  60              	.L3:
+  61 0018 00000000 		.word	packetData
+  62              		.cfi_endproc
+  63              	.LFE136:
+  65              		.section	.text.getLenght,"ax",%progbits
+  66              		.align	1
+  67              		.global	getLenght
+  68              		.syntax unified
+  69              		.thumb
+  70              		.thumb_func
+  72              	getLenght:
+  73              	.LVL4:
+  74              	.LFB137:
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 3
+
+
+  44:PacketReciveConfig/Src/packetreceive.c **** 
+  45:PacketReciveConfig/Src/packetreceive.c **** packet_data getLenght(uint8_t* data)
+  46:PacketReciveConfig/Src/packetreceive.c **** {
+  75              		.loc 1 46 1 is_stmt 1 view -0
+  76              		.cfi_startproc
+  77              		@ args = 0, pretend = 0, frame = 0
+  78              		@ frame_needed = 0, uses_anonymous_args = 0
+  79              		.loc 1 46 1 is_stmt 0 view .LVU11
+  80 0000 10B5     		push	{r4, lr}
+  81              		.cfi_def_cfa_offset 8
+  82              		.cfi_offset 4, -8
+  83              		.cfi_offset 14, -4
+  84 0002 0446     		mov	r4, r0
+  47:PacketReciveConfig/Src/packetreceive.c ****     packetData.Data_Lengh = data[1];
+  85              		.loc 1 47 5 is_stmt 1 view .LVU12
+  86              		.loc 1 47 27 is_stmt 0 view .LVU13
+  87 0004 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+  88 0006 0449     		ldr	r1, .L7
+  89              	.LVL5:
+  90              		.loc 1 47 27 view .LVU14
+  91 0008 4B70     		strb	r3, [r1, #1]
+  48:PacketReciveConfig/Src/packetreceive.c ****     return packetData;
+  92              		.loc 1 48 5 is_stmt 1 view .LVU15
+  93              		.loc 1 48 12 is_stmt 0 view .LVU16
+  94 000a 40F20512 		movw	r2, #261
+  95 000e FFF7FEFF 		bl	memcpy
+  96              	.LVL6:
+  49:PacketReciveConfig/Src/packetreceive.c **** }
+  97              		.loc 1 49 1 view .LVU17
+  98 0012 2046     		mov	r0, r4
+  99 0014 10BD     		pop	{r4, pc}
+ 100              	.LVL7:
+ 101              	.L8:
+ 102              		.loc 1 49 1 view .LVU18
+ 103 0016 00BF     		.align	2
+ 104              	.L7:
+ 105 0018 00000000 		.word	packetData
+ 106              		.cfi_endproc
+ 107              	.LFE137:
+ 109              		.section	.text.getCrc,"ax",%progbits
+ 110              		.align	1
+ 111              		.global	getCrc
+ 112              		.syntax unified
+ 113              		.thumb
+ 114              		.thumb_func
+ 116              	getCrc:
+ 117              	.LVL8:
+ 118              	.LFB139:
+  50:PacketReciveConfig/Src/packetreceive.c **** 
+  51:PacketReciveConfig/Src/packetreceive.c **** packet_data getPayloud(uint8_t* data)
+  52:PacketReciveConfig/Src/packetreceive.c **** {
+  53:PacketReciveConfig/Src/packetreceive.c ****     memcpy(packetData.Payload, data+2, packetData.Data_Lengh);
+  54:PacketReciveConfig/Src/packetreceive.c ****     return packetData;
+  55:PacketReciveConfig/Src/packetreceive.c **** }
+  56:PacketReciveConfig/Src/packetreceive.c **** 
+  57:PacketReciveConfig/Src/packetreceive.c **** packet_data getCrc (uint8_t* data)
+  58:PacketReciveConfig/Src/packetreceive.c **** {
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 4
+
+
+ 119              		.loc 1 58 1 is_stmt 1 view -0
+ 120              		.cfi_startproc
+ 121              		@ args = 0, pretend = 0, frame = 0
+ 122              		@ frame_needed = 0, uses_anonymous_args = 0
+ 123              		.loc 1 58 1 is_stmt 0 view .LVU20
+ 124 0000 10B5     		push	{r4, lr}
+ 125              		.cfi_def_cfa_offset 8
+ 126              		.cfi_offset 4, -8
+ 127              		.cfi_offset 14, -4
+ 128 0002 0446     		mov	r4, r0
+ 129 0004 0A46     		mov	r2, r1
+  59:PacketReciveConfig/Src/packetreceive.c ****     memcpy(packetData.CRC_byte, data+2+packetData.Data_Lengh, 3);
+ 130              		.loc 1 59 5 is_stmt 1 view .LVU21
+ 131              		.loc 1 59 50 is_stmt 0 view .LVU22
+ 132 0006 0949     		ldr	r1, .L11
+ 133              	.LVL9:
+ 134              		.loc 1 59 50 view .LVU23
+ 135 0008 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+ 136              		.loc 1 59 39 view .LVU24
+ 137 000a 0233     		adds	r3, r3, #2
+ 138 000c 02EB030C 		add	ip, r2, r3
+ 139              		.loc 1 59 5 view .LVU25
+ 140 0010 D25A     		ldrh	r2, [r2, r3]	@ unaligned
+ 141              	.LVL10:
+ 142              		.loc 1 59 5 view .LVU26
+ 143 0012 9CF80230 		ldrb	r3, [ip, #2]	@ zero_extendqisi2
+ 144 0016 A1F80121 		strh	r2, [r1, #257]	@ unaligned
+ 145 001a 81F80331 		strb	r3, [r1, #259]
+  60:PacketReciveConfig/Src/packetreceive.c ****     return packetData;
+ 146              		.loc 1 60 5 is_stmt 1 view .LVU27
+ 147              		.loc 1 60 12 is_stmt 0 view .LVU28
+ 148 001e 40F20512 		movw	r2, #261
+ 149 0022 FFF7FEFF 		bl	memcpy
+ 150              	.LVL11:
+  61:PacketReciveConfig/Src/packetreceive.c **** }
+ 151              		.loc 1 61 1 view .LVU29
+ 152 0026 2046     		mov	r0, r4
+ 153 0028 10BD     		pop	{r4, pc}
+ 154              	.LVL12:
+ 155              	.L12:
+ 156              		.loc 1 61 1 view .LVU30
+ 157 002a 00BF     		.align	2
+ 158              	.L11:
+ 159 002c 00000000 		.word	packetData
+ 160              		.cfi_endproc
+ 161              	.LFE139:
+ 163              		.section	.text.getStopByte,"ax",%progbits
+ 164              		.align	1
+ 165              		.global	getStopByte
+ 166              		.syntax unified
+ 167              		.thumb
+ 168              		.thumb_func
+ 170              	getStopByte:
+ 171              	.LVL13:
+ 172              	.LFB140:
+  62:PacketReciveConfig/Src/packetreceive.c **** 
+  63:PacketReciveConfig/Src/packetreceive.c **** packet_data getStopByte(uint8_t* data)
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 5
+
+
+  64:PacketReciveConfig/Src/packetreceive.c **** {
+ 173              		.loc 1 64 1 is_stmt 1 view -0
+ 174              		.cfi_startproc
+ 175              		@ args = 0, pretend = 0, frame = 0
+ 176              		@ frame_needed = 0, uses_anonymous_args = 0
+ 177              		.loc 1 64 1 is_stmt 0 view .LVU32
+ 178 0000 10B5     		push	{r4, lr}
+ 179              		.cfi_def_cfa_offset 8
+ 180              		.cfi_offset 4, -8
+ 181              		.cfi_offset 14, -4
+ 182 0002 0446     		mov	r4, r0
+  65:PacketReciveConfig/Src/packetreceive.c ****     packetData.Stop_byte = data[5+packetData.Data_Lengh];
+ 183              		.loc 1 65 5 is_stmt 1 view .LVU33
+ 184              		.loc 1 65 45 is_stmt 0 view .LVU34
+ 185 0004 064B     		ldr	r3, .L15
+ 186 0006 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+ 187              		.loc 1 65 34 view .LVU35
+ 188 0008 0532     		adds	r2, r2, #5
+ 189              		.loc 1 65 32 view .LVU36
+ 190 000a 8A5C     		ldrb	r2, [r1, r2]	@ zero_extendqisi2
+ 191              		.loc 1 65 26 view .LVU37
+ 192 000c 83F80421 		strb	r2, [r3, #260]
+  66:PacketReciveConfig/Src/packetreceive.c ****     return packetData;
+ 193              		.loc 1 66 5 is_stmt 1 view .LVU38
+ 194              		.loc 1 66 12 is_stmt 0 view .LVU39
+ 195 0010 40F20512 		movw	r2, #261
+ 196 0014 1946     		mov	r1, r3
+ 197              	.LVL14:
+ 198              		.loc 1 66 12 view .LVU40
+ 199 0016 FFF7FEFF 		bl	memcpy
+ 200              	.LVL15:
+  67:PacketReciveConfig/Src/packetreceive.c **** }
+ 201              		.loc 1 67 1 view .LVU41
+ 202 001a 2046     		mov	r0, r4
+ 203 001c 10BD     		pop	{r4, pc}
+ 204              	.LVL16:
+ 205              	.L16:
+ 206              		.loc 1 67 1 view .LVU42
+ 207 001e 00BF     		.align	2
+ 208              	.L15:
+ 209 0020 00000000 		.word	packetData
+ 210              		.cfi_endproc
+ 211              	.LFE140:
+ 213              		.section	.text.getPayloud,"ax",%progbits
+ 214              		.align	1
+ 215              		.global	getPayloud
+ 216              		.syntax unified
+ 217              		.thumb
+ 218              		.thumb_func
+ 220              	getPayloud:
+ 221              	.LVL17:
+ 222              	.LFB138:
+  52:PacketReciveConfig/Src/packetreceive.c ****     memcpy(packetData.Payload, data+2, packetData.Data_Lengh);
+ 223              		.loc 1 52 1 is_stmt 1 view -0
+ 224              		.cfi_startproc
+ 225              		@ args = 0, pretend = 0, frame = 0
+ 226              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 6
+
+
+  52:PacketReciveConfig/Src/packetreceive.c ****     memcpy(packetData.Payload, data+2, packetData.Data_Lengh);
+ 227              		.loc 1 52 1 is_stmt 0 view .LVU44
+ 228 0000 38B5     		push	{r3, r4, r5, lr}
+ 229              		.cfi_def_cfa_offset 16
+ 230              		.cfi_offset 3, -16
+ 231              		.cfi_offset 4, -12
+ 232              		.cfi_offset 5, -8
+ 233              		.cfi_offset 14, -4
+ 234 0002 0446     		mov	r4, r0
+  53:PacketReciveConfig/Src/packetreceive.c ****     return packetData;
+ 235              		.loc 1 53 5 is_stmt 1 view .LVU45
+  53:PacketReciveConfig/Src/packetreceive.c ****     return packetData;
+ 236              		.loc 1 53 50 is_stmt 0 view .LVU46
+ 237 0004 064D     		ldr	r5, .L19
+  53:PacketReciveConfig/Src/packetreceive.c ****     return packetData;
+ 238              		.loc 1 53 5 view .LVU47
+ 239 0006 6A78     		ldrb	r2, [r5, #1]	@ zero_extendqisi2
+ 240 0008 0231     		adds	r1, r1, #2
+ 241              	.LVL18:
+  53:PacketReciveConfig/Src/packetreceive.c ****     return packetData;
+ 242              		.loc 1 53 5 view .LVU48
+ 243 000a A81C     		adds	r0, r5, #2
+ 244              	.LVL19:
+  53:PacketReciveConfig/Src/packetreceive.c ****     return packetData;
+ 245              		.loc 1 53 5 view .LVU49
+ 246 000c FFF7FEFF 		bl	memcpy
+ 247              	.LVL20:
+  54:PacketReciveConfig/Src/packetreceive.c **** }
+ 248              		.loc 1 54 5 is_stmt 1 view .LVU50
+  54:PacketReciveConfig/Src/packetreceive.c **** }
+ 249              		.loc 1 54 12 is_stmt 0 view .LVU51
+ 250 0010 40F20512 		movw	r2, #261
+ 251 0014 2946     		mov	r1, r5
+ 252 0016 2046     		mov	r0, r4
+ 253 0018 FFF7FEFF 		bl	memcpy
+ 254              	.LVL21:
+  55:PacketReciveConfig/Src/packetreceive.c **** 
+ 255              		.loc 1 55 1 view .LVU52
+ 256 001c 2046     		mov	r0, r4
+ 257 001e 38BD     		pop	{r3, r4, r5, pc}
+ 258              	.LVL22:
+ 259              	.L20:
+  55:PacketReciveConfig/Src/packetreceive.c **** 
+ 260              		.loc 1 55 1 view .LVU53
+ 261              		.align	2
+ 262              	.L19:
+ 263 0020 00000000 		.word	packetData
+ 264              		.cfi_endproc
+ 265              	.LFE138:
+ 267              		.section	.rodata.isPacketValid.str1.4,"aMS",%progbits,1
+ 268              		.align	2
+ 269              	.LC0:
+ 270 0000 77726F6E 		.ascii	"wrong start byte. start byte should be 0x7E\000"
+ 270      67207374 
+ 270      61727420 
+ 270      62797465 
+ 270      2E207374 
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 7
+
+
+ 271              		.align	2
+ 272              	.LC1:
+ 273 002c 77726F6E 		.ascii	"wrong stop byte. stop byte should be 0x7E\000"
+ 273      67207374 
+ 273      6F702062 
+ 273      7974652E 
+ 273      2073746F 
+ 274 0056 0000     		.align	2
+ 275              	.LC2:
+ 276 0058 77726F6E 		.ascii	"wrong lenght. lenght should be %d\000"
+ 276      67206C65 
+ 276      6E676874 
+ 276      2E206C65 
+ 276      6E676874 
+ 277              		.section	.text.isPacketValid,"ax",%progbits
+ 278              		.align	1
+ 279              		.global	isPacketValid
+ 280              		.syntax unified
+ 281              		.thumb
+ 282              		.thumb_func
+ 284              	isPacketValid:
+ 285              	.LVL23:
+ 286              	.LFB135:
+  18:PacketReciveConfig/Src/packetreceive.c ****     if(data[0] != START_STOP_BYTE)
+ 287              		.loc 1 18 1 is_stmt 1 view -0
+ 288              		.cfi_startproc
+ 289              		@ args = 0, pretend = 0, frame = 0
+ 290              		@ frame_needed = 0, uses_anonymous_args = 0
+  18:PacketReciveConfig/Src/packetreceive.c ****     if(data[0] != START_STOP_BYTE)
+ 291              		.loc 1 18 1 is_stmt 0 view .LVU55
+ 292 0000 10B5     		push	{r4, lr}
+ 293              		.cfi_def_cfa_offset 8
+ 294              		.cfi_offset 4, -8
+ 295              		.cfi_offset 14, -4
+  19:PacketReciveConfig/Src/packetreceive.c ****     {
+ 296              		.loc 1 19 5 is_stmt 1 view .LVU56
+  19:PacketReciveConfig/Src/packetreceive.c ****     {
+ 297              		.loc 1 19 12 is_stmt 0 view .LVU57
+ 298 0002 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+  19:PacketReciveConfig/Src/packetreceive.c ****     {
+ 299              		.loc 1 19 7 view .LVU58
+ 300 0004 7E2B     		cmp	r3, #126
+ 301 0006 0DD1     		bne	.L27
+ 302 0008 0446     		mov	r4, r0
+ 303 000a 0A46     		mov	r2, r1
+  24:PacketReciveConfig/Src/packetreceive.c ****     {
+ 304              		.loc 1 24 5 is_stmt 1 view .LVU59
+  24:PacketReciveConfig/Src/packetreceive.c ****     {
+ 305              		.loc 1 24 9 is_stmt 0 view .LVU60
+ 306 000c 7E21     		movs	r1, #126
+ 307              	.LVL24:
+  24:PacketReciveConfig/Src/packetreceive.c ****     {
+ 308              		.loc 1 24 9 view .LVU61
+ 309 000e 0130     		adds	r0, r0, #1
+ 310              	.LVL25:
+  24:PacketReciveConfig/Src/packetreceive.c ****     {
+ 311              		.loc 1 24 9 view .LVU62
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 8
+
+
+ 312 0010 FFF7FEFF 		bl	memchr
+ 313              	.LVL26:
+  24:PacketReciveConfig/Src/packetreceive.c ****     {
+ 314              		.loc 1 24 7 discriminator 1 view .LVU63
+ 315 0014 58B1     		cbz	r0, .L28
+  31:PacketReciveConfig/Src/packetreceive.c ****     {
+ 316              		.loc 1 31 5 is_stmt 1 view .LVU64
+  31:PacketReciveConfig/Src/packetreceive.c ****     {
+ 317              		.loc 1 31 17 is_stmt 0 view .LVU65
+ 318 0016 6178     		ldrb	r1, [r4, #1]	@ zero_extendqisi2
+  31:PacketReciveConfig/Src/packetreceive.c ****     {
+ 319              		.loc 1 31 12 view .LVU66
+ 320 0018 0C44     		add	r4, r4, r1
+ 321              	.LVL27:
+  31:PacketReciveConfig/Src/packetreceive.c ****     {
+ 322              		.loc 1 31 12 view .LVU67
+ 323 001a 6379     		ldrb	r3, [r4, #5]	@ zero_extendqisi2
+  31:PacketReciveConfig/Src/packetreceive.c ****     {
+ 324              		.loc 1 31 7 view .LVU68
+ 325 001c 7E2B     		cmp	r3, #126
+ 326 001e 0BD1     		bne	.L29
+  36:PacketReciveConfig/Src/packetreceive.c **** }
+ 327              		.loc 1 36 12 view .LVU69
+ 328 0020 0020     		movs	r0, #0
+ 329              	.L21:
+  37:PacketReciveConfig/Src/packetreceive.c **** 
+ 330              		.loc 1 37 1 view .LVU70
+ 331 0022 10BD     		pop	{r4, pc}
+ 332              	.LVL28:
+ 333              	.L27:
+  21:PacketReciveConfig/Src/packetreceive.c ****         return 1;
+ 334              		.loc 1 21 9 is_stmt 1 view .LVU71
+ 335 0024 0748     		ldr	r0, .L30
+ 336              	.LVL29:
+  21:PacketReciveConfig/Src/packetreceive.c ****         return 1;
+ 337              		.loc 1 21 9 is_stmt 0 view .LVU72
+ 338 0026 FFF7FEFF 		bl	serial_message
+ 339              	.LVL30:
+  22:PacketReciveConfig/Src/packetreceive.c ****     }
+ 340              		.loc 1 22 9 is_stmt 1 view .LVU73
+  22:PacketReciveConfig/Src/packetreceive.c ****     }
+ 341              		.loc 1 22 16 is_stmt 0 view .LVU74
+ 342 002a 0120     		movs	r0, #1
+ 343 002c F9E7     		b	.L21
+ 344              	.LVL31:
+ 345              	.L28:
+  26:PacketReciveConfig/Src/packetreceive.c ****         return 1;
+ 346              		.loc 1 26 9 is_stmt 1 view .LVU75
+ 347 002e 0648     		ldr	r0, .L30+4
+ 348 0030 FFF7FEFF 		bl	serial_message
+ 349              	.LVL32:
+  27:PacketReciveConfig/Src/packetreceive.c **** 
+ 350              		.loc 1 27 9 view .LVU76
+  27:PacketReciveConfig/Src/packetreceive.c **** 
+ 351              		.loc 1 27 16 is_stmt 0 view .LVU77
+ 352 0034 0120     		movs	r0, #1
+ 353 0036 F4E7     		b	.L21
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 9
+
+
+ 354              	.LVL33:
+ 355              	.L29:
+  33:PacketReciveConfig/Src/packetreceive.c ****          return 1;
+ 356              		.loc 1 33 9 is_stmt 1 view .LVU78
+ 357 0038 0631     		adds	r1, r1, #6
+ 358 003a 0448     		ldr	r0, .L30+8
+ 359 003c FFF7FEFF 		bl	serial_message
+ 360              	.LVL34:
+  34:PacketReciveConfig/Src/packetreceive.c ****     }
+ 361              		.loc 1 34 10 view .LVU79
+  34:PacketReciveConfig/Src/packetreceive.c ****     }
+ 362              		.loc 1 34 17 is_stmt 0 view .LVU80
+ 363 0040 0120     		movs	r0, #1
+ 364 0042 EEE7     		b	.L21
+ 365              	.L31:
+ 366              		.align	2
+ 367              	.L30:
+ 368 0044 00000000 		.word	.LC0
+ 369 0048 2C000000 		.word	.LC1
+ 370 004c 58000000 		.word	.LC2
+ 371              		.cfi_endproc
+ 372              	.LFE135:
+ 374              		.section	.text.get_packet_steps_state,"ax",%progbits
+ 375              		.align	1
+ 376              		.global	get_packet_steps_state
+ 377              		.syntax unified
+ 378              		.thumb
+ 379              		.thumb_func
+ 381              	get_packet_steps_state:
+ 382              	.LFB141:
+  68:PacketReciveConfig/Src/packetreceive.c **** 
+  69:PacketReciveConfig/Src/packetreceive.c **** 
+  70:PacketReciveConfig/Src/packetreceive.c **** 
+  71:PacketReciveConfig/Src/packetreceive.c **** 
+  72:PacketReciveConfig/Src/packetreceive.c **** 
+  73:PacketReciveConfig/Src/packetreceive.c **** 
+  74:PacketReciveConfig/Src/packetreceive.c **** 
+  75:PacketReciveConfig/Src/packetreceive.c **** packet_steps_t get_packet_steps_state(void) {
+ 383              		.loc 1 75 45 is_stmt 1 view -0
+ 384              		.cfi_startproc
+ 385              		@ args = 0, pretend = 0, frame = 0
+ 386              		@ frame_needed = 0, uses_anonymous_args = 0
+ 387              		@ link register save eliminated.
+  76:PacketReciveConfig/Src/packetreceive.c ****     return packet_steps;
+ 388              		.loc 1 76 5 view .LVU82
+  77:PacketReciveConfig/Src/packetreceive.c **** }
+ 389              		.loc 1 77 1 is_stmt 0 view .LVU83
+ 390 0000 014B     		ldr	r3, .L33
+ 391 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 392 0004 7047     		bx	lr
+ 393              	.L34:
+ 394 0006 00BF     		.align	2
+ 395              	.L33:
+ 396 0008 00000000 		.word	packet_steps
+ 397              		.cfi_endproc
+ 398              	.LFE141:
+ 400              		.section	.text.set_packet_steps_state,"ax",%progbits
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 10
+
+
+ 401              		.align	1
+ 402              		.global	set_packet_steps_state
+ 403              		.syntax unified
+ 404              		.thumb
+ 405              		.thumb_func
+ 407              	set_packet_steps_state:
+ 408              	.LVL35:
+ 409              	.LFB142:
+  78:PacketReciveConfig/Src/packetreceive.c **** 
+  79:PacketReciveConfig/Src/packetreceive.c **** void set_packet_steps_state(packet_steps_t new_state) {
+ 410              		.loc 1 79 55 is_stmt 1 view -0
+ 411              		.cfi_startproc
+ 412              		@ args = 0, pretend = 0, frame = 0
+ 413              		@ frame_needed = 0, uses_anonymous_args = 0
+ 414              		@ link register save eliminated.
+  80:PacketReciveConfig/Src/packetreceive.c ****     packet_steps = new_state;
+ 415              		.loc 1 80 5 view .LVU85
+ 416              		.loc 1 80 18 is_stmt 0 view .LVU86
+ 417 0000 014B     		ldr	r3, .L36
+ 418 0002 1870     		strb	r0, [r3]
+  81:PacketReciveConfig/Src/packetreceive.c **** }
+ 419              		.loc 1 81 1 view .LVU87
+ 420 0004 7047     		bx	lr
+ 421              	.L37:
+ 422 0006 00BF     		.align	2
+ 423              	.L36:
+ 424 0008 00000000 		.word	packet_steps
+ 425              		.cfi_endproc
+ 426              	.LFE142:
+ 428              		.section	.rodata.read_packet.str1.4,"aMS",%progbits,1
+ 429              		.align	2
+ 430              	.LC3:
+ 431 0000 73746172 		.ascii	"start byte:0x%02x\012 \000"
+ 431      74206279 
+ 431      74653A30 
+ 431      78253032 
+ 431      780A2000 
+ 432              		.align	2
+ 433              	.LC4:
+ 434 0014 5061796C 		.ascii	"Payload:0x%02x \000"
+ 434      6F61643A 
+ 434      30782530 
+ 434      32782000 
+ 435              		.align	2
+ 436              	.LC5:
+ 437 0024 0A00     		.ascii	"\012\000"
+ 438 0026 0000     		.align	2
+ 439              	.LC6:
+ 440 0028 4352433A 		.ascii	"CRC:0x%0x \000"
+ 440      30782530 
+ 440      782000
+ 441 0033 00       		.align	2
+ 442              	.LC7:
+ 443 0034 53746F70 		.ascii	"Stop byte:0x%02x \012\000"
+ 443      20627974 
+ 443      653A3078 
+ 443      25303278 
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 11
+
+
+ 443      200A00
+ 444              		.section	.text.read_packet,"ax",%progbits
+ 445              		.align	1
+ 446              		.global	read_packet
+ 447              		.syntax unified
+ 448              		.thumb
+ 449              		.thumb_func
+ 451              	read_packet:
+ 452              	.LFB143:
+  82:PacketReciveConfig/Src/packetreceive.c **** 
+  83:PacketReciveConfig/Src/packetreceive.c **** 
+  84:PacketReciveConfig/Src/packetreceive.c **** 
+  85:PacketReciveConfig/Src/packetreceive.c **** 
+  86:PacketReciveConfig/Src/packetreceive.c **** 
+  87:PacketReciveConfig/Src/packetreceive.c **** 
+  88:PacketReciveConfig/Src/packetreceive.c **** 
+  89:PacketReciveConfig/Src/packetreceive.c **** 
+  90:PacketReciveConfig/Src/packetreceive.c **** 
+  91:PacketReciveConfig/Src/packetreceive.c **** 
+  92:PacketReciveConfig/Src/packetreceive.c **** 
+  93:PacketReciveConfig/Src/packetreceive.c **** 
+  94:PacketReciveConfig/Src/packetreceive.c **** 
+  95:PacketReciveConfig/Src/packetreceive.c **** //      7E 01 C3 AC 31 83 7E 
+  96:PacketReciveConfig/Src/packetreceive.c **** //      7E 02 C1 AA BB 2A AB 7E
+  97:PacketReciveConfig/Src/packetreceive.c **** //      7E 03 C2 AA F1 AF 8A 40 7E
+  98:PacketReciveConfig/Src/packetreceive.c **** //      7E 04 C2 AA F1 F2 AF 8A 40 7E
+  99:PacketReciveConfig/Src/packetreceive.c **** //      7E 05 c3 C2 AA F1 F2 AF 8A 40 7E
+ 100:PacketReciveConfig/Src/packetreceive.c **** //      7E 0a c1 c1 c1 c1 c1 C2 AA F1 F2 F5 AF 8A 40 7E
+ 101:PacketReciveConfig/Src/packetreceive.c **** //      7E 64 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1
+ 102:PacketReciveConfig/Src/packetreceive.c **** 
+ 103:PacketReciveConfig/Src/packetreceive.c **** //      71 01 C3 AC 31 83 7E            7E 01 C3 AC 31 83 71        7E 01 C3 AC 31 83 71 7E
+ 104:PacketReciveConfig/Src/packetreceive.c **** //      71 03 C2 AA F1 AF 8A 40 7E      7E 03 C2 AA F1 AF 8A 40 71  7E 03 C2 AA F1 AF 7E
+ 105:PacketReciveConfig/Src/packetreceive.c **** //          start eror                  stop eror                   lenght eror
+ 106:PacketReciveConfig/Src/packetreceive.c **** 
+ 107:PacketReciveConfig/Src/packetreceive.c ****  
+ 108:PacketReciveConfig/Src/packetreceive.c **** 
+ 109:PacketReciveConfig/Src/packetreceive.c **** 
+ 110:PacketReciveConfig/Src/packetreceive.c **** 
+ 111:PacketReciveConfig/Src/packetreceive.c **** void read_packet(void)
+ 112:PacketReciveConfig/Src/packetreceive.c **** {
+ 453              		.loc 1 112 1 is_stmt 1 view -0
+ 454              		.cfi_startproc
+ 455              		@ args = 0, pretend = 0, frame = 0
+ 456              		@ frame_needed = 0, uses_anonymous_args = 0
+ 457 0000 10B5     		push	{r4, lr}
+ 458              		.cfi_def_cfa_offset 8
+ 459              		.cfi_offset 4, -8
+ 460              		.cfi_offset 14, -4
+ 113:PacketReciveConfig/Src/packetreceive.c ****     serial_message("start byte:0x%02x\n ",packetData.Start_byte);
+ 461              		.loc 1 113 5 view .LVU89
+ 462 0002 174B     		ldr	r3, .L44
+ 463 0004 1978     		ldrb	r1, [r3]	@ zero_extendqisi2
+ 464 0006 1748     		ldr	r0, .L44+4
+ 465 0008 FFF7FEFF 		bl	serial_message
+ 466              	.LVL36:
+ 114:PacketReciveConfig/Src/packetreceive.c ****     for (size_t i = 0; i < packetData.Data_Lengh; i++)
+ 467              		.loc 1 114 5 view .LVU90
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 12
+
+
+ 468              	.LBB2:
+ 469              		.loc 1 114 10 view .LVU91
+ 470              		.loc 1 114 17 is_stmt 0 view .LVU92
+ 471 000c 0024     		movs	r4, #0
+ 472              		.loc 1 114 5 view .LVU93
+ 473 000e 06E0     		b	.L39
+ 474              	.LVL37:
+ 475              	.L40:
+ 115:PacketReciveConfig/Src/packetreceive.c ****     {
+ 116:PacketReciveConfig/Src/packetreceive.c ****         serial_message("Payload:0x%02x ", packetData.Payload[i]);
+ 476              		.loc 1 116 9 is_stmt 1 view .LVU94
+ 477              		.loc 1 116 61 is_stmt 0 view .LVU95
+ 478 0010 134B     		ldr	r3, .L44
+ 479 0012 2344     		add	r3, r3, r4
+ 480              		.loc 1 116 9 view .LVU96
+ 481 0014 9978     		ldrb	r1, [r3, #2]	@ zero_extendqisi2
+ 482 0016 1448     		ldr	r0, .L44+8
+ 483 0018 FFF7FEFF 		bl	serial_message
+ 484              	.LVL38:
+ 114:PacketReciveConfig/Src/packetreceive.c ****     for (size_t i = 0; i < packetData.Data_Lengh; i++)
+ 485              		.loc 1 114 52 is_stmt 1 discriminator 3 view .LVU97
+ 486 001c 0134     		adds	r4, r4, #1
+ 487              	.LVL39:
+ 488              	.L39:
+ 114:PacketReciveConfig/Src/packetreceive.c ****     for (size_t i = 0; i < packetData.Data_Lengh; i++)
+ 489              		.loc 1 114 26 discriminator 1 view .LVU98
+ 114:PacketReciveConfig/Src/packetreceive.c ****     for (size_t i = 0; i < packetData.Data_Lengh; i++)
+ 490              		.loc 1 114 38 is_stmt 0 discriminator 1 view .LVU99
+ 491 001e 104B     		ldr	r3, .L44
+ 492 0020 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 114:PacketReciveConfig/Src/packetreceive.c ****     for (size_t i = 0; i < packetData.Data_Lengh; i++)
+ 493              		.loc 1 114 26 discriminator 1 view .LVU100
+ 494 0022 A342     		cmp	r3, r4
+ 495 0024 F4D8     		bhi	.L40
+ 496              	.LBE2:
+ 117:PacketReciveConfig/Src/packetreceive.c ****     }
+ 118:PacketReciveConfig/Src/packetreceive.c ****     serial_message("\n");
+ 497              		.loc 1 118 5 is_stmt 1 view .LVU101
+ 498 0026 1148     		ldr	r0, .L44+12
+ 499 0028 FFF7FEFF 		bl	serial_message
+ 500              	.LVL40:
+ 119:PacketReciveConfig/Src/packetreceive.c ****     for(size_t i=0 ; i<3; i++)
+ 501              		.loc 1 119 5 view .LVU102
+ 502              	.LBB3:
+ 503              		.loc 1 119 9 view .LVU103
+ 504              		.loc 1 119 16 is_stmt 0 view .LVU104
+ 505 002c 0024     		movs	r4, #0
+ 506              	.LVL41:
+ 507              		.loc 1 119 5 view .LVU105
+ 508 002e 07E0     		b	.L41
+ 509              	.LVL42:
+ 510              	.L42:
+ 120:PacketReciveConfig/Src/packetreceive.c ****     {
+ 121:PacketReciveConfig/Src/packetreceive.c ****         serial_message("CRC:0x%0x ",packetData.CRC_byte[i]);
+ 511              		.loc 1 121 9 is_stmt 1 view .LVU106
+ 512              		.loc 1 121 56 is_stmt 0 view .LVU107
+ 513 0030 0B4B     		ldr	r3, .L44
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 13
+
+
+ 514 0032 2344     		add	r3, r3, r4
+ 515              		.loc 1 121 9 view .LVU108
+ 516 0034 93F80111 		ldrb	r1, [r3, #257]	@ zero_extendqisi2
+ 517 0038 0D48     		ldr	r0, .L44+16
+ 518 003a FFF7FEFF 		bl	serial_message
+ 519              	.LVL43:
+ 119:PacketReciveConfig/Src/packetreceive.c ****     for(size_t i=0 ; i<3; i++)
+ 520              		.loc 1 119 28 is_stmt 1 discriminator 3 view .LVU109
+ 521 003e 0134     		adds	r4, r4, #1
+ 522              	.LVL44:
+ 523              	.L41:
+ 119:PacketReciveConfig/Src/packetreceive.c ****     for(size_t i=0 ; i<3; i++)
+ 524              		.loc 1 119 23 discriminator 1 view .LVU110
+ 525 0040 022C     		cmp	r4, #2
+ 526 0042 F5D9     		bls	.L42
+ 527              	.LBE3:
+ 122:PacketReciveConfig/Src/packetreceive.c ****     }
+ 123:PacketReciveConfig/Src/packetreceive.c ****     serial_message("\n");
+ 528              		.loc 1 123 5 view .LVU111
+ 529 0044 094C     		ldr	r4, .L44+12
+ 530              	.LVL45:
+ 531              		.loc 1 123 5 is_stmt 0 view .LVU112
+ 532 0046 2046     		mov	r0, r4
+ 533 0048 FFF7FEFF 		bl	serial_message
+ 534              	.LVL46:
+ 124:PacketReciveConfig/Src/packetreceive.c ****     serial_message("Stop byte:0x%02x \n",packetData.Stop_byte);
+ 535              		.loc 1 124 5 is_stmt 1 view .LVU113
+ 536 004c 044B     		ldr	r3, .L44
+ 537 004e 93F80411 		ldrb	r1, [r3, #260]	@ zero_extendqisi2
+ 538 0052 0848     		ldr	r0, .L44+20
+ 539 0054 FFF7FEFF 		bl	serial_message
+ 540              	.LVL47:
+ 125:PacketReciveConfig/Src/packetreceive.c ****     serial_message("\n");
+ 541              		.loc 1 125 5 view .LVU114
+ 542 0058 2046     		mov	r0, r4
+ 543 005a FFF7FEFF 		bl	serial_message
+ 544              	.LVL48:
+ 126:PacketReciveConfig/Src/packetreceive.c **** }
+ 545              		.loc 1 126 1 is_stmt 0 view .LVU115
+ 546 005e 10BD     		pop	{r4, pc}
+ 547              	.L45:
+ 548              		.align	2
+ 549              	.L44:
+ 550 0060 00000000 		.word	packetData
+ 551 0064 00000000 		.word	.LC3
+ 552 0068 14000000 		.word	.LC4
+ 553 006c 24000000 		.word	.LC5
+ 554 0070 28000000 		.word	.LC6
+ 555 0074 34000000 		.word	.LC7
+ 556              		.cfi_endproc
+ 557              	.LFE143:
+ 559              		.global	function_ptr
+ 560              		.section	.data.function_ptr,"aw"
+ 561              		.align	2
+ 564              	function_ptr:
+ 565 0000 00000000 		.word	0
+ 566 0004 00000000 		.word	getStartByte
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 14
+
+
+ 567 0008 00000000 		.word	getLenght
+ 568 000c 00000000 		.word	getPayloud
+ 569 0010 00000000 		.word	getCrc
+ 570 0014 00000000 		.word	getStopByte
+ 571              		.section	.bss.packet_steps,"aw",%nobits
+ 574              	packet_steps:
+ 575 0000 00       		.space	1
+ 576              		.section	.bss.packetData,"aw",%nobits
+ 577              		.align	2
+ 580              	packetData:
+ 581 0000 00000000 		.space	261
+ 581      00000000 
+ 581      00000000 
+ 581      00000000 
+ 581      00000000 
+ 582              		.text
+ 583              	.Letext0:
+ 584              		.file 2 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 585              		.file 3 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 586              		.file 4 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 587              		.file 5 "PacketReciveConfig/Inc/packetreceive.h"
+ 588              		.file 6 "C:/Users/STAJYER/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-
+ 589              		.file 7 "Core/Inc/main.h"
+ 590              		.file 8 "<built-in>"
+ARM GAS  C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s 			page 15
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 packetreceive.c
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:21     .text.getStartByte:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:27     .text.getStartByte:00000000 getStartByte
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:61     .text.getStartByte:00000018 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:580    .bss.packetData:00000000 packetData
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:66     .text.getLenght:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:72     .text.getLenght:00000000 getLenght
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:105    .text.getLenght:00000018 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:110    .text.getCrc:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:116    .text.getCrc:00000000 getCrc
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:159    .text.getCrc:0000002c $d
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:164    .text.getStopByte:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:170    .text.getStopByte:00000000 getStopByte
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:209    .text.getStopByte:00000020 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:214    .text.getPayloud:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:220    .text.getPayloud:00000000 getPayloud
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:263    .text.getPayloud:00000020 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:268    .rodata.isPacketValid.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:278    .text.isPacketValid:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:284    .text.isPacketValid:00000000 isPacketValid
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:368    .text.isPacketValid:00000044 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:375    .text.get_packet_steps_state:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:381    .text.get_packet_steps_state:00000000 get_packet_steps_state
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:396    .text.get_packet_steps_state:00000008 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:574    .bss.packet_steps:00000000 packet_steps
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:401    .text.set_packet_steps_state:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:407    .text.set_packet_steps_state:00000000 set_packet_steps_state
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:424    .text.set_packet_steps_state:00000008 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:429    .rodata.read_packet.str1.4:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:445    .text.read_packet:00000000 $t
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:451    .text.read_packet:00000000 read_packet
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:550    .text.read_packet:00000060 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:564    .data.function_ptr:00000000 function_ptr
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:561    .data.function_ptr:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:575    .bss.packet_steps:00000000 $d
+C:\Users\STAJYER\AppData\Local\Temp\ccSV9xu6.s:577    .bss.packetData:00000000 $d
+
+UNDEFINED SYMBOLS
+memcpy
+memchr
+serial_message
